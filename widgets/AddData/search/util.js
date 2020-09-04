@@ -1,98 +1,9 @@
-///////////////////////////////////////////////////////////////////////////
-// Copyright © 2014 - 2018 Esri. All Rights Reserved.
-//
-// Licensed under the Apache License Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//    http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-///////////////////////////////////////////////////////////////////////////
-define(["dojo/_base/array"],
-  function(array) {
-
-    return {
-
-      checkMixedContent: function(uri) {
-        if ((typeof window.location.href === "string") &&
-          (window.location.href.indexOf("https://") === 0)) {
-          if ((typeof uri === "string") && (uri.indexOf("http://") === 0)) {
-            uri = "https:" + uri.substring("5");
-          }
-        }
-        return uri;
-      },
-
-      endsWith: function(sv, sfx) {
-        return (sv.indexOf(sfx, (sv.length - sfx.length)) !== -1);
-      },
-
-      escapeForLucene: function(value) {
-        var a = ['+', '-', '&', '!', '(', ')', '{', '}', '[', ']',
-        '^', '"', '~', '*', '?', ':', '\\'];
-        var r = new RegExp("(\\" + a.join("|\\") + ")", "g");
-        return value.replace(r, "\\$1");
-      },
-
-      findLayersAdded: function(map, itemId) {
-        var ids = [],
-          itemIds = [],
-          layers = [];
-        var response = {
-          itemIds: itemIds,
-          layers: layers
-        };
-        if (!map) {
-          return response;
-        }
-        var checkId = (typeof itemId === "string" && itemId.length > 0);
-        array.forEach(map.layerIds, function(id) {
-          ids.push(id);
-        });
-        array.forEach(map.graphicsLayerIds, function(id) {
-          ids.push(id);
-        });
-        array.forEach(ids, function(id) {
-          var lyr = map.getLayer(id);
-          if (lyr && typeof lyr.xtnItemId === "string" && lyr.xtnItemId.length > 0) {
-            //console.warn("found added layer",lyr);
-            if (!checkId || lyr.xtnItemId === itemId) {
-              layers.push(lyr);
-              if (itemIds.indexOf(lyr.xtnItemId) === -1) {
-                itemIds.push(lyr.xtnItemId);
-              }
-            }
-          }
-        });
-        return response;
-      },
-
-      setNodeText: function(nd, text) {
-        nd.innerHTML = "";
-        if (text) {
-          nd.appendChild(document.createTextNode(text));
-        }
-      },
-
-      setNodeTitle: function(nd, text) {
-        nd.title = "";
-        if (text) {
-          nd.setAttribute("title", text);
-        }
-      },
-
-      setNodeHTML: function(nd, html) {
-        nd.innerHTML = "";
-        if (html) {
-          nd.innerHTML = html;
-        }
-      }
-
-    };
-
-  });
+// All material copyright ESRI, All Rights Reserved, unless otherwise specified.
+// See http://js.arcgis.com/3.15/esri/copyright.txt and http://www.arcgis.com/apps/webappbuilder/copyright.txt for details.
+//>>built
+define(["dojo/_base/array","dojo/aspect","dojo/io-query","esri/InfoTemplate","esri/layers/WFSLayer"],function(e,v,f,w,t){return{checkMixedContent:function(a){"string"===typeof window.location.href&&0===window.location.href.indexOf("https://")&&"string"===typeof a&&0===a.indexOf("http://")&&(a="https:"+a.substring("5"));return a},endsWith:function(a,b){return-1!==a.indexOf(b,a.length-b.length)},escapeForLucene:function(a){return a.replace(/(\+|\-|\&|\!|\(|\)|\{|\}|\[|\]|\^|\"|\~|\*|\?|\:|\\)/g,"\\$1")},
+findLayersAdded:function(a,b){var c=[],d=[],h=[],n={itemIds:d,layers:h};if(!a)return n;var k="string"===typeof b&&0<b.length;e.forEach(a.layerIds,function(a){c.push(a)});e.forEach(a.graphicsLayerIds,function(a){c.push(a)});e.forEach(c,function(c){(c=a.getLayer(c))&&"string"===typeof c.xtnItemId&&0<c.xtnItemId.length&&(!k||c.xtnItemId===b)&&(h.push(c),-1===d.indexOf(c.xtnItemId)&&d.push(c.xtnItemId))});return n},loadWFSByUrl:function(a,b,c,d,h,n){var k,l,e,p,f=this.makeOGCRequestInfo(d);d=f.url;var q=
+new t;k=q.on("error",function(b){k&&k.remove();a.reject(b.error)});q.fromJson(f,function(f){try{if(k&&k.remove(),f&&f.push&&0<f.length){var r=f[0],m={url:d,version:q._version,name:r.name};p=r.name||r.title;if("string"===typeof m.version&&0<m.version.length&&"string"===typeof m.name&&0<m.name.length){var g=new t({id:h,infoTemplate:new w});"string"===typeof p&&0<p.length&&(g.name=p);l=g.on("error",function(b){l&&l.remove();a.reject(b.error)});e=v.after(g,"_describeFeatureTypeResponse",function(){e&&
+e.remove();g.fields&&0<g.fields.length&&c._setFeatureLayerInfoTemplate(g)});g.fromJson(m,function(){l&&l.remove();g.xtnAddData=!0;b&&n&&b.addLayer(g);a.resolve(g)})}else a.reject(Error("Error loading WFSLayer, missing version and/or layer"))}else a.reject(Error("Error loading WFSLayer, no layers"))}catch(u){console.warn("Error loading WFSLayer",d),console.error(u),a.reject(u)}})},makeOGCRequestInfo:function(a){var b={url:a},c=a.indexOf("?");if(-1!==c){b.url=a.substring(0,c);var d;a=a.substring(c+
+1,a.length);if("string"===typeof a&&0<a.length){var h=f.queryToObject(a),e={};if(h){for(d in h)h.hasOwnProperty(d)&&(a=h[d],c=d.toLowerCase(),"request"!==c&&"service"!==c&&("version"===c?"string"===typeof a&&0<a.length&&(b.version=a):"name"===c?"string"===typeof a&&0<a.length&&(b.name=a):e[d]=a));a=f.objectToQuery(e);"string"===typeof a&&0<a.length&&(b.url=b.url+"?"+a)}}}return b},setNodeText:function(a,b){a.innerHTML="";b&&a.appendChild(document.createTextNode(b))},setNodeTitle:function(a,b){a.title=
+"";b&&a.setAttribute("title",b)},setNodeHTML:function(a,b){a.innerHTML="";b&&(a.innerHTML=b)}}});

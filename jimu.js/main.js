@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// Copyright © 2014 - 2018 Esri. All Rights Reserved.
+// Copyright © Esri. All Rights Reserved.
 //
 // Licensed under the Apache License Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -40,33 +40,6 @@ define([
     'esri/IdentityManager',
     'jimu/portalUrlUtils',
     './utils',
-    
-    'widgets/Demo/help/help_Welcome',
-    'widgets/Demo/help/help_Elevation1',
-    'widgets/Demo/help/help_Elevation2',
-    'widgets/Demo/help/help_FeaturedCollections1',
-    'widgets/Demo/help/help_FeaturedCollections2',
-    'widgets/Demo/help/help_Demographic1',
-    'widgets/Demo/help/help_Demographic2',
-    'widgets/Demo/help/help_EnviroAtlasDataSearch1',
-    'widgets/Demo/help/help_EnviroAtlasDataSearch2',
-    'widgets/Demo/help/help_TimesSeries1',
-    'widgets/Demo/help/help_TimesSeries2',
-    'widgets/Demo/help/help_AddData1',
-    'widgets/Demo/help/help_AddData2',
-    'widgets/Demo/help/help_SelectCommunity1',
-    'widgets/Demo/help/help_SelectCommunity2',
-    'widgets/Demo/help/help_DrawerMapping1',
-    'widgets/Demo/help/help_DrawerMapping2',
-    'widgets/Demo/help/help_ECAT1',
-    'widgets/Demo/help/help_ECAT2',
-    'widgets/Demo/help/help_HucNavigation1',
-    'widgets/Demo/help/help_HucNavigation2',
-    'widgets/Demo/help/help_Raindrop1',
-    'widgets/Demo/help/help_Raindrop2',  
-    'widgets/Demo/help/help_EnhancedBookmarks1',
-    'widgets/Demo/help/help_EnhancedBookmarks2',       
-    'widgets/Demo/help/help_EndPage',      
     'require',
     'dojo/i18n',
     'dojo/i18n!./nls/main',
@@ -76,7 +49,7 @@ define([
   function(ConfigManager, LayoutManager, DataManager, WidgetManager, FeatureActionManager, SelectionManager,
     DataSourceManager, FilterManager, html, lang, array, on, keys, mouse,
     topic, cookie, Deferred, all, ioquery, esriConfig, esriRequest, urlUitls, IdentityManager,
-    portalUrlUtils, jimuUtils, help_Welcome, help_Elevation1,help_Elevation2, help_FeaturedCollections1, help_FeaturedCollections2, help_Demographic1, help_Demographic2, help_EnviroAtlasDataSearch1, help_EnviroAtlasDataSearch2, help_TimesSeries1, help_TimesSeries2, help_AddData1, help_AddData2, help_SelectCommunity1, help_SelectCommunity2, help_DrawerMapping1, help_DrawerMapping2, help_ECAT1, help_ECAT2, help_HucNavigation1, help_HucNavigation2, help_Raindrop1, help_Raindrop2, help_EnhancedBookmarks1, help_EnhancedBookmarks2, help_EndPage, require, i18n, mainBundle, esriMain, dojoReady) {
+    portalUrlUtils, jimuUtils, require, i18n, mainBundle, esriMain, dojoReady) {
     /* global jimuConfig:true */
     var mo = {}, appConfig;
 
@@ -85,242 +58,6 @@ define([
     //set the default timeout to 3 minutes
     esriConfig.defaults.io.timeout = 60000 * 3;
 
-    window.layerIdPrefix = "eaLyrNum_";
-    window.layerIdDemographPrefix = "eaLyrDEMNum_";
-    window.layerIdTiledPrefix = "tiledNum_";
-    window.addedLayerIdPrefix = "added_";
-    window.demographicsTitlePrefix = "Demographics - ";
-    window.topLayerID = "";
-    window.timeSliderLayerId = "TimeSliderLayer";//This is only used in AddData widget (added time aware layer)
-    window.timeSliderPause = false;
-    window.addedLayerIndex = 0;
-    window.uploadedFeatLayerIdPrefix = "uploaded_";
-    window.timeSeriesLayerId = "ScenarioDataLayer";//This is for Time Series Layer from sidebar controller
-    window.timeSeriesMetadata = {};
-    window.timeSeriesMetadata['PET'] =  "T001";
-    window.timeSeriesMetadata['TempMin'] =  "T002";
-    window.timeSeriesMetadata['TempMax'] =  "T003";
-    window.timeSeriesMetadata['Precip'] =  "T004";
-    
-    window.displayMoreInfor = "false";
-
-    window.widthOfInfoWindow = 0;
-    window.heightOfInfoWindow = 0;
-    window.toggleOnHucNavigation = false;
-    window.toggleOnRainDrop = false;
-    window.toggleOnElevation = false;
-    window.toggleOnCMA = false;
-    window.mapClickListenerForPopup = null;
-    window.removeAllMessage = "removeAll";
-    window.chkTopicPrefix = "ckTopic_";
-    window.chkTopicPBSPrefix = "ckTopicPBS_";
-    window.chkSelectableLayer = "ck";
-    window.layerTitlePrefix = "layerTitle_";
-    window.idCommuBoundaryPoint = "Boundary_Point";
-    window.PanelId = "";
-    window.timeSeriesDisclaim = false;
-    
-    window.filterForSelectOpened = false;
-    window.filterForSelectFirstCreated = true;
-    window.fcDetailsOpened = false;
-    window.fcDetailsFirstCreated = true;    
-    window.bLayerListWidgetStarted = false;
-    window.dataFactSheet = "https://enviroatlas.epa.gov/enviroatlas/DataFactSheets/pdf/";
-    //window.matadata = "https://edg.epa.gov/metadata/catalog/search/resource/details.page?uuid=%7BBDF514A6-05A8-400D-BF3D-030645461334%7D";
-	window.matadata = "https://edg.epa.gov/metadata/catalog/search/resource/details.page";//?uuid=%7BBDF514A6-05A8-400D-BF3D-030645461334%7D";
-    
-    window.bFirstLoadFilterWidget = true;
-    window.cmaMapPoint = null;
-    window.allLayerNumber = [];
-    window.featureLyrNumber = [];
-    window.nationalLayerNumber = [];
-    window.communityLayerNumber =  [];
-    window.dynamicLayerNumber = [];
-    window.tiledLayerNumber = [];
-    window.imageLayerNumber = [];
-    window.layerID_Portal_WebMap = [];
-    window.demographicLayerSetting = {};
-    window.onlineDataTobeAdded = [];
-    window.onlineDataAlreadyAdded = [];
-    window.uploadedFileColl = [];
-    
-    window.formatters = {};
-    window.formatters['help_Welcome'] =  help_Welcome;
-    window.formatters['help_EndPage'] =  help_EndPage; 
-    window.formatters['help_FeaturedCollections1'] = help_FeaturedCollections1;
-    window.formatters['help_FeaturedCollections2'] = help_FeaturedCollections2;
-        
-    window.formatters['help_Elevation1'] = help_Elevation1;  
-    window.formatters['help_Demographic1'] = help_Demographic1;
-    window.formatters['help_EnviroAtlasDataSearch1'] =  help_EnviroAtlasDataSearch1; 
-    window.formatters['help_TimesSeries1'] =  help_TimesSeries1; 
-    window.formatters['help_AddData1'] =  help_AddData1; 
-    window.formatters['help_SelectCommunity1'] = help_SelectCommunity1;    
-    window.formatters['help_DrawerMapping1'] = help_DrawerMapping1;
-    window.formatters['help_ECAT1'] =  help_ECAT1;  
-    window.formatters['help_HucNavigation1'] = help_HucNavigation1;
-    window.formatters['help_Raindrop1'] = help_Raindrop1;
-    window.formatters['help_EnhancedBookmarks1'] = help_EnhancedBookmarks1;
-       
-    window.formatters['help_Elevation2'] = help_Elevation2;  
-    window.formatters['help_Demographic2'] = help_Demographic2;
-    window.formatters['help_EnviroAtlasDataSearch2'] =  help_EnviroAtlasDataSearch2; 
-    window.formatters['help_TimesSeries2'] =  help_TimesSeries2; 
-    window.formatters['help_AddData2'] =  help_AddData2; 
-    window.formatters['help_SelectCommunity2'] = help_SelectCommunity2;    
-    window.formatters['help_DrawerMapping2'] = help_DrawerMapping2;
-    window.formatters['help_ECAT2'] =  help_ECAT2;  
-    window.formatters['help_HucNavigation2'] = help_HucNavigation2;
-    window.formatters['help_Raindrop2'] = help_Raindrop2; 
-    window.formatters['help_EnhancedBookmarks2'] = help_EnhancedBookmarks2;
-    
-    window.categoryDic = {};
-    window.categoryDic["Clean Air"] = "cair";
-    window.categoryDic["Clean and Plentiful Water"] = "cpw";
-    window.categoryDic["Climate Stabilization"] = "clim";
-    window.categoryDic["Natural Hazard Mitigation"] = "nhm";
-    window.categoryDic["Recreation, Culture, and Aesthetics"] = "rca";
-    window.categoryDic["Food, Fuel, and Materials"] ="ffm";
-    window.categoryDic["Biodiversity Conservation"] = "biod";
-    //window.categoryDic["People and Built Spaces"] = "pbs";
-    //window.categoryDic["Supplemental"] = "sup";
-    window.categoryClassSupply = "Supply";
-    window.categoryClassDemand = "Demand";
-    window.categoryClassDriver = "Driver";
-    window.categoryClassSpatialExplicit = "Spatially Explicit";
-    
-	window.categoryTabDic = {};
-	window.categoryTabDic ["ESB"] = "ESB"; //Ecosystems and Biodiversity
-	window.categoryTabDic ["PSI"] = "PSI"; //Pollution Sources and Impacts
-	window.categoryTabDic ["PBS"] = "PBS"; //People and Built Spaces
-	window.categoryTabDic ["BNF"] = "BNF"; //Boundaries and Natural Features (or Supplemental)
-	
-    window.topicDicESB = {};
-    window.topicDicESB["Carbon Storage"] = "CS";
-    window.topicDicESB["Crop Productivity"] = "CP";
-    window.topicDicESB["Ecosystem Markets"] = "EM";    
-    window.topicDicESB["Energy Potential"] = "EP";
-    window.topicDicESB["Engagement with Outdoors"] = "EwO";
-    window.topicDicESB["Health and Economic Outcomes"] = "HaEO";
-    
-    window.topicDicESB["Land Cover: Near-Water"] = "LCNW";
-    window.topicDicESB["Land Cover: Type"] = "LCT";
-    window.topicDicESB["Landscape Pattern"] = "LP";
-    window.topicDicESB["Near-Road Environments"] = "NRE";    
-    
-    window.topicDicESB["Pollutant Reduction: Air"] = "PRA"; //This is newly added Mar 2017    
-    window.topicDicESB["Pollutant Reduction: Water"] = "PRW"; //This is newly added Mar 2017      
-     
-    
-        
-    
-    window.topicDicESB["Protected Lands"] = "PL";
-    window.topicDicESB["Species: At-Risk and Priority"] = "SARaP";
-    window.topicDicESB["Species: Other"] = "SO";
-    window.topicDicESB["Water Supply, Runoff, and Flow"] = "WSRaF"; //This is newly added Mar 2017     
-    
-    window.topicDicESB["Water Use"] = "WU";
-    window.topicDicESB["Weather and Climate"] = "WaC"; //This is newly added Mar 2017 
-    window.topicDicESB["Wetlands and Lowlands"] = "WaL";
-    
-    window.topicDicPSI = {};
-    window.topicDicPSI["EPA Regulated Facilities"] = "RF";
-    //window.topicDicPSI["EPA NATA"] = "NATA";
-    window.topicDicPSI["Impaired Waters"] = "IW";
-	window.topicDicPSI["National Air Toxics Assessment"] = "NATA";
-    window.topicDicPSI["Pollutants: Other"] = "PO";
-    window.topicDicPSI["Pollutants: Nutrients"] = "PN";     
-    
-    window.topicDicPBS = {};
-    window.topicDicPBS["Commuting and Walkability"] = "CaW";
-    //window.topicDicPBS["Community Demographics"] = "CD";
-    window.topicDicPBS["Employment"] = "E";
-    window.topicDicPBS["Housing and Schools"] = "HaF";
-    //window.topicDicPBS["National Demographics"] = "ND";
-    window.topicDicPBS["Population Distribution"] = "PoD";
-    window.topicDicPBS["Quality of Life"] = "QoL";
-    window.topicDicPBS["Vacancy"] = "Vcy";
-    
-    window.topicDicBNF = {};
-    window.topicDicBNF["Ecological Boundaries"] = "EB";
-    window.topicDicBNF["Hydrologic Features"] = "HF";
-    window.topicDicBNF["Political Boundaries"] = "PB";
-
-    
-    window.strAllCommunity = "AllCommunity";	
-    window.communityDic = {};
-  	window.communityDic["ATX"] = "Austin, TX";
-    window.communityDic["BirAL"]= "Birmingham, AL";
-    window.communityDic["BMD"]= "Baltimore, MD";
-    window.communityDic["BTX"]= "Brownsville, TX";
-    window.communityDic["CIL"]= "Chicago, IL";
-  	window.communityDic["CleOH"] = "Cleveland, OH";
-  	window.communityDic["DMIA"] = "Des Moines, IA";
-    window.communityDic["DNC"]= "Durham, NC";
-    window.communityDic["FCA"] = "Fresno, CA";
-    window.communityDic["GBWI"] = "Green Bay, WI";
-	window.communityDic["LACA"] = "Los Angeles, CA";
-    window.communityDic["MTN"] = "Memphis, TN";
-    window.communityDic["MWI"] = "Milwaukee, WI";
-    //window.communityDic["MSPMN"] = "Minneapolis/St. Paul, MN";
-    window.communityDic["MSPMN"] = "Minneapolis-St.Paul, MN";
-    window.communityDic["NBMA"] = "New Bedford, MA";
-    window.communityDic["NHCT"] = "New Haven, CT";
-    window.communityDic["NYNY"] = "New York, NY";
-    window.communityDic["PNJ"] = "Paterson, NJ";
-    window.communityDic["PhiPA"] = "Philadelphia, PA";
-    window.communityDic["PAZ"] = "Phoenix, AZ";
-    window.communityDic["PitPA"] = "Pittsburgh, PA";
-    window.communityDic["PME"] = "Portland, ME";
-    window.communityDic["POR"] = "Portland, OR";
-	window.communityDic["SLMO"] = "St. Louis, MO";
-	window.communityDic["SLCUT"] = "Salt Lake City, UT";
-    window.communityDic["SonCA"] = "Sonoma County, CA";
-    window.communityDic["TFL"] = "Tampa, FL";
-    window.communityDic["VBWVA"] = "Virginia Beach - Williamsburg, VA";
-    window.communityDic["WDC"] = "Washington, DC";
-    window.communityDic["WIA"] = "Woodbine, IA";
-    
-    window.communitySelected = window.strAllCommunity;
-    window.nationalMetadataDic = {};
-    window.attributeByOneCommu = false;
-    
-    window.communitySelectedByTheOtherFrame = window.strAllCommunity;
-    //variables that are used for synchronize map
-    window.changedExtentByOtherFrameXmin = null;
-    window.changedExtentByOtherFrameXmax = null;   
-    window.changedExtentByOtherFrameYmin = null;
-    window.changedExtentByOtherFrameYmax = null;   
-    window.frameBeClicked = 1;
-    window.extentFromURL = null;
-    window.eaLayerFromURL = null;
-    window.eaCommunityFromURL = null;
-    window.communityMetadataDic = {};
-    window.faildedEALayerDictionary = {};
-    window.faildedOutsideLayerDictionary = {};
-    window.successLayerDictionary = {};
-    window.communityExtentDic = {};
-    window.hashAttribute = {};
-    window.hashPopup = {};
-    window.hashURL = {};
-    window.hashURLtoTile = {};
-    window.hashTopic = {};
-    window.hashScale = {};
-    window.hashFieldsAddedFeatureLayer = {};
-    window.hashVisibleLayersForDynamic = {};
-    window.hashTitleToEAID = {};
-    window.hashEAIDToTitle = {};
-    window.hashGeometryTypeAddedFeatLyr = {};
-    window.hashInfoTemplate = {};
-	window.hashRenderer = {};
-	window.hashAddedURLToType = {};
-	window.hashAddedURLToId = {};
-	window.hashIDtoTileURL = {};
-	window.hashIDtoCacheLevelNat = {};
-	window.hashFeaturedCollectionToEAID = {};
-	window.allLayersTurnedOn = {};
-	
-                
     //patch for JS API 3.10
     var hasMethod = typeof cookie.getAll === 'function';
     if (!hasMethod) {
@@ -430,6 +167,7 @@ define([
     on(window, 'mousedown', function(evt) {
       if(jimuUtils.isInNavMode()){
         html.removeClass(document.body, 'jimu-nav-mode');
+        window.isMoveFocusWhenInit = false;
       }
       if (!mouse.isMiddle(evt)) {
         return;
@@ -484,10 +222,10 @@ define([
     }, jimuConfig);
 
 
-    window.wabVersion = '2.11';
-    // window.productVersion = 'Online 6.4';
-    window.productVersion = 'Web AppBuilder for ArcGIS (Developer Edition) 2.11';
-    // window.productVersion = 'Portal for ArcGIS 10.7';
+    window.wabVersion = '2.17';
+    // window.productVersion = 'Online 8.2';
+    window.productVersion = 'ArcGIS Web AppBuilder (Developer Edition) 2.17';
+    // window.productVersion = 'Portal for ArcGIS 10.8.1';
 
     function initApp() {
       var urlParams, configManager, layoutManager;
@@ -569,18 +307,19 @@ define([
         return;
       }
 
-      html.setStyle(jimuConfig.loadingId, 'display', 'none');
       html.setStyle(jimuConfig.mainPageId, 'display', 'block');
     }
     //ie css
     var ieVersion = jimuUtils.has('ie');
-    if(ieVersion > 9){
-      html.addClass(document.body, 'ie-nav-mode');
-    }else{
-      html.addClass(document.body, 'ie-low-nav-mode');
-    }
-    if(ieVersion > 10){
-      html.addClass(document.body, 'ie-gte-10');
+    if(ieVersion){
+      if(ieVersion > 9){
+        html.addClass(document.body, 'ie-nav-mode');
+      }else{
+        html.addClass(document.body, 'ie-low-nav-mode');
+      }
+      if(ieVersion > 10){
+        html.addClass(document.body, 'ie-gte-10');
+      }
     }
     mo.initApp = initApp;
     return mo;

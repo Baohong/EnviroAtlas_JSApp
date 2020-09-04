@@ -2,7 +2,7 @@
   "legend":{
     "arrangement": 0,
     "autoUpdate": true,
-    "respectCurrentMapScale": false
+    "respectCurrentMapScale": true
   },
   "layerState": {},
   "syncWithWebmap": false

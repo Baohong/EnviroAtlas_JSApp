@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// Copyright © 2014 - 2018 Esri. All Rights Reserved.
+// Copyright © Esri. All Rights Reserved.
 //
 // Licensed under the Apache License Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,15 +45,6 @@ function (declare, lang, array, html, topic, Deferred, on, jimuUtils, WidgetMana
 
     constructor: function (urlParams) {
       this.urlParams = urlParams || {};
-      if (this.urlParams.extent != undefined) {
-          window.extentFromURL = this.urlParams.extent;
-      }
-      if (this.urlParams.eaLayer != undefined) {
-          window.eaLayerFromURL = this.urlParams.eaLayer;
-      }
-      if (this.urlParams.eaCommunity != undefined) {
-          window.eaCommunityFromURL = this.urlParams.eaCommunity;
-      }      
       this.listenBuilderEvents();
       this.versionManager = new AppVersionManager();
       this.widgetManager = WidgetManager.getInstance();
@@ -787,7 +778,7 @@ function (declare, lang, array, html, topic, Deferred, on, jimuUtils, WidgetMana
 
       if(newSharedTheme.useLogo && !oldSharedTheme.useLogo){
         if(this.portalSelf.portalProperties && this.portalSelf.portalProperties.sharedTheme){
-          if(this.portalSelf.portalProperties.sharedTheme.logo.small){
+          if(this.portalSelf.portalProperties.sharedTheme.logo && this.portalSelf.portalProperties.sharedTheme.logo.small){
             this.appConfig.logo = this.portalSelf.portalProperties.sharedTheme.logo.small;
           }else{
             this.appConfig.logo = 'images/app-logo.png';
