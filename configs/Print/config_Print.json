@@ -1,0 +1,8 @@
+{
+  "serviceURL": "https://leb.epa.gov/arcgis/rest/services/EPAPrintTool/GPServer/Export%20Web%20Map",
+  "defaultTitle": "EnviroAtlas Map Export",
+  "defaultAuthor": "EnviroAtlas User",
+  "defaultCopyright": "U.S. Environmental Protection Agency",
+  "defaultFormat": "PDF",
+  "defaultLayout": "Letter ANSI A Portrait"
+}
