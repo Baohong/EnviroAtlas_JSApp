@@ -45,6 +45,15 @@ function (declare, lang, array, html, topic, Deferred, on, jimuUtils, WidgetMana
 
     constructor: function (urlParams) {
       this.urlParams = urlParams || {};
+      if (this.urlParams.extent != undefined) {
+          window.extentFromURL = this.urlParams.extent;
+      }
+      if (this.urlParams.eaLayer != undefined) {
+          window.eaLayerFromURL = this.urlParams.eaLayer;
+      }
+      if (this.urlParams.eaCommunity != undefined) {
+          window.eaCommunityFromURL = this.urlParams.eaCommunity;
+      }      
       this.listenBuilderEvents();
       this.versionManager = new AppVersionManager();
       this.widgetManager = WidgetManager.getInstance();

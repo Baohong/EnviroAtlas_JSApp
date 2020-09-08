@@ -28,14 +28,24 @@ define([
     },
 
     onExecute: function(featureSet){
-      var ds = exportUtils.createDataSource({
-        type: exportUtils.TYPE_FEATURESET,
-        filename: 'features',
-        data: featureSet
-      });
 
-      ds.setFormat(exportUtils.FORMAT_CSV);
-      ds.download();
+
+		featureSetNew=featureSet;
+		for (var key in featureSetNew.fieldAliases) {
+	        var fieldNameAlias = featureSetNew.fieldAliases[key];
+	        if (fieldNameAlias.indexOf(",")>=0) {
+	        	featureSetNew.fieldAliases[key] = "\"" + fieldNameAlias + "\"";
+	        }
+		}
+			
+      	var ds = exportUtils.createDataSource({
+	        type: exportUtils.TYPE_FEATURESET,
+	        filename: 'features',
+	        data: featureSetNew
+      	});
+
+      	ds.setFormat(exportUtils.FORMAT_CSV);
+      	ds.download();
     }
 
   });

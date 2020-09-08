@@ -440,7 +440,13 @@ LabelClass, PopupTemplate, Legend, Graphic, Point, Query, RelationshipQuery, Que
     },
 
     drawLegends: function(legendsNode) {
-      var useLegendDijit = true;
+      //var useLegendDijit = true;
+      var useLegendDijit;
+      if (this.layerObject.id === window.timeSeriesLayerId) {
+      	useLegendDijit = false;
+      } else {
+      	useLegendDijit = true;
+      }
       if (useLegendDijit) {
         this._initLegendsNodeByLegendDijit(legendsNode);
       } else {
@@ -561,6 +567,19 @@ LabelClass, PopupTemplate, Legend, Graphic, Point, Query, RelationshipQuery, Que
       return isVisbleOrInvisilbe;
     },
 
+    getOpacity: function() {
+      if (this.layerObject.opacity) {
+        return this.layerObject.opacity;
+      } else {
+        return 1;
+      }
+    },
+
+    setOpacity: function(opacity) {
+      if (this.layerObject.setOpacity) {
+        this.layerObject.setOpacity(opacity);
+      }
+    },
     _getCustomPopupInfo: function(object, fieldNames) {
       // return popupInfo with all fieldInfos if the fieldName is null;
       var popupInfo = null;

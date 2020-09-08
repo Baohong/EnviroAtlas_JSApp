@@ -30,6 +30,9 @@ define(['dojo/_base/declare',
     declare, lang, html, on, Move,
     _TemplatedMixin, BaseWidgetPanel, utils, ResizeHandle, a11y
   ) {
+      var numberStops = null;
+      
+
     /* global jimuConfig */
     var clazz = declare([BaseWidgetPanel, _TemplatedMixin], {
       baseClass: 'jimu-panel jimu-on-screen-widget-panel jimu-main-background',
@@ -51,6 +54,9 @@ define(['dojo/_base/declare',
             '<div tabindex="0" class="max-btn jimu-vcenter" aria-label="${headerNls.maxWindow}" role="button"' +
               'data-dojo-attach-point="maxNode"' +
               'data-dojo-attach-event="onclick:_onMaxBtnClicked,onkeydown:_onMaxBtnKeyDown"></div>' +
+        '<div tabindex="0" class="help-btn jimu-vcenter" ' +
+        'data-dojo-attach-point="helpNode"' +
+        'data-dojo-attach-event="onclick:_onHelpBtnClicked,press:_onHelpBtnClicked,onkeydown:_onHelpBtnClicked"></div>' +         
             '<div tabindex="0" class="close-btn jimu-vcenter" aria-label="${headerNls.closeWindow}" role="button"' +
               'data-dojo-attach-point="closeNode"' +
               'data-dojo-attach-event="onclick:_onCloseBtnClicked,onkeydown:_onCloseBtnKey"></div>' +
@@ -70,6 +76,25 @@ define(['dojo/_base/declare',
       },
 
       startup: function() {
+        self = this;
+        //tourDialogOnScreenWidget = null;
+        var helpExist = false;
+        
+            for (var i=0, il=window.helpTour.length; i<il; i++) {
+               var widgetName = window.helpTour[i].widgetName;
+               if (widgetName !=null) {
+                   if (this.id.toUpperCase().indexOf(widgetName.toUpperCase()) >= 0) {
+                       helpExist = true;
+                       break;                 
+                   }                   
+               }
+
+            }  
+         
+        
+            if (helpExist == false){            
+                this.helpNode.parentNode.removeChild(this.helpNode);     
+            }
         this.inherited(arguments);
 
         this._normalizePositionObj(this.position);
@@ -123,7 +148,20 @@ define(['dojo/_base/declare',
           this._setMobilePosition();
         }
       },
+      _onHelpBtnClicked: function(evt) {
+        
 
+        evt.stopPropagation();
+
+        //avoid to touchEvent pass through the closeBtn
+        if (evt.type === "touchstart") {
+          evt.preventDefault();
+        }
+        
+        window.PanelId = this.id;    
+
+        utils.startTour();
+      },
       _onCloseBtnClicked: function(evt) {
         //avoid to touchEvent pass through the closeBtn
         evt.preventDefault();

@@ -111,6 +111,33 @@ define([
 
     getLayerInfoArray: function() {
       return array.filter(this._finalLayerInfos, function(layerInfo) {
+  		//layerInfo.title : Demographics - 10th grade (2012-2016 ACS)
+  		//layerInfo._layerInfos._finalLayerInfos[0].id: eaLyrDEMNum_ejdemogEDU_10_map
+  		//layerInfo._layerInfos._finalLayerInfos[0].title: Demographics - 10th grade (2012-2016 ACS)
+  		//layerInfo._layerInfos._finalLayerInfos[0].subId: eaLyrDEMNum_ejdemogEDU_10_map
+  		
+      	if ((layerInfo.title != null) &&(layerInfo.title.indexOf(window.demographicsTitlePrefix) == 0)){
+      		layerTitle = layerInfo.title;
+      		for (ii = 0; ii< layerInfo.layerObject.layerInfos.length; ii++){
+      			currentSublayerName = layerInfo.layerObject.layerInfos[ii].name;
+      			if ((window.demographicsTitlePrefix + currentSublayerName).indexOf(layerTitle) < 0) {
+      				layerInfo.layerObject.layerInfos[ii].name = layerTitle.replace(window.demographicsTitlePrefix, "") + " " + currentSublayerName;
+      				if ((layerInfo.newSubLayers != undefined)&& (layerInfo.newSubLayers.length>ii)) {
+      					layerInfo.newSubLayers[ii].title = layerInfo.layerObject.layerInfos[ii].name;
+      				}    				
+      			}      			
+      		}
+      		for (jj = 0; jj<layerInfo._layerInfos._finalLayerInfos.length; jj++ ){
+      			if (layerInfo._layerInfos._finalLayerInfos[jj].title ==  layerTitle) {
+		      		for (kk = 0; kk< layerInfo._layerInfos._finalLayerInfos[jj]._jsapiLayerInfos.length; kk++){
+		      			currentSublayerName = layerInfo._layerInfos._finalLayerInfos[jj]._jsapiLayerInfos[kk].name;
+		      			if ((window.demographicsTitlePrefix + currentSublayerName).indexOf(layerTitle) < 0) {
+		      				layerInfo._layerInfos._finalLayerInfos[jj]._jsapiLayerInfos[kk].name = layerTitle.replace(window.demographicsTitlePrefix, "") + " " + currentSublayerName;
+		      			}      			
+		      		}      				
+      			}
+      		}
+      	}
         // supports to set isTemporaryLayer when layerObject already added to map.
         if(lang.getObject("_wabProperties.isTemporaryLayer", false, layerInfo.layerObject)) {
           layerInfo._flag._isTemporaryLayerInfo = true;
@@ -847,7 +874,9 @@ define([
             if(lang.getObject('_wabProperties.isTemporaryLayer', false, newLayer)) {
               newLayerInfo._flag._isTemporaryLayerInfo = true;
             }
+            if ((newLayer.id.indexOf(window.layerIdTiledPrefix)) == -1){
             specifiedLayerInfos.push(newLayerInfo);
+            }
           }
         }
 
@@ -861,12 +890,16 @@ define([
               array.forEach(serviceDefinition.tables, function(tableDifination) {
                 tableDifination.url = newLayerInfo.getUrl() + '/' + tableDifination.id;
                 tableDifination.id = newLayerInfo.id + '_' + tableDifination.id;
+                //tableDifination.title = this._getLayerTitle(tableDifination);
+                if (tableDifination.url.indexOf("ejscreen")<0) {
                 tableDifination.title = this._getLayerTitle(tableDifination);
                 // var newTalbeInfo = this._addTable([tableDifination], this._tableInfos);
                 // if (newTalbeInfo) {
                 //   newTableInfos.push(newTalbeInfo);
                 // }
                 tableDifinations.push(tableDifination);
+                }
+                //tableDifinations.push(tableDifination);
               }, this);
               this._addTables(tableDifinations, this._tableInfos);
             }));
