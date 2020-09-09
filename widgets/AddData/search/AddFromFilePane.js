@@ -1,25 +1,639 @@
-// All material copyright ESRI, All Rights Reserved, unless otherwise specified.
-// See http://js.arcgis.com/3.15/esri/copyright.txt and http://www.arcgis.com/apps/webappbuilder/copyright.txt for details.
-//>>built
-require({cache:{"url:widgets/AddData/search/templates/AddFromFilePane.html":'\x3cdiv class\x3d"secondary-pane add-file-pane"\x3e\r\n\r\n  \x3cdiv class\x3d"generalize-options"\x3e\r\n    \x3cdiv data-dojo-type\x3d"jimu/dijit/CheckBox"\r\n      data-dojo-attach-point\x3d"generalizeCheckBox"\r\n      data-dojo-props\x3d"checked:true"\x3e\r\n    \x3c/div\x3e\r\n  \x3c/div\x3e\r\n\r\n  \x3cdiv class\x3d"browse-or-drop"\x3e\r\n    \x3cdiv class\x3d"drop-container" data-dojo-attach-point\x3d"dropContainer"\x3e\r\n      \x3cdiv class\x3d"drop-area" data-dojo-attach-point\x3d"dropArea"\x3e\r\n        \x3cdiv class\x3d"supported-file-types" data-dojo-attach-point\x3d"supportedFileTypes"\x3e\x3c/div\x3e\r\n        \x3cdiv class\x3d"or"\x3e${i18n.addFromFile.dropOrBrowse}\x3c/div\x3e\r\n        \x3cform class\x3d"file-form" enctype\x3d"multipart/form-data" method\x3d"post"\r\n          data-dojo-attach-point\x3d"fileForm"\x3e\r\n          \x3clabel for\x3d"${id}_file" class\x3d"jimu-btn"\r\n            data-dojo-attach-point\x3d"uploadLabel"\x3e${i18n.addFromFile.browse}\x3c/label\x3e\r\n          \x3cinput id\x3d"${id}_file" name\x3d"file" type\x3d"file" style\x3d"display:none"\r\n            data-dojo-attach-point\x3d"fileNode" /\x3e\r\n        \x3c/form\x3e\r\n        \x3ca href\x3d"#" class\x3d"drop-area-hint" data-dojo-attach-point\x3d"hintButton"\x3e\r\n          \x3ci class\x3d"esri-icon-question"\x3e\x3c/i\x3e\r\n        \x3c/a\x3e\r\n        \x3cspan class\x3d"upload-arrow"\x3e\x3c/span\x3e\r\n      \x3c/div\x3e\r\n    \x3c/div\x3e\r\n  \x3c/div\x3e\r\n\r\n\x3c/div\x3e\r\n'}});
-define("dojo/_base/declare dojo/_base/lang dojo/_base/array dojo/_base/json dojo/on dojo/Deferred dojo/dom-class dijit/Viewport dojo/sniff dijit/_WidgetBase dijit/_TemplatedMixin dijit/_WidgetsInTemplateMixin dojo/text!./templates/AddFromFilePane.html dojo/i18n!../nls/strings ./LayerLoader ./util dojo/_base/kernel esri/request esri/layers/FeatureLayer esri/layers/KMLLayer esri/geometry/scaleUtils jimu/dijit/Message jimu/dijit/CheckBox".split(" "),function(t,n,p,u,h,v,l,w,x,y,z,A,B,g,r,k,C,q,D,E,F,
-m){return t([y,z,A],{i18n:g,templateString:B,wabWidget:null,maxRecordCount:1E3,maxRecordThreshold:1E5,SHAPETYPE_ICONS:[{type:"shapefile",url:"images/filetypes/zip.svg"},{type:"csv",url:"images/filetypes/csv.svg"},{type:"kml",url:"images/filetypes/kml.svg"},{type:"gpx",url:"images/filetypes/gpx.svg"},{type:"geojson",url:"images/filetypes/geojson.svg"}],postCreate:function(){this.inherited(arguments);this.generalizeCheckBox.setLabel(g.addFromFile.generalizeOn);this.own(w.on("resize",this.resize()))},
-destroy:function(){this.inherited(arguments)},startup:function(){if(!this._started){this.wabWidget.isPortal&&(this.SHAPETYPE_ICONS=[{type:"shapefile",url:"images/filetypes/zip.svg"},{type:"csv",url:"images/filetypes/csv.svg"},{type:"kml",url:"images/filetypes/kml.svg"}]);this.inherited(arguments);var a=this,b=this.dropArea,c,d=this.wabWidget.config;if(d.addFromFile)try{c=Number(d.addFromFile.maxRecordCount),"number"!==typeof c||isNaN(c)||(c=Math.floor(c),1<=c&&c<=this.maxRecordThreshold&&(this.maxRecordCount=
-c))}catch(f){console.warn("Error setting AddFromFile.maxRecordCount:"),console.warn(f)}if(g.addFromFile.types)try{for(var e in g.addFromFile.types)this._createFileTypeImage(e)}catch(f){console.warn("Error reading support file types:"),console.warn(f)}this.own(h(this.fileNode,"change",function(){if(!a._getBusy()){a._setBusy(!0);var f=a._getFileInfo();f.ok&&a._execute(f)}}));this.own(h(this.uploadLabel,"click",function(f){a._getBusy()&&(f.preventDefault(),f.stopPropagation())}));this.own(h(b,"dragenter",
-function(f){f.preventDefault();a._getBusy()||(l.add(b,"hit"),a._setStatus(""))}));this.own(h(b,"dragleave",function(a){a.preventDefault();l.remove(b,"hit")}));this.own(h(b,"dragover",function(a){a.preventDefault()}));this.own(h(b,"drop",function(f){f.preventDefault();f.stopPropagation();a._getBusy()||(a._setBusy(!0),f=a._getFileInfo(f),f.ok&&a._execute(f))}));c=this.wabWidget.domNode;this.own(h(c,"dragenter",function(a){a.preventDefault()}));this.own(h(c,"dragleave",function(a){a.preventDefault()}));
-this.own(h(c,"dragover",function(a){a.preventDefault()}));this.own(h(c,"drop",function(a){a.preventDefault()}));this.own(h(this.hintButton,"click",n.hitch(this,function(a){a.preventDefault();a='\x3cdiv class\x3d"intro"\x3e\x3clabel\x3e'+g.addFromFile.intro+"\x3c/label\x3e\x3cul\x3e\x3cli\x3e"+g.addFromFile.types.Shapefile+"\x3c/li\x3e\x3cli\x3e"+g.addFromFile.types.CSV+"\x3c/li\x3e\x3cli\x3e"+g.addFromFile.types.KML+"\x3c/li\x3e\x3cli\x3e"+g.addFromFile.types.GPX+"\x3c/li\x3e\x3cli\x3e"+g.addFromFile.types.GeoJSON+
-'\x3c/li\x3e\x3cli\x3e\x3cspan class\x3d"note"\x3e'+g.addFromFile.maxFeaturesAllowedPattern.replace("{count}",this.maxRecordCount)+"\x3c/span\x3e\x3c/li\x3e\x3c/ul\x3e\x3c/div\x3e";this.wabWidget.isPortal&&(a='\x3cdiv class\x3d"intro"\x3e\x3clabel\x3e'+g.addFromFile.intro+"\x3c/label\x3e\x3cul\x3e\x3cli\x3e"+g.addFromFile.types.Shapefile+"\x3c/li\x3e\x3cli\x3e"+g.addFromFile.types.CSV+"\x3c/li\x3e\x3cli\x3e"+g.addFromFile.types.KML+'\x3c/li\x3e\x3cli\x3e\x3cspan class\x3d"note"\x3e'+g.addFromFile.maxFeaturesAllowedPattern.replace("{count}",
-this.maxRecordCount)+"\x3c/span\x3e\x3c/li\x3e\x3c/ul\x3e\x3c/div\x3e");new m({message:a})})))}},_addFeatures:function(a,b){var c,d=[],e=a.map,f=0,h=new r;b.layers&&(f=b.layers.length);p.forEach(b.layers,function(b){b=new D(b,{id:h._generateLayerId(),outFields:["*"]});b.xtnAddData=!0;b.graphics&&(a.numFeatures+=b.graphics.length);0===f?b.name=a.baseFileName:"string"!==typeof b.name||0===b.name.length?b.name=a.baseFileName:0!==b.name.indexOf(a.baseFileName)&&(b.name=g.addFromFile.layerNamePattern.replace("{filename}",
-a.baseFileName).replace("{name}",b.name));h._setFeatureLayerInfoTemplate(b,null,null);if(b.fullExtent){var e=b.fullExtent.getCenter();e.x&&e.y&&(c=c?c.union(b.fullExtent):b.fullExtent)}d.push(b)});0<d.length&&(e.addLayers(d),c&&e.setExtent(c.expand(1.25),!0))},_analyze:function(a,b){if("csv"!==a.fileType.toLowerCase())return b=new v,b.resolve(null),b;var c=null;this.wabWidget.batchGeocoderServers&&0<this.wabWidget.batchGeocoderServers.length&&(c=this.wabWidget.batchGeocoderServers[0]);var d={enableGlobalGeocoding:!0,
-sourceLocale:C.locale};c&&(d.geocodeServiceUrl=c.url,c.isWorldGeocodeServer&&(d.sourceCountry="world",d.sourceCountryHint=""));c=a.sharingUrl+"/content/features/analyze";d={f:"json",filetype:a.fileType.toLowerCase(),analyzeParameters:window.JSON.stringify(d)};b=q({url:c,content:d,form:b,handleAs:"json"});b.then(function(b){b&&b.publishParameters&&(a.publishParameters=b.publishParameters)});return b},_createFileTypeImage:function(a){var b=window.isRTL;p.some(this.SHAPETYPE_ICONS,n.hitch(this,function(c,
-d){if(a.toLowerCase()===c.type.toLowerCase()){var e=document.createElement("IMG");e.src=this.wabWidget.folderUrl+c.url;e.alt=a;0===d?e.className+=" "+(b?"last":"first")+"-type-icon":1===d?e.className+=" second-"+(b?"last":"first")+"-type-icon":d===this.SHAPETYPE_ICONS.length-2?e.className+=" second-"+(b?"first":"last")+"-type-icon":d===this.SHAPETYPE_ICONS.length-1&&(e.className+=" "+(b?"first":"last")+"-type-icon");this.supportedFileTypes.appendChild(e)}}))},_execute:function(a){var b={map:this.wabWidget.map,
-sharingUrl:this.wabWidget.getSharingUrl(),baseFileName:a.baseFileName,fileName:a.fileName,fileType:a.fileType,generalize:!!this.generalizeCheckBox.getValue(),publishParameters:{},numFeatures:0};this._setBusy(!0);this._setStatus(g.addFromFile.addingPattern.replace("{filename}",a.fileName));if("kml"===a.fileType.toLowerCase())return this._executeKml(a);var c=a.fileName,d=this,e=new FormData;e.append("file",a.file);d._analyze(b,e).then(function(a){a&&a.publishParameters&&a.publishParameters.locationType&&
-"unknown"===a.publishParameters.locationType&&new m({titleLabel:g._widgetLabel,message:g.addFromFile.featureLocationsCouldNotBeFound});return d._generateFeatures(b,e)}).then(function(a){d._addFeatures(b,a.featureCollection);d._setBusy(!1);d._setStatus(g.addFromFile.featureCountPattern.replace("{filename}",c).replace("{count}",b.numFeatures))}).otherwise(function(a){d._setBusy(!1);d._setStatus(g.addFromFile.addFailedPattern.replace("{filename}",c));console.warn("Error generating features.");console.warn(a);
-a&&"string"===typeof a.message&&0<a.message.length&&new m({titleLabel:g._widgetLabel,message:g.addFromFile.generalIssue+"\x3cbr\x3e\x3cbr\x3e"+a.message})})},_executeKml:function(a){var b=this,c=new FileReader,d=this.wabWidget.map,e=function(c,d){b._setBusy(!1);b._setStatus(g.addFromFile.addFailedPattern.replace("{filename}",a.fileName));console.warn(c);console.error(d);d&&"string"===typeof d.message&&0<d.message.length&&new m({titleLabel:g._widgetLabel,message:g.addFromFile.generalIssue+"\x3cbr\x3e\x3cbr\x3e"+
-d.message})};c.onerror=function(a){e("FileReader::onerror",a)};c.onload=function(f){if(c.error)e("FileReader::error",c.error);else{var h=f.target.result,l=new r;f=l._generateLayerId();var k=new E("",{id:f,name:a.fileName,linkInfo:{visibility:!1}});k.visible=!0;delete k.linkInfo;k._parseKml=function(){var c=this;this._fireUpdateStart();this._io=q({url:this.serviceUrl,content:{kmlString:encodeURIComponent(h),model:"simple",folders:"",refresh:this.loaded?!0:void 0,outSR:u.toJson(this._outSR.toJson())},
-callbackParamName:"callback",load:function(f){c._io=null;c._initLayer(f);l._waitForLayer(k).then(function(c){var e=0;c.name=a.fileName;c.xtnAddData=!0;p.forEach(c.getLayers(),function(a){a&&a.graphics&&0<a.graphics.length&&(e+=a.graphics.length)});var f=d.spatialReference,h=c._outSR;f&&h&&(f.equals(h)||f.isWebMercator()&&4326===h.wkid||h.isWebMercator()&&4326===f.wkid)?d.addLayer(c):new m({titleLabel:g._widgetLabel,message:g.addFromFile.kmlProjectionMismatch});b._setBusy(!1);b._setStatus(g.addFromFile.featureCountPattern.replace("{filename}",
-a.fileName).replace("{count}",e))}).otherwise(function(a){e("kml-_waitForLayer.error",a)})},error:function(a){c._io=null;a=n.mixin(Error(),a);a.message="Unable to load KML: "+(a.message||"");c._fireUpdateEnd(a);c._errorHandler(a);e("Unable to load KML",a)}},{usePost:!0})};k._parseKml()}};try{c.readAsText(a.file)}catch(f){e("FileReader::readAsText",f)}},_generateFeatures:function(a,b){var c=a.sharingUrl+"/content/features/generate";a.publishParameters=a.publishParameters||{};var d=n.mixin(a.publishParameters,
-{name:a.baseFileName,targetSR:a.map.spatialReference,maxRecordCount:this.maxRecordCount,enforceInputFileSizeLimit:!0,enforceOutputJsonSizeLimit:!0});if(a.generalize){var e=F.getExtentForScale(a.map,4E4).getWidth()/a.map.width;d.generalize=!0;d.maxAllowableOffset=e;for(var e=e/10,f=0;1>e;)e*=10,f++;d.reducePrecision=!0;d.numberOfDigitsAfterDecimal=f}a={f:"json",filetype:a.fileType.toLowerCase(),publishParameters:window.JSON.stringify(d)};return q({url:c,content:a,form:b,handleAs:"json"})},_getBaseFileName:function(a){x("ie")&&
-(a=a.split("\\"),a=a[a.length-1]);a=a.split(".");return a=a[0].replace("c:\\fakepath\\","")},_getBusy:function(){return l.contains(this.uploadLabel,"disabled")},_getFileInfo:function(a){var b={ok:!1,file:null,fileName:null,fileType:null};if((a=a?a.dataTransfer.files:this.fileNode.files)&&1===a.length)if(b.file=a=a[0],b.fileName=a.name,k.endsWith(a.name,".zip"))b.ok=!0,b.fileType="Shapefile";else if(k.endsWith(a.name,".csv"))b.ok=!0,b.fileType="CSV";else if(k.endsWith(a.name,".kml"))b.ok=!0,b.fileType=
-"KML";else if(k.endsWith(a.name,".gpx"))b.ok=!0,b.fileType="GPX";else if(k.endsWith(a.name,".geojson")||k.endsWith(a.name,".geo.json"))b.ok=!0,b.fileType="GeoJSON";b.ok&&(b.ok=p.some(this.SHAPETYPE_ICONS,function(a){return a.type.toLowerCase()===b.fileType.toLowerCase()}));if(b.ok)b.baseFileName=this._getBaseFileName(b.fileName);else{a=g.addFromFile.invalidType;"string"===typeof b.fileName&&0<b.fileName.length&&(a=g.addFromFile.invalidTypePattern.replace("{filename}",b.fileName));this._setBusy(!1);
-this._setStatus(a);var c=document.createElement("div");c.appendChild(document.createTextNode(a));new m({titleLabel:g._widgetLabel,message:c})}return b},resize:function(){},_setBusy:function(a){a?(l.add(this.uploadLabel,"disabled"),l.add(this.dropArea,["hit","disabled"])):(l.remove(this.uploadLabel,"disabled"),l.remove(this.dropArea,["hit","disabled"]))},_setStatus:function(a){this.wabWidget&&this.wabWidget._setStatus(a)}})});
+///////////////////////////////////////////////////////////////////////////
+// Copyright © Esri. All Rights Reserved.
+//
+// Licensed under the Apache License Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+///////////////////////////////////////////////////////////////////////////
+define(["dojo/_base/declare",
+    "dojo/_base/lang",
+    "dojo/_base/array",
+    "dojo/_base/json",
+    "dojo/on",
+    "dojo/Deferred",
+    "dojo/dom-class",
+    "dijit/Viewport",
+    "dojo/sniff",
+    "dijit/_WidgetBase",
+    "dijit/_TemplatedMixin",
+    "dijit/_WidgetsInTemplateMixin",
+    "dojo/text!./templates/AddFromFilePane.html",
+    "dojo/i18n!../nls/strings",
+    "./LayerLoader",
+    "./util",
+    "dojo/_base/kernel",
+    "esri/request",
+    "esri/layers/FeatureLayer",
+    "esri/layers/KMLLayer",
+    "esri/geometry/scaleUtils",
+    "jimu/dijit/Message",
+    "jimu/dijit/CheckBox"
+  ],
+  function(declare, lang, array, dojoJson, on, Deferred, domClass, Viewport, sniff,
+    _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,template, i18n,
+     LayerLoader, util, kernel, esriRequest, FeatureLayer, KMLLayer, scaleUtils,
+     Message) {
+
+    return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
+
+      i18n: i18n,
+      templateString: template,
+      wabWidget: null,
+      maxRecordCount: 1000,
+      maxRecordThreshold: 100000,
+      SHAPETYPE_ICONS: [{
+        "type": "shapefile",
+        "url": "images/filetypes/zip.svg"
+      },{
+        "type": "csv",
+        "url": "images/filetypes/csv.svg"
+      },{
+        "type": "kml",
+        "url": "images/filetypes/kml.svg"
+      },{
+        "type": "gpx",
+        "url": "images/filetypes/gpx.svg"
+      },{
+        "type": "geojson",
+        "url": "images/filetypes/geojson.svg"
+      }],
+
+      postCreate: function() {
+        this.inherited(arguments);
+        this.generalizeCheckBox.setLabel(i18n.addFromFile.generalizeOn);
+        this.own(Viewport.on("resize",this.resize()));
+      },
+
+      destroy: function() {
+        this.inherited(arguments);
+        //console.warn("AddFromFilePane::destroy");
+      },
+
+      startup: function() {
+        if (this._started) {
+          return;
+        }
+        if (this.wabWidget.isPortal) {
+          this.SHAPETYPE_ICONS = [{
+            "type": "shapefile",
+            "url": "images/filetypes/zip.svg"
+          },{
+            "type": "csv",
+            "url": "images/filetypes/csv.svg"
+          },{
+            "type": "kml",
+            "url": "images/filetypes/kml.svg"
+          }];
+        }
+        this.inherited(arguments);
+        //console.warn("AddFromFilePane.startup .......................");
+
+        var self = this, dropNode = this.dropArea;
+
+        var v, config = this.wabWidget.config;
+        if (config.addFromFile) {
+          try {
+            v = Number(config.addFromFile.maxRecordCount);
+            if (typeof v === "number" && !isNaN(v)) {
+              v = Math.floor(v);
+              if (v >= 1 && v <= this.maxRecordThreshold) {
+                this.maxRecordCount = v;
+              }
+            }
+          } catch (ex) {
+            console.warn("Error setting AddFromFile.maxRecordCount:");
+            console.warn(ex);
+          }
+        }
+
+        if(i18n.addFromFile.types) {
+          try {
+            for (var fileTypeName in i18n.addFromFile.types) {
+              this._createFileTypeImage(fileTypeName);
+            }
+          } catch (ex) {
+            console.warn("Error reading support file types:");
+            console.warn(ex);
+          }
+        }
+
+        this.own(on(this.fileNode,"change",function(){
+          if (!self._getBusy()) {
+            self._setBusy(true);
+            var fileInfo = self._getFileInfo();
+            if (fileInfo.ok) {
+              self._execute(fileInfo);
+            }
+          }
+        }));
+
+        this.own(on(this.uploadLabel,"click",function(event){
+          if (self._getBusy()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+        }));
+
+        this.own(on(dropNode,"dragenter",function(event) {
+          event.preventDefault();
+          if (!self._getBusy()) {
+            domClass.add(dropNode,"hit");
+            self._setStatus("");
+          }
+        }));
+        this.own(on(dropNode,"dragleave",function(event) {
+          event.preventDefault();
+          domClass.remove(dropNode,"hit");
+        }));
+        this.own(on(dropNode,"dragover",function(event) {
+          event.preventDefault();
+        }));
+        this.own(on(dropNode,"drop",function(event) {
+          event.preventDefault();
+          event.stopPropagation();
+          //console.warn("drop");
+          if (!self._getBusy()) {
+            self._setBusy(true);
+            var fileInfo = self._getFileInfo(event);
+            if (fileInfo.ok) {
+              self._execute(fileInfo);
+            }
+          }
+        }));
+
+        // by default, dropping a file on a page will cause
+        // the browser to navigate to the file
+        var nd = this.wabWidget.domNode;
+        this.own(on(nd,"dragenter",function(event) {
+          event.preventDefault();
+        }));
+        this.own(on(nd,"dragleave",function(event) {
+          event.preventDefault();
+        }));
+        this.own(on(nd,"dragover",function(event) {
+          event.preventDefault();
+        }));
+        this.own(on(nd,"drop",function(event) {
+          event.preventDefault();
+        }));
+
+        this.own(on(this.hintButton,"click", lang.hitch(this, function(event) {
+          event.preventDefault();
+
+          var test = '<div class="intro">' +
+            '<label>' + i18n.addFromFile.intro + "</label>" +
+            '<ul>' +
+              '<li>' + i18n.addFromFile.types.Shapefile + '</li>' +
+              '<li>' + i18n.addFromFile.types.CSV + '</li>' +
+              '<li>' + i18n.addFromFile.types.KML + '</li>' +
+              '<li>' + i18n.addFromFile.types.GPX + '</li>' +
+              '<li>' + i18n.addFromFile.types.GeoJSON + '</li>' +
+              '<li><span class="note">' + i18n.addFromFile.maxFeaturesAllowedPattern
+                        .replace("{count}", this.maxRecordCount) + '</span></li>' +
+            '</ul>' +
+          '</div>';
+
+          if (this.wabWidget.isPortal) {
+            test = '<div class="intro">' +
+              '<label>' + i18n.addFromFile.intro + "</label>" +
+              '<ul>' +
+                '<li>' + i18n.addFromFile.types.Shapefile + '</li>' +
+                '<li>' + i18n.addFromFile.types.CSV + '</li>' +
+                '<li>' + i18n.addFromFile.types.KML + '</li>' +
+                '<li><span class="note">' + i18n.addFromFile.maxFeaturesAllowedPattern
+                          .replace("{count}", this.maxRecordCount) + '</span></li>' +
+              '</ul>' +
+            '</div>';
+          }
+
+          new Message({message: test});
+        })));
+      },
+
+      _addFeatures: function(job,featureCollection) {
+        //var triggerError = null; triggerError.length;
+        var fullExtent, layers = [], map = job.map, nLayers = 0;
+        var loader = new LayerLoader();
+        if (featureCollection.layers) {
+          nLayers = featureCollection.layers.length;
+        }
+        array.forEach(featureCollection.layers,function(layer) {
+          var featureLayer = new FeatureLayer(layer, {
+            id: loader._generateLayerId(),
+            outFields: ["*"]
+          });
+          featureLayer.xtnAddData = true;
+          if (featureLayer.graphics) {
+            job.numFeatures += featureLayer.graphics.length;
+          }
+          if (nLayers === 0) {
+            featureLayer.name = job.baseFileName;
+          } else if (typeof featureLayer.name !== "string" ||
+            featureLayer.name.length === 0) {
+            featureLayer.name = job.baseFileName;
+          } else if (featureLayer.name.indexOf(job.baseFileName) !== 0) {
+            featureLayer.name = i18n.addFromFile.layerNamePattern
+              .replace("{filename}",job.baseFileName)
+              .replace("{name}",featureLayer.name);
+          }
+          loader._setFeatureLayerInfoTemplate(featureLayer,null,null);
+          if (featureLayer.fullExtent) {
+            var extentCenter = featureLayer.fullExtent.getCenter();
+            if(extentCenter.x && extentCenter.y) {
+              if (!fullExtent) {
+                fullExtent = featureLayer.fullExtent;
+              } else {
+                fullExtent = fullExtent.union(featureLayer.fullExtent);
+              }
+            }
+          }
+          layers.push(featureLayer);
+        });
+        if (layers.length > 0) {
+          map.addLayers(layers);
+          if (fullExtent) {
+            map.setExtent(fullExtent.expand(1.25),true);
+          }
+        }
+      },
+
+      _analyze: function(job,formData) {
+        if (job.fileType.toLowerCase() !== "csv") {
+          var dfd = new Deferred();
+          dfd.resolve(null);
+          return dfd;
+        }
+
+        var geocoder = null;
+        if (this.wabWidget.batchGeocoderServers &&
+            this.wabWidget.batchGeocoderServers.length > 0) {
+          geocoder = this.wabWidget.batchGeocoderServers[0];
+        }
+        var analyzeParams = {
+          "enableGlobalGeocoding": true,
+          "sourceLocale": kernel.locale
+        };
+        if (geocoder) {
+          analyzeParams.geocodeServiceUrl = geocoder.url;
+          if (geocoder.isWorldGeocodeServer) {
+            analyzeParams.sourceCountry = "world";
+            analyzeParams.sourceCountryHint = "";
+          }
+        }
+
+        var url = job.sharingUrl + "/content/features/analyze";
+        var content = {
+          f: "json",
+          filetype: job.fileType.toLowerCase(),
+          analyzeParameters: window.JSON.stringify(analyzeParams)
+        };
+        var req = esriRequest({
+          url: url,
+          content: content,
+          form: formData,
+          handleAs: "json"
+        });
+        req.then(function(response){
+          //console.warn("Analyzed:",response);
+          if (response && response.publishParameters) {
+            job.publishParameters = response.publishParameters;
+          }
+        });
+        return req;
+      },
+
+      _createFileTypeImage: function(fileTypeName) {
+        var isRTL = window.isRTL;
+        array.some(this.SHAPETYPE_ICONS, lang.hitch(this, function(filetypeIcon, index) {
+          if(fileTypeName.toLowerCase() === filetypeIcon.type.toLowerCase()) {
+            var iconImg = document.createElement("IMG");
+            iconImg.src = this.wabWidget.folderUrl + filetypeIcon.url;
+            iconImg.alt = fileTypeName;
+            if(index === 0) {
+              iconImg.className += " " + (isRTL ? "last" : "first") + "-type-icon";
+            } else if(index === 1) {
+              iconImg.className += " second-" + (isRTL ? "last" : "first") + "-type-icon";
+            } else if(index === (this.SHAPETYPE_ICONS.length - 2)) {
+              iconImg.className += " second-" + (isRTL ? "first" : "last") + "-type-icon";
+            } else if (index === (this.SHAPETYPE_ICONS.length - 1)) {
+              iconImg.className += " " + (isRTL ? "first" : "last") + "-type-icon";
+            }
+            this.supportedFileTypes.appendChild(iconImg);
+          }
+        }));
+      },
+
+      _execute: function(fileInfo) {
+        var job = {
+          map: this.wabWidget.map,
+          sharingUrl: this.wabWidget.getSharingUrl(),
+          baseFileName: fileInfo.baseFileName,
+          fileName: fileInfo.fileName,
+          fileType: fileInfo.fileType,
+          generalize: !!this.generalizeCheckBox.getValue(),
+          publishParameters: {},
+          numFeatures: 0
+        };
+        this._setBusy(true);
+        this._setStatus(i18n.addFromFile.addingPattern
+          .replace("{filename}",fileInfo.fileName));
+        if (fileInfo.fileType.toLowerCase() === "kml") {
+          return this._executeKml(fileInfo);
+        }
+
+        var fileName = fileInfo.fileName;
+        var self = this, formData = new FormData();
+        formData.append("file",fileInfo.file);
+        self._analyze(job,formData).then(function(response){
+          if(response && response.publishParameters && response.publishParameters.locationType && 
+            response.publishParameters.locationType === "unknown") {
+            new Message({
+              titleLabel: i18n._widgetLabel,
+              message: i18n.addFromFile.featureLocationsCouldNotBeFound
+            });
+          }
+          return self._generateFeatures(job,formData);
+        }).then(function(response){
+          //console.warn("Generated",response);
+          self._addFeatures(job,response.featureCollection);
+          self._setBusy(false);
+          self._setStatus(i18n.addFromFile.featureCountPattern
+            .replace("{filename}",fileName)
+            .replace("{count}",job.numFeatures)
+          );
+        }).otherwise(function(error){
+          self._setBusy(false);
+          self._setStatus(i18n.addFromFile.addFailedPattern
+            .replace("{filename}",fileName));
+          console.warn("Error generating features.");
+          console.warn(error);
+          if (error && typeof error.message === "string" && error.message.length > 0) {
+            // e.g. The maximum number of records allowed (1000) has been exceeded.
+            new Message({
+              titleLabel: i18n._widgetLabel,
+              message: i18n.addFromFile.generalIssue+"<br><br>"+error.message
+            });
+          }
+        });
+      },
+
+      _executeKml: function(fileInfo) {
+        var _self = this;
+        var reader = new FileReader();
+        var map = this.wabWidget.map;
+
+        var handleError = function(pfx,error) {
+          _self._setBusy(false);
+          _self._setStatus(i18n.addFromFile.addFailedPattern
+            .replace("{filename}",fileInfo.fileName));
+          console.warn(pfx);
+          console.error(error);
+          if (error && typeof error.message === "string" && error.message.length > 0) {
+            new Message({
+              titleLabel: i18n._widgetLabel,
+              message: i18n.addFromFile.generalIssue+"<br><br>"+error.message
+            });
+          }
+        };
+
+        reader.onerror = function(err) {
+          handleError("FileReader::onerror",err);
+        };
+
+        reader.onload = function(event) {
+          if (reader.error) {
+            handleError("FileReader::error",reader.error);
+            return;
+          }
+          var v = event.target.result;
+          var url = "";
+          var loader = new LayerLoader();
+          var id = loader._generateLayerId();
+          var layer = new KMLLayer(url, {
+            id: id,
+            name: fileInfo.fileName,
+            linkInfo: {
+              visibility: false
+            }
+          });
+          layer.visible = true;
+          delete layer.linkInfo;
+
+          layer._parseKml = function() {
+            var self = this;
+            this._fireUpdateStart();
+            // Send viewFormat as necessary if this kml layer represents a
+            // network link i.e., in the constructor options.linkInfo is
+            // available and linkInfo has viewFormat property
+            this._io = esriRequest({
+              url: this.serviceUrl,
+              content: {
+                /*url: this._url.path + this._getQueryParameters(map),*/
+                kmlString: encodeURIComponent(v),
+                model: "simple",
+                folders: "",
+                refresh: this.loaded ? true : undefined,
+                outSR: dojoJson.toJson(this._outSR.toJson())
+              },
+              callbackParamName: "callback",
+              load: function(response) {
+                //console.warn("response",response);
+                self._io = null;
+                self._initLayer(response);
+                loader._waitForLayer(layer).then(function(lyr) {
+                  var num = 0;
+                  lyr.name = fileInfo.fileName;
+                  lyr.xtnAddData = true;
+                  array.forEach(lyr.getLayers(),function(l) {
+                    if (l && l.graphics && l.graphics.length > 0 ) {
+                      num += l.graphics.length;
+                    }
+                  });
+                  var mapSR = map.spatialReference, outSR = lyr._outSR;
+                  var projOk = (mapSR && outSR) && (mapSR.equals(outSR) ||
+                    mapSR.isWebMercator() && outSR.wkid === 4326 ||
+                    outSR.isWebMercator() && mapSR.wkid === 4326);
+                  if (projOk) {
+                    map.addLayer(lyr);
+                  } else {
+                    new Message({
+                      titleLabel: i18n._widgetLabel,
+                      message: i18n.addFromFile.kmlProjectionMismatch
+                    });
+                  }
+                  _self._setBusy(false);
+                  _self._setStatus(i18n.addFromFile.featureCountPattern
+                    .replace("{filename}",fileInfo.fileName)
+                    .replace("{count}",num)
+                  );
+                }).otherwise(function(err) {
+                  handleError("kml-_waitForLayer.error",err);
+                });
+              },
+              error: function(err) {
+                self._io = null;
+                err = lang.mixin(new Error(), err);
+                err.message = "Unable to load KML: " + (err.message || "");
+                self._fireUpdateEnd(err);
+                self._errorHandler(err);
+                handleError("Unable to load KML",err);
+              }
+            },{usePost:true});
+          };
+          layer._parseKml();
+
+        };
+
+        try {
+          reader.readAsText(fileInfo.file);
+        } catch(ex) {
+          handleError("FileReader::readAsText",ex);
+        }
+      },
+
+      _generateFeatures: function(job,formData) {
+        var url = job.sharingUrl + "/content/features/generate";
+        job.publishParameters =  job.publishParameters || {};
+        var params = lang.mixin(job.publishParameters,{
+          name: job.baseFileName,
+          targetSR: job.map.spatialReference,
+          maxRecordCount: this.maxRecordCount,
+          enforceInputFileSizeLimit: true,
+          enforceOutputJsonSizeLimit: true
+        });
+        if (job.generalize) {
+          // 1:40,000
+          var extent = scaleUtils.getExtentForScale(job.map,40000);
+          var resolution = extent.getWidth() / job.map.width;
+          params.generalize = true;
+          params.maxAllowableOffset = resolution;
+          // 1:4,000
+          resolution = resolution / 10;
+          var numDecimals = 0;
+          while (resolution < 1) {
+            resolution = resolution * 10;
+            numDecimals++;
+          }
+          params.reducePrecision = true;
+          params.numberOfDigitsAfterDecimal = numDecimals;
+        }
+        var content = {
+          f: "json",
+          filetype: job.fileType.toLowerCase(),
+          publishParameters: window.JSON.stringify(params)
+        };
+        return esriRequest({
+          url: url,
+          content: content,
+          form: formData,
+          handleAs: "json"
+        });
+      },
+
+      _getBaseFileName: function(fileName) {
+        var a, baseFileName = fileName;
+        if (sniff("ie")) { //fileName is full path in IE so extract the file name
+          a = baseFileName.split("\\");
+          baseFileName = a[a.length - 1];
+        }
+        a = baseFileName.split(".");
+        //Chrome and IE add c:\fakepath to the value - we need to remove it
+        baseFileName = a[0].replace("c:\\fakepath\\","");
+        return baseFileName;
+      },
+
+      _getBusy: function() {
+        return domClass.contains(this.uploadLabel,"disabled");
+      },
+
+      _getFileInfo: function(dropEvent) {
+        var file, files;
+        var info = {
+          ok: false,
+          file: null,
+          fileName: null,
+          fileType: null
+        };
+        if (dropEvent) {
+          files = dropEvent.dataTransfer.files;
+        } else {
+          files = this.fileNode.files;
+        }
+        if (files && files.length === 1) {
+          info.file = file = files[0];
+          info.fileName = file.name;
+          if (util.endsWith(file.name,".zip")) {
+            info.ok = true;
+            info.fileType = "Shapefile";
+          } else if (util.endsWith(file.name,".csv")) {
+            info.ok = true;
+            info.fileType = "CSV";
+          } else if (util.endsWith(file.name,".kml")) {
+            info.ok = true;
+            info.fileType = "KML";
+          } else if (util.endsWith(file.name,".gpx")) {
+            info.ok = true;
+            info.fileType = "GPX";
+          } else if (util.endsWith(file.name,".geojson") ||
+            util.endsWith(file.name,".geo.json")) {
+            info.ok = true;
+            info.fileType = "GeoJSON";
+          }
+        }
+        if (info.ok) {
+          info.ok = array.some(this.SHAPETYPE_ICONS,function(filetypeIcon) {
+            return filetypeIcon.type.toLowerCase() === info.fileType.toLowerCase();
+          });
+        }
+        if (info.ok) {
+          info.baseFileName = this._getBaseFileName(info.fileName);
+        } else {
+          var msg = i18n.addFromFile.invalidType, usePopup = true;
+          if (typeof info.fileName === "string" && info.fileName.length > 0) {
+            msg = i18n.addFromFile.invalidTypePattern
+              .replace("{filename}",info.fileName);
+          }
+          this._setBusy(false);
+          this._setStatus(msg);
+          if (usePopup) {
+            var nd = document.createElement("div");
+            nd.appendChild(document.createTextNode(msg));
+            new Message({
+              titleLabel: i18n._widgetLabel,
+              message: nd
+            });
+          }
+        }
+        return info;
+      },
+
+      resize: function() {
+      },
+
+      _setBusy: function(isBusy) {
+        if (isBusy) {
+          domClass.add(this.uploadLabel,"disabled");
+          domClass.add(this.dropArea,["hit","disabled"]);
+        } else {
+          domClass.remove(this.uploadLabel,"disabled");
+          domClass.remove(this.dropArea,["hit","disabled"]);
+        }
+      },
+
+      _setStatus: function(msg) {
+        if(this.wabWidget) {
+          this.wabWidget._setStatus(msg);
+        }
+      }
+
+    });
+
+  });

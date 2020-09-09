@@ -1,19 +1,489 @@
-// All material copyright ESRI, All Rights Reserved, unless otherwise specified.
-// See http://js.arcgis.com/3.15/esri/copyright.txt and http://www.arcgis.com/apps/webappbuilder/copyright.txt for details.
-//>>built
-require({cache:{"url:widgets/Bookmark/setting/Sync.html":'\x3cdiv class\x3d"sync"\x3e\r\n  \x3cdiv class\x3d"sync-setting-item"\x3e\r\n    \x3cdiv class\x3d"check" data-dojo-attach-point\x3d"isSyncWebmapNode"\x3e\x3c/div\x3e\r\n    \x3cdiv class\x3d"marks-table-div web-map" data-dojo-attach-point\x3d"webMapBookMarkerContainer"\x3e\x3c/div\x3e\r\n  \x3c/div\x3e\r\n\r\n  \x3cdiv class\x3d"sync-setting-item"\x3e\r\n    \x3cdiv class\x3d"check" data-dojo-attach-point\x3d"isSyncCustomNode"\x3e\x3c/div\x3e\r\n\r\n    \x3cdiv data-dojo-attach-point\x3d"customBtns" class\x3d"verticalCenter"\x3e\r\n      \x3c!--\x3cdiv class\x3d"custom-btns" data-dojo-attach-point\x3d"importBtn"\x3e${nls.import}\x3c/div\x3e--\x3e\r\n      \x3cdiv class\x3d"custom-btns create" data-dojo-attach-point\x3d"createNewBtn"\x3e${nls.create}\x3c/div\x3e\r\n    \x3c/div\x3e\r\n\r\n    \x3cdiv class\x3d"marks-table-div custom editing" data-dojo-attach-point\x3d"custombookMarkerContainer"\x3e\x3c/div\x3e\r\n  \x3c/div\x3e\r\n\x3c/div\x3e'}});
-define("dojo/_base/declare dojo/_base/lang dojo/_base/array dojo/keys jimu/BaseWidgetSetting dijit/_WidgetsInTemplateMixin dojo/on dojo/_base/html jimu/dijit/Popup jimu/dijit/Message ./Edit ./Import dojo/text!./Sync.html ../utils jimu/dijit/CheckBox libs/Sortable".split(" "),function(r,c,g,k,t,u,f,d,m,n,v,w,x,e,p,q){return r([t,u],{templateString:x,map:null,edit:null,popup:null,popupState:"",editIndex:null,startup:function(){this.webMapBookmarksNodes=q.create(this.webMapBookMarkerContainer,{sort:!1,
-disabled:!0,animation:100});this.sortableBookMarkerNodes=q.create(this.custombookMarkerContainer,{handle:".drag-masker",sort:!0,disabled:!1,animation:100,onSort:c.hitch(this,function(){this.saveBookMarkersBySortable()})});this.isSyncWebmapCheckBox=new p({label:this.nls.alwaysSync,checked:!1},this.isSyncWebmapNode);this.isSyncWebmapCheckBox.startup();this.isSyncCustomCheckBox=new p({label:this.nls.configCustom,checked:!1},this.isSyncCustomNode);this.isSyncCustomCheckBox.startup();this.own(f(this.isSyncWebmapCheckBox,
-"change",c.hitch(this,function(){!0===this.isSyncWebmapCheckBox.getValue()?this.showWebmapBookmarks():this.hideWebmapBookmarks()})));this.own(f(this.isSyncCustomCheckBox,"change",c.hitch(this,function(){!0===this.isSyncCustomCheckBox.getValue()?this.showCustomBookmarks():this.hideCustomBookmarks()})));this.own(f(this.createNewBtn,"click",c.hitch(this,function(){this.onAddBookmarkClick()})));this.hideWebmapBookmarks();this.hideCustomBookmarks();this.inherited(arguments)},showWebmapBookmarks:function(){d.removeClass(this.webMapBookMarkerContainer,
-"hide");e.empty(this._bookmarksInWebmap);this._bookmarksInWebmap=e.readBookmarksInWebmap(this.map);this._bookmarksInWebmap=this.displayBookmarks({bookmarks:this._bookmarksInWebmap,syncMode:"webmap",bookmarksContainerNode:this.webMapBookMarkerContainer})},hideWebmapBookmarks:function(){d.addClass(this.webMapBookMarkerContainer,"hide")},showCustomBookmarks:function(){d.removeClass(this.customBtns,"hide");d.removeClass(this.custombookMarkerContainer,"hide");"undefined"===typeof this._customBookmarks&&
-(e.empty(this._customBookmarks),this._customBookmarks=this.config.bookmarks2D,this._customBookmarks=this.displayBookmarks({bookmarks:this._customBookmarks,syncMode:"custom",bookmarksContainerNode:this.custombookMarkerContainer}))},hideCustomBookmarks:function(){d.addClass(this.customBtns,"hide");d.addClass(this.custombookMarkerContainer,"hide")},destroy:function(){this.webMapBookmarksNodes&&this.webMapBookmarksNodes.destroy&&(this.webMapBookmarksNodes.destroy(),this.webMapBookmarksNodes=null);this.sortableBookMarkerNodes&&
-(this.sortableBookMarkerNodes.destroy(),this.sortableBookMarkerNodes=null);g.forEach(this._bookmarksInWebmap,function(a){a.itemNode&&a.itemNode.destroy()},this);this._bookmarksInWebmap=[];g.forEach(this._customBookmarks,function(a){a.itemNode&&a.itemNode.destroy()},this);this._customBookmarks=[];this.inherited(arguments)},setConfig:function(a){this.config=a;!0===this.config.syncMode.webmap&&this.isSyncWebmapCheckBox.setValue(!0);!0===this.config.syncMode.custom&&this.isSyncCustomCheckBox.setValue(!0)},
-getConfig:function(){!0===this.isSyncWebmapCheckBox.getValue()?this.config.syncMode.webmap=!0:this.config.syncMode.webmap=!1;!0===this.isSyncCustomCheckBox.getValue()?this.config.syncMode.custom=!0:this.config.syncMode.custom=!1;var a=[],a=a.concat(this._customBookmarks);return{syncMode:this.config.syncMode,bookmarks:a}},displayBookmarks:function(a){var b=a.bookmarks,h=a.syncMode,y=a.bookmarksContainerNode||this.custombookMarkerContainer;e.empty(b);var l={},l="webmap"===h?{editBtn:!1,selectedBtn:!1,
-deleteBtn:!1,renameBtn:!1}:{editBtn:!0,selectedBtn:!1,deleteBtn:!0,renameBtn:!1};g.forEach(b,function(a){if(a){l.layerInfosIcon=e.isWithLayerInfos(a);var b=e.createBookMarkNode(a,this.nls,this.folderUrl,l);a.itemNode=b;this.own(f(b,"thumbnail-click",c.hitch(this,c.partial(this._onBookmarkClick,a))));this.own(f(b,"delete",c.hitch(this,c.partial(this._onBookmarkDeleteImmediately,a))));this.own(f(b,"edit",c.hitch(this,c.partial(this._onBookmarkEdit,a))))}},this);b.forEach(c.hitch(this,function(a){a&&
-a.itemNode&&a.itemNode.domNode&&d.place(a.itemNode.domNode,y,"last")}));return b},saveBookMarkersBySortable:function(){for(var a=this.sortableBookMarkerNodes.toArray(),b=[],h=0,c=a.length;h<c;h++){var d=e.findBookMarkByUID(a[h],this._customBookmarks);d&&b.push(d.bookmark)}this._customBookmarks=b;this.displayBookmarks({bookmarks:this._customBookmarks,syncMode:"custom"})},getBookmarkByName:function(a){for(var b=this._customBookmarks.length,c=0;c<b;c++)if(this._customBookmarks[c].displayName===a)return this.editIndex=
-c,this._customBookmarks[c]},onAddBookmarkClick:function(){this.popupState="ADD";this._openEdit(this.nls.addBookmark,{name:"",thumbnail:"",extent:this.map.extent.toJson()})},_onBookmarkEdit:function(a){this.popupState="EDIT";this._openEdit(this.nls.edit,a)},_onBookmarkDeleteImmediately:function(a){(a=e.findBookMark(a,this._customBookmarks))&&a.bookmark&&(a.bookmark.itemNode&&a.bookmark.itemNode.destroy(),this._customBookmarks.splice(a.idx,1))},_openEdit:function(a,b){this.edit=new v({nls:this.nls,
-folderUrl:this.folderUrl,portalUrl:this.appConfig.map.portalUrl,itemId:this.appConfig.map.itemId,mapOptions:this.appConfig.map.mapOptions});this.edit.setConfig(b||{});this.popup=new m({titleLabel:a,autoHeight:!0,content:this.edit,container:"main-page",width:600,buttons:[{label:this.nls.ok,key:k.ENTER,disable:!0,onClick:c.hitch(this,"_onEditOk",b)},{label:this.nls.cancel,classNames:["jimu-btn-vacation"],key:k.ESCAPE}],onClose:c.hitch(this,"_onEditClose")});d.addClass(this.popup.domNode,"widget-setting-popup");
-this.edit.startup()},_onEditOk:function(a){var b=this.edit.getConfig(),d=null;if(b.name&&b.extent){"EDIT"===this.popupState&&(a=c.mixin(a,b));a=b.name;var f=e.getAutoRenameBeforeAdd(a,this._customBookmarks,!0);b.name=a;b.displayName=f;"ADD"===this.popupState?(this.addBookmark(b),d=!0):"EDIT"===this.popupState&&(this.saveBookMarkersBySortable(),d=!0);d?(this.popup.close(),this.popupState="",this.editIndex=null,d=!1):(b=g.mark(d.repeatFields,c.hitch(this,function(a){return a&&a.name})),new n({message:this.nls[d.errorCode]+
-b.toString()}))}else new n({message:this.nls.warning})},_onEditClose:function(){this.popup=this.edit=null},addBookmark:function(a){var b=e.createBookMarkNode(a,this.nls,this.folderUrl,{editBtn:!0,changeImgBtn:!1});a.itemNode=b;this._customBookmarks.unshift(a);a.itemNode&&a.itemNode.domNode&&d.place(a.itemNode.domNode,this.custombookMarkerContainer,"last");this.saveBookMarkersBySortable()},onImport:function(){this.importWidget=new w({nls:this.nls,map:this.map,folderUrl:this.folderUrl});this.popup=
-new m({titleLabel:this.nls.importTitle,autoHeight:!0,content:this.importWidget,container:"main-page",width:640,buttons:[{label:this.nls.ok,key:k.ENTER,disable:!0,onClick:c.hitch(this,"_onImportOk")},{label:this.nls.cancel,classNames:["jimu-btn-vacation"],key:k.ESCAPE}],onClose:c.hitch(this,"_onImportClose")});d.addClass(this.popup.domNode,"widget-setting-popup");this.importWidget.startup()},_onImportOk:function(){var a=this.importWidget.getConfig();g.forEach(a,function(a){this.addBookmark(a)},this);
-this.popup.close()},_onImportClose:function(){this.importWidget.destroy()}})});
+///////////////////////////////////////////////////////////////////////////
+// Copyright © Esri. All Rights Reserved.
+//
+// Licensed under the Apache License Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+///////////////////////////////////////////////////////////////////////////
+
+define(['dojo/_base/declare',
+  'dojo/_base/lang',
+  'dojo/_base/array',
+  'dojo/keys',
+  "jimu/BaseWidgetSetting",
+  "dijit/_WidgetsInTemplateMixin",
+  'dojo/on',
+  'dojo/_base/html',
+  'jimu/dijit/Popup',
+  'jimu/dijit/Message',
+  //'../ItemNode',
+  './Edit',
+  './Import',
+  "dojo/text!./Sync.html",
+  //'jimu/utils',
+  '../utils',
+  'jimu/dijit/CheckBox',
+  'libs/Sortable'
+],
+  function (declare, lang, array, keys, BaseWidgetSetting, _WidgetsInTemplateMixin,
+    on, html, Popup, Message,/* ItemNode,*/Edit, ImportWidget,
+    template, /*jimuUtils,*/utils, CheckBox, Sortable) {
+    //var Sortable = window.Sortable;
+    var clazz = declare([BaseWidgetSetting, _WidgetsInTemplateMixin], {
+      templateString: template,
+      map: null,
+      edit: null,
+      popup: null,
+      popupState: "", // ADD or EDIT
+      editIndex: null,
+
+      startup: function () {
+        this.webMapBookmarksNodes = Sortable.create(this.webMapBookMarkerContainer, {
+          sort: false,
+          disabled: true,//can't edit
+          animation: 100
+        });
+
+        this.sortableBookMarkerNodes = Sortable.create(this.custombookMarkerContainer, {
+          handle: ".drag-masker",
+          sort: true,
+          disabled: false,//enable dnd in edit mode
+          animation: 100,
+          onSort: lang.hitch(this, function (/*evt*/) {
+            this.saveBookMarkersBySortable(/*true*/);
+          })
+        });
+
+        this.isSyncWebmapCheckBox = new CheckBox({
+          label: this.nls.alwaysSync,
+          checked: false
+        }, this.isSyncWebmapNode);
+        this.isSyncWebmapCheckBox.startup();
+        this.isSyncCustomCheckBox = new CheckBox({
+          label: this.nls.configCustom,
+          checked: false
+        }, this.isSyncCustomNode);
+        this.isSyncCustomCheckBox.startup();
+
+        this.own(on(this.isSyncWebmapCheckBox, 'change', lang.hitch(this, function () {
+          if (true === this.isSyncWebmapCheckBox.getValue()) {
+            this.showWebmapBookmarks();
+          } else {
+            this.hideWebmapBookmarks();//just hide
+          }
+        })));
+        this.own(on(this.isSyncCustomCheckBox, 'change', lang.hitch(this, function () {
+          if (true === this.isSyncCustomCheckBox.getValue()) {
+            this.showCustomBookmarks();
+          } else {
+            this.hideCustomBookmarks();
+          }
+        })));
+        // this.own(on(this.importBtn, 'click', lang.hitch(this, function () {//add bookmark
+        //   this.onImport();
+        // })));
+        this.own(on(this.createNewBtn, 'click', lang.hitch(this, function () {
+          this.onAddBookmarkClick();
+        })));
+
+        this.hideWebmapBookmarks();
+        this.hideCustomBookmarks();
+
+        this.inherited(arguments);
+      },
+
+      //Webmap
+      showWebmapBookmarks: function () {
+        html.removeClass(this.webMapBookMarkerContainer, "hide");
+        utils.empty(this._bookmarksInWebmap);//clean dom before readBookmarksInWebmap
+        this._bookmarksInWebmap = utils.readBookmarksInWebmap(this.map);
+        this._bookmarksInWebmap = this.displayBookmarks({
+          bookmarks: this._bookmarksInWebmap,
+          syncMode: "webmap",
+          //initDuplicateName: false,
+          bookmarksContainerNode: this.webMapBookMarkerContainer
+        });
+      },
+      hideWebmapBookmarks: function () {
+        html.addClass(this.webMapBookMarkerContainer, "hide");
+      },
+      //Custom
+      showCustomBookmarks: function () {
+        html.removeClass(this.customBtns, "hide");
+        html.removeClass(this.custombookMarkerContainer, "hide");
+
+        if("undefined" === typeof this._customBookmarks){
+          utils.empty(this._customBookmarks);
+          //var bookmarksInConfig = this.config.bookmarks2D;
+          //this._customBookmarks = utils.webmapBookmarkFilter(bookmarksInConfig, this.map);
+          this._customBookmarks = this.config.bookmarks2D;//DO NOT filter bookmark, allow repeat
+          this._customBookmarks = this.displayBookmarks({
+            bookmarks: this._customBookmarks,
+            syncMode: "custom",
+            //initDuplicateName: true,
+            bookmarksContainerNode: this.custombookMarkerContainer
+          });
+        }
+      },
+      hideCustomBookmarks: function () {
+        html.addClass(this.customBtns, "hide");
+        html.addClass(this.custombookMarkerContainer, "hide");
+      },
+      destroy: function () {
+        if (this.webMapBookmarksNodes && this.webMapBookmarksNodes.destroy){
+          this.webMapBookmarksNodes.destroy();
+          this.webMapBookmarksNodes = null;
+        }
+        if (this.sortableBookMarkerNodes) {
+          this.sortableBookMarkerNodes.destroy();
+          this.sortableBookMarkerNodes = null;
+        }
+
+        array.forEach(this._bookmarksInWebmap, function (bookmark) {
+          if (bookmark.itemNode) {
+            bookmark.itemNode.destroy();
+          }
+        }, this);
+        this._bookmarksInWebmap = [];
+        array.forEach(this._customBookmarks, function (bookmark) {
+          if (bookmark.itemNode) {
+            bookmark.itemNode.destroy();
+          }
+        }, this);
+        this._customBookmarks = [];
+
+        this.inherited(arguments);
+      },
+
+      setConfig: function (config) {
+        this.config = config;
+
+        if (true === this.config.syncMode.webmap) {
+          this.isSyncWebmapCheckBox.setValue(true);
+        }
+        if (true === this.config.syncMode.custom) {
+          this.isSyncCustomCheckBox.setValue(true);
+        }
+      },
+      getConfig: function () {
+        if (true === this.isSyncWebmapCheckBox.getValue()) {
+          this.config.syncMode.webmap = true;
+        } else {
+          this.config.syncMode.webmap = false;
+        }
+        if (true === this.isSyncCustomCheckBox.getValue()) {
+          this.config.syncMode.custom = true;
+        } else {
+          this.config.syncMode.custom = false;
+        }
+
+        var bookmarks = [];//just save custom-bookmarks, because read webmap-bookmarks every time when open
+        bookmarks = bookmarks.concat(this._customBookmarks);
+
+        return {
+          syncMode: this.config.syncMode,
+          bookmarks: bookmarks//,
+          //updating: this._NEED_TO_UPDATE || false
+        };
+      },
+
+      //options{bookmarks:, syncMode:, bookmarksContainerNode:}
+      displayBookmarks: function (options) {
+        var bookmarks = options.bookmarks,
+          syncMode = options.syncMode,
+          //initDuplicateName = options.initDuplicateName,
+          bookmarksContainerNode = options.bookmarksContainerNode || this.custombookMarkerContainer;
+        //default oper custom bookmarke;
+
+        utils.empty(bookmarks);
+
+        // if (true === initDuplicateName) {
+        //   utils.processDuplicateName(bookmarks);//processDuplicateName only init bookmarks
+        // }
+
+        var display = {};
+        if (syncMode === "webmap") {
+          display = {
+            editBtn: false,
+            selectedBtn: false,
+            deleteBtn: false,
+            renameBtn: false
+          };
+        } else { //"custom"
+          display = {
+            editBtn: true,
+            selectedBtn: false,
+            deleteBtn: true,
+            renameBtn: false
+          };
+        }
+
+        array.forEach(bookmarks, function (bookmark) {
+          if (!bookmark) {
+            return;
+          }
+
+          display.layerInfosIcon = utils.isWithLayerInfos(bookmark);//layerInfosIcon
+
+          var bookMarkNode = utils.createBookMarkNode(bookmark, this.nls, this.folderUrl, display);
+          bookmark.itemNode = bookMarkNode;
+
+          this.own(on(bookMarkNode, 'thumbnail-click', lang.hitch(
+            this, lang.partial(this._onBookmarkClick, bookmark))));
+          //this.own(on(node, 'selected', lang.hitch(this, lang.partial(this._onBookmarkSelected, bookmark))));
+          //this.own(on(node, 'unselected', lang.hitch(this, lang.partial(this._onBookmarkUnSelected, bookmark))));
+          this.own(on(bookMarkNode, 'delete', lang.hitch(this, lang.partial(
+            this._onBookmarkDeleteImmediately, bookmark))));
+          //this.own(on(node, 'labelBlur', lang.hitch(this, lang.partial(this._onBookmarkLabelChange, bookmark))));
+          this.own(on(bookMarkNode, 'edit', lang.hitch(this, lang.partial(this._onBookmarkEdit, bookmark))));
+        }, this);
+
+        bookmarks.forEach(lang.hitch(this, function (bookmark) {
+          if (!bookmark) {
+            return;
+          }
+
+          if (bookmark.itemNode && bookmark.itemNode.domNode) {
+            //DOMs have the same order to Json
+            html.place(bookmark.itemNode.domNode, bookmarksContainerNode, "last");
+          }
+        }));
+
+        return bookmarks;
+      },
+      saveBookMarkersBySortable: function (/*isKeepEditing*/) {
+        //get new order
+        var orders = this.sortableBookMarkerNodes.toArray();
+        var newOrderBookMarkers = [];
+        for (var i = 0, len = orders.length; i < len; i++) {
+          var id = orders[i];
+
+          var res = utils.findBookMarkByUID(id, this._customBookmarks);
+          if (res) {
+            var b = res.bookmark;
+            newOrderBookMarkers.push(b);
+          }
+        }
+        //save
+        this._customBookmarks = newOrderBookMarkers;
+        this.displayBookmarks({
+          bookmarks: this._customBookmarks,
+          syncMode: "custom"//,
+          //initDuplicateName: true
+        });
+        //keep editing after save
+        // if (isKeepEditing) {
+        //   this._customBookmarks.forEach(lang.hitch(this, function (bookmark) {
+        //     ItemNode.toggleEditable(bookmark);
+        //   }));
+        //   this.sortableBookMarkerNodes.option("disabled", !this.headBar.isEditing());
+        // }
+      },
+      getBookmarkByName: function (name) {
+        var len = this._customBookmarks.length;
+        for (var i = 0; i < len; i++) {
+          if (this._customBookmarks[i].displayName === name) {
+            this.editIndex = i;
+            return this._customBookmarks[i];
+          }
+        }
+      },
+
+      /////////////////////////////////////////////////////////////////////////////////////////
+      onAddBookmarkClick: function () {
+        this.popupState = "ADD";
+        this._openEdit(this.nls.addBookmark, {
+          name: '',
+          thumbnail: '',
+          extent: this.map.extent.toJson()
+        });
+      },
+      _onBookmarkEdit: function (bookmark) {
+        this.popupState = "EDIT";
+        this._openEdit(this.nls.edit, bookmark);
+      },
+      _onBookmarkDeleteImmediately: function (bookmark) {
+        var bm = utils.findBookMark(bookmark, this._customBookmarks);
+        if (bm && bm.bookmark) {
+          if (bm.bookmark.itemNode) {
+            bm.bookmark.itemNode.destroy();
+          }
+
+          this._customBookmarks.splice(bm.idx, 1);
+        }
+      },
+
+      // _onEditClick: function(name){
+      //     this.getBookmarkByName(name);
+      //     var bookmark = this._customBookmarks[this.editIndex];
+      //     this.popupState = "EDIT";
+      //     this._openEdit(this.nls.edit, bookmark);
+      //   },
+      _openEdit: function (title, bookmark) {
+        this.edit = new Edit({
+          nls: this.nls,
+          folderUrl: this.folderUrl,
+          portalUrl: this.appConfig.map.portalUrl,
+          itemId: this.appConfig.map.itemId,
+          mapOptions: this.appConfig.map.mapOptions
+        });
+        this.edit.setConfig(bookmark || {});
+        this.popup = new Popup({
+          titleLabel: title,
+          autoHeight: true,
+          content: this.edit,
+          container: 'main-page',
+          width: 600,
+          buttons: [{
+            label: this.nls.ok,
+            key: keys.ENTER,
+            disable: true,
+            onClick: lang.hitch(this, '_onEditOk', bookmark)
+          }, {
+            label: this.nls.cancel,
+            classNames: ['jimu-btn-vacation'],
+            key: keys.ESCAPE
+          }
+          ],
+          onClose: lang.hitch(this, '_onEditClose')
+        });
+        html.addClass(this.popup.domNode, 'widget-setting-popup');
+        this.edit.startup();
+      },
+
+      _onEditOk: function (bookmarkRef) {
+        var bookmark = this.edit.getConfig();
+        var editResult = null;
+        if (!bookmark.name || !bookmark.extent) {
+          new Message({
+            message: this.nls.warning
+          });
+          return;
+        }
+
+        if(this.popupState === "EDIT"){
+          bookmarkRef = lang.mixin(bookmarkRef, bookmark);//edit need mix infomation first
+        }
+        //autoRename
+        var rawNewName = bookmark.name;
+        var name = utils.getAutoRenameBeforeAdd(rawNewName, this._customBookmarks, true);
+        bookmark.name = rawNewName;//"bookmark"
+        bookmark.displayName = name;//"bookmark(n)"
+
+        if (this.popupState === "ADD") {
+          this.addBookmark(bookmark);
+          editResult = true;
+        } else if (this.popupState === "EDIT") {
+          //this._customBookmarks.splice(this.editIndex, 1, bookmark);
+          //this.displayBookmarks();
+          // bookmarkRef.name = bookmark.name;
+          // bookmarkRef.displayName = bookmark.displayName;
+          // bookmarkRef.extent = bookmark.extent;
+          this.saveBookMarkersBySortable();
+          editResult = true;
+        }
+
+        if (editResult) {
+          this.popup.close();
+          this.popupState = "";
+          this.editIndex = null;
+          editResult = false;
+        } else {
+          var repeatnames = array.mark(editResult.repeatFields, lang.hitch(this, function (field) {
+            return field && field.name;
+          }));
+          new Message({
+            message: this.nls[editResult.errorCode] + repeatnames.toString()
+          });
+        }
+      },
+      _onEditClose: function () {
+        this.edit = null;
+        this.popup = null;
+      },
+
+      addBookmark: function (bookmark) {
+        //var name = utils.getAutoRenameBeforeAdd(rawNewName, this._customBookmarks);
+        //var bookMarkNode = this._createBookMarkNode(bookmark);
+        var display = {
+          editBtn: true,
+          changeImgBtn: false
+        };
+        var bookMarkNode = utils.createBookMarkNode(bookmark, this.nls, this.folderUrl, display);
+        bookmark.itemNode = bookMarkNode;
+
+        this._customBookmarks.unshift(bookmark);
+
+        if (bookmark.itemNode && bookmark.itemNode.domNode) {
+          html.place(bookmark.itemNode.domNode, this.custombookMarkerContainer, "last");
+        }
+
+        this.saveBookMarkersBySortable();
+      },
+
+      //ImportWidget
+      onImport: function () {
+        this.importWidget = new ImportWidget({
+          nls: this.nls,
+          map: this.map,
+          folderUrl: this.folderUrl//,
+          //bookmarksInSetting: this._customBookmarks
+        });
+        //this.importWidget.setConfig(bookmark || {});
+        this.popup = new Popup({
+          titleLabel: this.nls.importTitle,
+          autoHeight: true,
+          content: this.importWidget,
+          container: 'main-page',
+          width: 640,
+          buttons: [{
+            label: this.nls.ok,
+            key: keys.ENTER,
+            disable: true,
+            onClick: lang.hitch(this, '_onImportOk')
+          }, {
+            label: this.nls.cancel,
+            classNames: ['jimu-btn-vacation'],
+            key: keys.ESCAPE
+          }
+          ],
+          onClose: lang.hitch(this, '_onImportClose')
+        });
+        html.addClass(this.popup.domNode, 'widget-setting-popup');
+        this.importWidget.startup();
+      },
+      _onImportOk: function () {
+        var bookmarks = this.importWidget.getConfig();
+        //TODO when already have bookmarks, delete them?
+        array.forEach(bookmarks, function (bookmark) {
+          this.addBookmark(bookmark);
+        }, this);
+        this.popup.close();
+      },
+      _onImportClose: function () {
+        this.importWidget.destroy();
+      }
+      // _onmarkItemEditClick: function (bookmarkName) {
+      //   this._onEditClick(bookmarkName);
+      // },
+      // _onmarkItemDeleteClick: function (bookmarkName) {
+      //   this.getBookmarkByName(bookmarkName);
+      //   if (this.editIndex !== null) {
+      //     this._customBookmarks.splice(this.editIndex, 1);
+      //   }
+      //   this.displayBookmarks({
+      //     bookmarks: this._customBookmarks,
+      //     syncMode: "custom"
+      //   });
+      // }
+    });
+    return clazz;
+  });

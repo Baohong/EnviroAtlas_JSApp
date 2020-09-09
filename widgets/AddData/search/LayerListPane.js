@@ -1,9 +1,171 @@
-// All material copyright ESRI, All Rights Reserved, unless otherwise specified.
-// See http://js.arcgis.com/3.15/esri/copyright.txt and http://www.arcgis.com/apps/webappbuilder/copyright.txt for details.
-//>>built
-require({cache:{"url:widgets/AddData/search/templates/LayerListPane.html":'\x3cdiv\x3e\r\n  \x3cdiv class\x3d"add-data-layerlist--mask"\x3e\x3c/div\x3e\r\n  \x3cdiv class\x3d"add-data-layerlist--container" data-dojo-attach-point\x3d"_container"\x3e\r\n    \x3ch2 data-dojo-attach-point\x3d"_title"\x3e\x3c/h2\x3e\r\n    \x3cdiv data-dojo-attach-point\x3d"_layerlist"\x3e\r\n  \x3c/div\x3e\r\n  \x3cdiv class\x3d"add-data-layerlist--footer jimu-widget-add-data-footer" data-dojo-attach-point\x3d"_footer"\x3e\r\n    \x3ca href\x3d"#" class\x3d"back-button" data-dojo-attach-point\x3d"_backButton"\x3e\r\n      ${i18n.layerList.back}\x3ci class\x3d"esri-icon-collapse"\x3e\x3c/i\x3e\r\n    \x3c/a\x3e\r\n  \x3c/div\x3e\r\n\x3c/div\x3e\r\n'}});
-define("dojo/_base/declare dojo/_base/array dojo/on dojo/dom-class dojo/dom-construct dijit/_WidgetBase dijit/_TemplatedMixin dijit/_WidgetsInTemplateMixin dojo/text!./templates/LayerListPane.html dojo/i18n!../nls/strings ./util".split(" "),function(l,k,m,g,d,n,p,q,r,h,t){return l([n,p,q],{i18n:h,templateString:r,wabWidget:null,baseClass:"add-data-widget-layers",postCreate:function(){this.inherited(arguments)},startup:function(){this._started||(this._buildList(),this._initListeners(),this.inherited(arguments))},
-_addLayer:function(a,c){var b=this,f=this._getLayerTitle(c),e=d.create("div",{"class":"add-data-layerlist--listitem"},a);d.create("A",{"class":"remove-button",href:"#",innerHTML:"\x3cspan class\x3d'esri-icon-trash'\x3e\x3c/span\x3e",title:h.layerList.removeLayer,onclick:function(a){a.preventDefault();try{b.wabWidget&&b.wabWidget.map&&(b.wabWidget.map.removeLayer(c),d.destroy(e))}catch(u){console.warn("Error removing layer."),console.warn(u)}}},e);a=d.create("label",{"class":"layer-name"},e);t.setNodeText(a,
-f)},_buildList:function(){var a=this,c=!1,b=[],f=this.wabWidget.map,e=d.create("div",{"class":"add-data-layerlist--list"});k.forEach(f.layerIds,function(a){b.push(a)});k.forEach(f.graphicsLayerIds,function(a){b.push(a)});b.reverse();k.forEach(b,function(b){(b=f.getLayer(b))&&b.xtnAddData&&(c=!0,a._addLayer(e,b))});return c?e:d.create("div",{"class":"no-data-message",innerHTML:h.layerList.noLayersAdded})},_getLayerTitle:function(a){var c="...";if("string"===typeof a.label&&0<a.label.length)c=a.label;
-else if("string"===typeof a.title&&0<a.title.length)c=a.title;else if("string"===typeof a.name&&0<a.name.length)c=a.name;else if(a.url){var b=a.url.indexOf("/FeatureServer");-1===b&&(b=a.url.indexOf("/MapServer"));-1===b&&(b=a.url.indexOf("/ImageServer"));-1===b&&(b=a.url.indexOf("/service"));-1<b&&(a=a.url.substring(0,b),c=a=a.substring(a.lastIndexOf("/")+1,a.length))}return c},_initListeners:function(){var a=this;this.own(m(this._backButton,"click",function(c){c.preventDefault();a.hide()}))},show:function(){var a=
-this._buildList();this._title.innerHTML=h.layerList.caption;this._layerlist.innerHTML="";a&&a.tagName&&this._layerlist.appendChild(a);this.wabWidget&&this.wabWidget.domNode&&g.add(this.wabWidget.domNode,"layerlist-show");g.add(this.domNode,"show")},hide:function(){this.wabWidget&&this.wabWidget.domNode&&g.remove(this.wabWidget.domNode,"layerlist-show");g.remove(this.domNode,"show")}})});
+///////////////////////////////////////////////////////////////////////////
+// Copyright © Esri. All Rights Reserved.
+//
+// Licensed under the Apache License Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+///////////////////////////////////////////////////////////////////////////
+define(["dojo/_base/declare",
+    "dojo/_base/array",
+    "dojo/on",
+    "dojo/dom-class",
+    "dojo/dom-construct",
+    "dijit/_WidgetBase",
+    "dijit/_TemplatedMixin",
+    "dijit/_WidgetsInTemplateMixin",
+    "dojo/text!./templates/LayerListPane.html",
+    "dojo/i18n!../nls/strings",
+    "./util"
+],
+function(declare, array, on, domClass, domConstruct, _WidgetBase, _TemplatedMixin,
+  _WidgetsInTemplateMixin, template, i18n, util) {
+
+  return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
+
+    i18n: i18n,
+    templateString: template,
+    wabWidget: null,
+    baseClass: "add-data-widget-layers",
+
+    postCreate: function() {
+      this.inherited(arguments);
+    },
+
+    startup: function() {
+      if (this._started) {
+        return;
+      }
+      this._buildList();
+      this._initListeners();
+      this.inherited(arguments);
+    },
+
+    _addLayer: function(parentNode,layer) {
+      //console.warn("layer",layer);
+      var self = this, name = this._getLayerTitle(layer);
+      var layerNode = domConstruct.create("div",{
+        "class": "add-data-layerlist--listitem"
+      }, parentNode);
+      domConstruct.create("A",{
+        "class": "remove-button",
+        "href": "#",
+        innerHTML: "<span class='esri-icon-trash'></span>",
+        title: i18n.layerList.removeLayer,
+        onclick: function(event) {
+          event.preventDefault();
+          try {
+            if (self.wabWidget && self.wabWidget.map) {
+              self.wabWidget.map.removeLayer(layer);
+              domConstruct.destroy(layerNode);
+            }
+          } catch(err) {
+            console.warn("Error removing layer.");
+            console.warn(err);
+          }
+        }
+      },layerNode);
+      var nameNode = domConstruct.create("label",{
+        "class": "layer-name"
+      },layerNode);
+      util.setNodeText(nameNode,name);
+    },
+
+    _buildList: function() {
+      var self = this, hasLayer = false, ids = [], map = this.wabWidget.map;
+      /*
+      var captionNode = domConstruct.create("div",{
+        "class": "caption"
+      },contentNode);
+      util.setNodeText(captionNode,i18n.layerList.caption);
+      */
+      var layersNode = domConstruct.create("div",{
+        "class": "add-data-layerlist--list"
+      });
+      array.forEach(map.layerIds, function(id) {ids.push(id);});
+      array.forEach(map.graphicsLayerIds, function(id) {ids.push(id);});
+      ids.reverse();
+      array.forEach(ids, function(id) {
+        var lyr = map.getLayer(id);
+        if (lyr && lyr.xtnAddData) {
+          hasLayer = true;
+          self._addLayer(layersNode,lyr);
+        }
+      });
+      if (!hasLayer) {
+
+        return domConstruct.create("div",{
+          "class": "no-data-message",
+          "innerHTML": i18n.layerList.noLayersAdded
+        });
+      }
+      return layersNode;
+    },
+
+    _getLayerTitle: function(layer) {
+      var title = "...";
+      if (typeof layer.label === "string" && layer.label.length > 0) {
+        title = layer.label;
+      } else if (typeof layer.title === "string" && layer.title.length > 0) {
+        title = layer.title;
+      } else if (typeof layer.name === "string" && layer.name.length > 0) {
+        title = layer.name;
+      } else if (layer.url) {
+        var svc;
+        var index = layer.url.indexOf("/FeatureServer");
+        if (index === -1) {
+          index = layer.url.indexOf("/MapServer");
+        }
+        if (index === -1) {
+          index = layer.url.indexOf("/ImageServer");
+        }
+        if (index === -1) {
+          index = layer.url.indexOf("/service");
+        }
+        if (index > -1) {
+          svc = layer.url.substring(0,index);
+          svc = svc.substring(svc.lastIndexOf("/") + 1,svc.length);
+          title = svc;
+        }
+      }
+      return title;
+    },
+
+    _initListeners: function() {
+      var self = this;
+      this.own(on(this._backButton, "click", function(event) {
+        event.preventDefault();
+        self.hide();
+      }));
+    },
+
+    show: function() {
+      var content = this._buildList();
+      this._title.innerHTML = i18n.layerList.caption;
+      this._layerlist.innerHTML = "";
+      if(content && content.tagName) {
+        this._layerlist.appendChild(content);
+      }
+      if(this.wabWidget && this.wabWidget.domNode) {
+        domClass.add(this.wabWidget.domNode, "layerlist-show");
+      }
+      domClass.add(this.domNode, "show");
+    },
+
+    hide: function() {
+      if(this.wabWidget && this.wabWidget.domNode) {
+        domClass.remove(this.wabWidget.domNode, "layerlist-show");
+      }
+      domClass.remove(this.domNode, "show");
+    }
+
+  });
+
+});

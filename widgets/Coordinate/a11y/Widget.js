@@ -1,6 +1,106 @@
-// All material copyright ESRI, All Rights Reserved, unless otherwise specified.
-// See http://js.arcgis.com/3.15/esri/copyright.txt and http://www.arcgis.com/apps/webappbuilder/copyright.txt for details.
-//>>built
-define("dojo/_base/lang dojo/on dojo/_base/html dojo/keys jimu/utils dijit/a11yclick".split(" "),function(b,c,h,e,d,f){var g={a11y_init:function(a){d.initFirstFocusNode(this.domNode,this.locateButton);a&&a.isHidePopmenu?d.initLastFocusNode(this.domNode,this.locateButton):d.initLastFocusNode(this.domNode,this.foldableNode)},a11y_initEvents:function(){this.own(c(this.locateButton,f,b.hitch(this,this.onLocateButtonClick)));this.own(c(this.foldContainer,f,b.hitch(this,this.onFoldContainerClick)));this.own(c(this.foldContainer,
-"keydown",b.hitch(this,function(a){if(a.keyCode===e.UP_ARROW||a.keyCode===e.DOWN_ARROW)this.onFoldContainerClick()})))},a11y_setCoordinateInfo:function(a){var b=this.coordinateInfo,c=this.domNode;b&&(b.innerHTML=d.sanitizeHTML(a));c&&h.setAttr(c,"aria-label",a)},_isKeyEvent:function(a){return a&&a._origType?!0:!1},a11y_initPopMenuEvents:function(){this.own(c(this.popMenu.domNode,"keydown",b.hitch(this,function(a){a.keyCode===e.ESCAPE&&(a.stopPropagation(),a.preventDefault(),this.onFoldContainerClick(),
-setTimeout(b.hitch(this,function(){this.foldableNode.focus()}),0))})))},a11y_bindMenuItemEvent:function(a){this.own(c(a,"click",b.hitch(this,function(a){g._isKeyEvent(a)&&setTimeout(b.hitch(this,function(){this.a11y_focusToPopMenuBtn()}),0)})))},a11y_focusMenuItem:function(){this.selectedItem.domNode.focus()},a11y_focusToPopMenuBtn:function(){this.foldableNode.focus()}};return g});
+///////////////////////////////////////////////////////////////////////////
+// Copyright © Esri. All Rights Reserved.
+//
+// Licensed under the Apache License Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+///////////////////////////////////////////////////////////////////////////
+
+define([
+  'dojo/_base/lang',
+  'dojo/on',
+  //'dojo/Deferred',
+  'dojo/_base/html',
+  'dojo/keys',
+  'jimu/utils',
+  "dijit/a11yclick"
+],
+  function (lang, on,/*Deferred, */html, keys, jimuUtils, a11yclick) {
+    var mo = {};
+
+    mo.a11y_init = function (options) {
+      jimuUtils.initFirstFocusNode(this.domNode, this.locateButton);
+
+      if (options && options.isHidePopmenu) {
+        jimuUtils.initLastFocusNode(this.domNode, this.locateButton);
+      } else {
+        jimuUtils.initLastFocusNode(this.domNode, this.foldableNode);
+      }
+    };
+
+    mo.a11y_initEvents = function () {
+      this.own(on(this.locateButton, a11yclick, lang.hitch(this, this.onLocateButtonClick)));
+
+      this.own(on(this.foldContainer, a11yclick, lang.hitch(this, this.onFoldContainerClick)));
+      this.own(on(this.foldContainer, "keydown", lang.hitch(this, function (evt) {
+        if (evt.keyCode === keys.UP_ARROW || evt.keyCode === keys.DOWN_ARROW) {
+          this.onFoldContainerClick();
+        }
+      })));
+    };
+
+    mo.a11y_setCoordinateInfo = function (str) {
+      var labelDom = this.coordinateInfo;
+      var widgetDom = this.domNode;
+      if (labelDom) {
+        labelDom.innerHTML = jimuUtils.sanitizeHTML(str);
+      }
+
+      if (widgetDom) {
+        html.setAttr(widgetDom, 'aria-label', str);
+      }
+    };
+
+    mo._isKeyEvent = function (evt) {
+      if (evt && evt._origType) {//: "keyup"
+        return true;
+      }
+
+      return false;
+    };
+
+    /* popUp */
+    mo.a11y_initPopMenuEvents = function () {
+      this.own(on(this.popMenu.domNode, "keydown", lang.hitch(this, function (evt) {
+        if (evt.keyCode === keys.ESCAPE) {
+          //esc to close popup
+          evt.stopPropagation();
+          evt.preventDefault();
+
+          this.onFoldContainerClick();
+
+          setTimeout(lang.hitch(this, function () {
+            this.foldableNode.focus();
+          }), 0);
+        }
+      })));
+    };
+
+    mo.a11y_bindMenuItemEvent = function (menuItem) {
+      this.own(on(menuItem, "click", lang.hitch(this, function (evt) {
+        if (mo._isKeyEvent(evt)) {
+          setTimeout(lang.hitch(this, function () {
+            this.a11y_focusToPopMenuBtn();//just for keyboard events
+          }), 0);
+        }
+      })));
+    };
+
+    mo.a11y_focusMenuItem = function () {
+      this.selectedItem.domNode.focus();
+    };
+
+    mo.a11y_focusToPopMenuBtn = function () {
+      this.foldableNode.focus();
+    };
+
+    return mo;
+  });

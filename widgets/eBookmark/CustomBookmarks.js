@@ -1,14 +1,376 @@
-// All material copyright ESRI, All Rights Reserved, unless otherwise specified.
-// See http://js.arcgis.com/3.15/esri/copyright.txt and http://www.arcgis.com/apps/webappbuilder/copyright.txt for details.
-//>>built
-define("dojo/Evented dojo/_base/declare dojo/_base/lang dojo/_base/html dojo/_base/array dojo/on dojo/sniff esri/SpatialReference jimu/BaseWidget dijit/_TemplatedMixin ./utils ./ItemNode jimu/dijit/ImageChooser libs/Sortable".split(" "),function(k,l,c,d,m,e,n,h,p,q,f,g,r,t){return l([p,q,k],{baseClass:"dojoDndSource dojoDndTarget dojoDndContainer bookmarker-nodes",templateString:"\x3cdiv\x3e\x3c/div\x3e",nls:null,_CHANGING_IMG_BM:null,postCreate:function(){this.inherited(arguments);this.drawerHandle=
-d.create("div",{"class":"drawer-handle hide",innerHTML:"\x3cdiv class\x3d'separate-line'\x3e\x3c/div\x3e"},this.domNode);this.bookMarkerContainer=d.create("div",{"class":"custom editing"},this.domNode);this.imageChooserContainer=d.create("div",{"class":"hide"},this.domNode)},startup:function(){this.inherited(arguments);var a=f.readBookmarksInWebmap(this.map);(!0===this.config.syncMode.webmap&&0<a.length||!0===this.config.syncMode.custom&&0<this.config.bookmarks2D.length)&&d.removeClass(this.drawerHandle,
-"hide");this.sortableBookMarkerNodes=t.create(this.bookMarkerContainer,{handle:".drag-masker",filter:".disable-drag .hide",sort:!0,disabled:!1,animation:100,onSort:c.hitch(this,function(){this.saveBookMarkersBySortable();this.emit("sort",this.bookmarks)})});this.imageChooser=new r({cropImage:!1,showSelfImg:!0,goldenWidth:108,goldenHeight:71,maxSize:100,label:this.nls.selectFile,format:["image/gif","image/png","image/jpeg"]},this.imageChooserContainer);this.imageChooser.startup();this.own(e(this.imageChooser,
-"imageChange",c.hitch(this,"_onImageChange")))},toggleMobile:function(a){(this._IS_MOBILE=a)?this.sortableBookMarkerNodes.option("disabled",!0):this.sortableBookMarkerNodes.option("disabled",!1)},refresh:function(a){this.bookmarks=a;f.updateBookmarks(this.bookmarks);this.displayBookmarks(this.bookmarks);this.toggleDrawer()},add:function(){var a=f.getAutoRenameBeforeAdd("bookmark",this.bookmarks),b={name:"bookmark",displayName:a,extent:this.map.extent.toJson(),isSaveLayers:this.config.isSaveLayerVisibility,
-isSaveExtent:!0};!0===this.config.isSaveLayerVisibility&&(b.layerOptions=f.getlayerInfos());"bookmark"!==a&&(b._autoRename=!0);this._doAddBookmark(b);this.bookmarks.unshift(b);b.itemNode&&b.itemNode.domNode&&d.place(b.itemNode.domNode,this.bookMarkerContainer,"first");this.displayBookmarks(this.bookmarks);this.toggleDrawer();this.bookmarks.forEach(c.hitch(this,function(a,b){0===b?(g.enableEditable(a),g.focusLabel(a)):g.disableEditable(a)}));this.emit("added",this.bookmarks)},_doAddBookmark:function(a){var b=
-{enableEditLabel:!0,editBtn:!1,changeImgBtn:!0,layerInfosIcon:f.isWithLayerInfos(a)},b=f.createBookMarkNode(a,this.nls,this.folderUrl,b);a.itemNode=b;this.own(e(b,"thumbnail-click",c.hitch(this,c.partial(this._onNodeBoxClick,a))));this.own(e(b,"label-click",c.hitch(this,c.partial(this._onLebelClick,a))));this.own(e(b,"label-blur",c.hitch(this,c.partial(this._onLabelBlur,a))));this.own(e(b,"delete",c.hitch(this,c.partial(this._onBookmarkDeleteImmediately,a))));this.own(e(b,"change-img",c.hitch(this,
-c.partial(this._onBookmarkChangeImg,a))));this.own(e(b,"rename",c.hitch(this,c.partial(this._onRename,a))));return b},filter:function(a){this._LAST_FILTER_STR=a;f.filter(a,this.bookmarks)},displayBookmarks:function(a){f.empty(a,this.bookMarkerContainer);m.forEach(a,function(a){a&&this._doAddBookmark(a)},this);a.forEach(c.hitch(this,function(a){a&&a.itemNode&&a.itemNode.domNode&&d.place(a.itemNode.domNode,this.bookMarkerContainer,"last")}))},saveBookMarkersBySortable:function(a){for(var b=this.sortableBookMarkerNodes.toArray(),
-c=[],d=0,u=b.length;d<u;d++){var e=f.findBookMarkByUID(b[d],this.bookmarks);e&&c.push(e.bookmark)}this.bookmarks=c;a&&a.isRefresh&&this.displayBookmarks(this.bookmarks)},_isListMode:function(){if(this.domNode){var a=this.domNode.parentElement||this.domNode.parentNode;if(a)return d.hasClass(a,"list")}return!1},_onNodeBoxClick:function(a){require(["esri/geometry/Extent"],c.hitch(this,function(b){if(!1!==a.isSaveExtent){var c=a.extent;c.spatialReference?new h(c.spatialReference):new h({wkid:4326});this.map.setExtent(new b(c))}f.layerInfosRestoreState(a.isSaveLayers,
-a.layerOptions)}))},_onLebelClick:function(a){this._isListMode()||!0===this._IS_MOBILE?this._onNodeBoxClick(a):g.focusLabel(a)},_onLabelBlur:function(a){var b=a.itemNode.nodeLabel.get("value");a.displayName=b;a.name=b;this.emit("label-blur",this.bookmarks);this.filter(this._LAST_FILTER_STR)},_onBookmarkDeleteImmediately:function(a){this.removeBookMarks([a])},removeBookMarks:function(a){for(var b=null,c=0,d=a.length;c<d;c++){var e=f.findBookMark(a[c],this.bookmarks);e&&e.bookmark&&(e.bookmark.itemNode&&
-e.bookmark.itemNode.destroy(),b=f.findNextBookMarkByIdx(e.idx,this.bookmarks),this.bookmarks.splice(e.idx,1))}this.emit("delete",{bookmarks:this.bookmarks,nextBookmark:b});this.toggleDrawer()},_onBookmarkChangeImg:function(a){this._CHANGING_IMG_BM=a;a=this.imageChooser.mask;if(n("safari")){var b=document.createEvent("MouseEvents");b.initEvent("click",!0,!0);a.dispatchEvent(b)}else a.click()},_onImageChange:function(a){this._CHANGING_IMG_BM&&this._CHANGING_IMG_BM.itemNode&&(""!==a&&(this._CHANGING_IMG_BM.itemNode.changeImg(a),
-this._CHANGING_IMG_BM.thumbnail=a),this.emit("change-img",this.bookmarks))},_onRename:function(a){g.focusLabel(a)},toggleDrawer:function(){!0===f.isBookmarksDataEmpty(this.bookmarks)?d.addClass(this.domNode,"hide"):d.removeClass(this.domNode,"hide")},hideDrawer:function(){d.addClass(this.bookMarkerContainer,"hide")},showDrawer:function(){d.removeClass(this.bookMarkerContainer,"hide")}})});
+///////////////////////////////////////////////////////////////////////////
+// Copyright © Esri. All Rights Reserved.
+//
+// Licensed under the Apache License Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+///////////////////////////////////////////////////////////////////////////
+
+define([
+  'dojo/Evented',
+  'dojo/_base/declare',
+  'dojo/_base/lang',
+  'dojo/_base/html',
+  'dojo/_base/array',
+  'dojo/on',
+  'dojo/sniff',
+  'esri/SpatialReference',
+  'jimu/BaseWidget',
+  'dijit/_TemplatedMixin',
+  './utils',
+  './ItemNode',
+  'jimu/dijit/ImageChooser',
+  'libs/Sortable'
+],
+  function (Evented, declare, lang, html, array, on, has,
+    SpatialReference, BaseWidget, _TemplatedMixin, utils,
+    ItemNode, ImageChooser, Sortable) {
+    //var Sortable = window.Sortable;
+    return declare([BaseWidget, _TemplatedMixin, Evented], {
+      baseClass: 'dojoDndSource dojoDndTarget dojoDndContainer bookmarker-nodes',
+      templateString: "<div></div>",//template,
+      nls: null,
+      _CHANGING_IMG_BM: null,//bookMark whick is chaning thumbnail
+
+      postCreate: function () {
+        this.inherited(arguments);
+        this.drawerHandle = html.create('div', {
+          'class': "drawer-handle hide",
+          "innerHTML":"<div class='separate-line'></div>"
+        }, this.domNode);
+        this.bookMarkerContainer = html.create('div', {
+          'class': "custom editing"
+        }, this.domNode);
+        this.imageChooserContainer = html.create('div', {
+          'class': "hide"
+        }, this.domNode);
+      },
+
+      startup: function () {
+        this.inherited(arguments);
+
+        var webMapBookmark = utils.readBookmarksInWebmap(this.map);
+        if ((true === this.config.syncMode.webmap && webMapBookmark.length > 0) ||
+          (true === this.config.syncMode.custom && this.config.bookmarks2D.length > 0)) {
+          html.removeClass(this.drawerHandle, "hide");//there is pre-defined bookmark, so display the line
+        }
+
+        //this._initDrawerHandle();
+        this.sortableBookMarkerNodes = Sortable.create(this.bookMarkerContainer, {
+          handle: ".drag-masker",
+          filter: ".disable-drag .hide",//itme can't drag, with this class
+          sort: true,
+          disabled: false,
+          //delay: 10,
+          animation: 100,
+          onSort: lang.hitch(this, function (/*evt*/) {
+            this.saveBookMarkersBySortable();
+            this.emit("sort", this.bookmarks);
+          })
+        });
+
+        //image chooser
+        this.imageChooser = new ImageChooser({
+          cropImage: false,
+          showSelfImg: true,
+          goldenWidth: 108,
+          goldenHeight: 71,
+          maxSize: 100,//TODO limit size
+          label: this.nls.selectFile,
+          format: ['image/gif', "image/png", "image/jpeg"]
+        }, this.imageChooserContainer);
+        this.imageChooser.startup();
+        this.own(on(this.imageChooser, 'imageChange', lang.hitch(this, '_onImageChange')));
+      },
+
+      toggleMobile: function (isMobile) {
+        this._IS_MOBILE = isMobile;
+        if(this._IS_MOBILE){
+          this.sortableBookMarkerNodes.option("disabled", true);//disable drag reorder in mobile
+        } else {
+          this.sortableBookMarkerNodes.option("disabled", false);
+        }
+      },
+
+      refresh: function (localCache) {
+        var bookmarks = localCache;
+
+        this.bookmarks = bookmarks;
+        utils.updateBookmarks(this.bookmarks);//update old configs
+        this.displayBookmarks(this.bookmarks/*, true*/);
+
+        this.toggleDrawer();
+      },
+
+      add: function () {
+        //data
+        var rawNewName = "bookmark";
+        var name = utils.getAutoRenameBeforeAdd(rawNewName, this.bookmarks);
+        var bookmark = {
+          name: rawNewName,//"bookmark"
+          displayName: name,//"bookmark(n)"
+          extent: this.map.extent.toJson(),
+          isSaveLayers: this.config.isSaveLayerVisibility
+        };
+        bookmark.isSaveExtent = true;
+        // layer visibility
+        if (true === this.config.isSaveLayerVisibility) {
+          bookmark.layerOptions = utils.getlayerInfos();
+        }
+        if (name !== rawNewName) {
+          bookmark._autoRename = true;
+        }
+
+        //show drawer, if hide
+        //this.showDrawer();
+
+        //add to html
+        this._doAddBookmark(bookmark);
+        this.bookmarks.unshift(bookmark);//add new bookmark to the head of stack
+        if (bookmark.itemNode && bookmark.itemNode.domNode) {
+          html.place(bookmark.itemNode.domNode, this.bookMarkerContainer, "first");//put new bookmark to the first place
+        }
+
+        this.displayBookmarks(this.bookmarks/*, true*/);
+
+        this.toggleDrawer();
+
+        //keep editing label
+        this.bookmarks.forEach(lang.hitch(this, function (bookmark, forEachIdx) {
+          if (0 === forEachIdx) {
+            ItemNode.enableEditable(bookmark);
+            ItemNode.focusLabel(bookmark);
+          } else {
+            ItemNode.disableEditable(bookmark);
+          }
+        }));
+
+        this.emit("added", this.bookmarks);//have add callback
+      },
+
+      _doAddBookmark: function (bookmark) {
+        var display = {
+          enableEditLabel: true,
+          editBtn: false,
+          changeImgBtn: true,
+          layerInfosIcon: utils.isWithLayerInfos(bookmark)
+        };
+
+        var bookMarkNode = utils.createBookMarkNode(bookmark, this.nls, this.folderUrl, display);
+        bookmark.itemNode = bookMarkNode;
+
+        this.own(on(bookMarkNode, 'thumbnail-click', lang.hitch(this, lang.partial(
+          this._onNodeBoxClick, bookmark))));
+        this.own(on(bookMarkNode, "label-click", lang.hitch(this, lang.partial(this._onLebelClick, bookmark))));
+        this.own(on(bookMarkNode, 'label-blur', lang.hitch(this, lang.partial(this._onLabelBlur, bookmark))));
+
+        this.own(on(bookMarkNode, "delete", lang.hitch(this, lang.partial(
+          this._onBookmarkDeleteImmediately, bookmark))));
+        this.own(on(bookMarkNode, "change-img", lang.hitch(this, lang.partial(this._onBookmarkChangeImg, bookmark))));
+        this.own(on(bookMarkNode, "rename", lang.hitch(this, lang.partial(this._onRename, bookmark))));
+
+        return bookMarkNode;
+      },
+
+      filter: function (value) {
+        this._LAST_FILTER_STR = value;//recorder
+        utils.filter(value, this.bookmarks);
+      },
+      displayBookmarks: function (bookmarks/*, initDuplicateName*/) {
+        utils.empty(bookmarks, this.bookMarkerContainer);
+
+        // if (true === initDuplicateName) {
+        //   utils.processDuplicateName(bookmarks);//processDuplicateName only init bookmarks
+        // }
+
+        array.forEach(bookmarks, function (bookmark) {
+          if (!bookmark) {
+            return;
+          }
+          this._doAddBookmark(bookmark);
+        }, this);
+
+        bookmarks.forEach(lang.hitch(this, function (bookmark) {
+          if (!bookmark) {
+            return;
+          }
+
+          if (bookmark.itemNode && bookmark.itemNode.domNode) {
+            //DOMs have the same order to Json
+            html.place(bookmark.itemNode.domNode, this.bookMarkerContainer, "last");
+          }
+        }));
+      },
+      saveBookMarkersBySortable: function (option) {//option{isRefresh}
+        //get new order
+        var orders = this.sortableBookMarkerNodes.toArray();
+        var newOrderBookMarkers = [];
+        for (var i = 0, len = orders.length; i < len; i++) {
+          var id = orders[i];
+
+          var res = utils.findBookMarkByUID(id, this.bookmarks);
+          if (res) {
+            var b = res.bookmark;
+            newOrderBookMarkers.push(b);
+          }
+        }
+        //save
+        this.bookmarks = newOrderBookMarkers;
+
+        if (option) {
+          if (option.isRefresh) {
+            this.displayBookmarks(this.bookmarks/*, true*/);
+          }
+        }
+      },
+
+      _isListMode: function () {
+        var res = false;
+        if (this.domNode) {
+          var parent = this.domNode.parentElement || this.domNode.parentNode;
+          if (parent) {
+            return html.hasClass(parent, "list");
+          } else {
+            return res;
+          }
+        }
+
+        return res;
+      },
+
+      _onNodeBoxClick: function (bookmark) {
+        require(['esri/geometry/Extent'], lang.hitch(this, function (Extent) {
+          if (false !== bookmark.isSaveExtent) {
+            var ext = bookmark.extent, sr;
+            if (ext.spatialReference) {
+              sr = new SpatialReference(ext.spatialReference);
+            } else {
+              sr = new SpatialReference({ wkid: 4326 });
+            }
+            this.map.setExtent(new Extent(ext));
+          }
+
+          //layers
+          utils.layerInfosRestoreState(bookmark.isSaveLayers, bookmark.layerOptions);
+        }));
+      },
+      _onLebelClick: function (bookmark) {
+        if (this._isListMode() || true === this._IS_MOBILE) {
+          this._onNodeBoxClick(bookmark);//goto extent when under list mode(rename-btn for change name)
+        } else {
+          //ItemNode.enableEditable(bookmark);
+          ItemNode.focusLabel(bookmark);
+        }
+      },
+      _onLabelBlur: function (bookmark) {
+        //setTimeout(lang.hitch(this, function() {
+        var val = bookmark.itemNode.nodeLabel.get('value');
+        bookmark.displayName = val;
+        bookmark.name = val;
+
+        this.emit("label-blur", this.bookmarks);
+
+        this.filter(this._LAST_FILTER_STR);
+        //}), 500);
+      },
+
+      //delete
+      _onBookmarkDeleteImmediately: function (bookmark) {
+        this.removeBookMarks([bookmark]);
+      },
+      removeBookMarks: function (deleteBookmarks) {
+        var nextBookmark = null;//for 508 focus, when delete bookmark
+        //delete from this.bookmarks
+        for (var i = 0, len = deleteBookmarks.length; i < len; i++) {
+          var deleteBookmark = deleteBookmarks[i];
+          var bm = utils.findBookMark(deleteBookmark, this.bookmarks);
+          if (bm && bm.bookmark) {
+            if (bm.bookmark.itemNode) {
+              bm.bookmark.itemNode.destroy();
+            }
+
+            nextBookmark = utils.findNextBookMarkByIdx(bm.idx, this.bookmarks);
+
+            this.bookmarks.splice(bm.idx, 1);
+          }
+        }
+        //console.log("bookmarks len==>" + this.bookmarks.length);
+        this.emit("delete", { bookmarks: this.bookmarks, nextBookmark: nextBookmark });
+
+        this.toggleDrawer();
+      },
+
+      _onBookmarkChangeImg: function (bookmark) {
+        this._CHANGING_IMG_BM = bookmark;
+
+        var mask = this.imageChooser.mask;
+        if (has('safari')) {
+          var click_ev = document.createEvent("MouseEvents");
+          click_ev.initEvent("click", true /* bubble */, true /* cancelable */);
+          mask.dispatchEvent(click_ev);
+        } else {
+          mask.click();
+        }
+      },
+      _onImageChange: function (data) {
+        if (this._CHANGING_IMG_BM && this._CHANGING_IMG_BM.itemNode) {
+          if ("" === data) {
+
+          } else {
+            this._CHANGING_IMG_BM.itemNode.changeImg(data);
+            this._CHANGING_IMG_BM.thumbnail = data;
+          }
+          this.emit("change-img", this.bookmarks);
+        }
+      },
+      _onRename: function (bookmark) {
+        //ItemNode.enableEditable(bookmark);
+        ItemNode.focusLabel(bookmark);
+      },
+
+
+      /*_initDrawerHandle: function () {
+        html.create('div', {
+          'class': "label",
+          innerHTML: this.nls.bookmarksFromCache
+        }, this.drawerHandle);
+        this.dropDown = html.create('div', {
+          'class': "drop-down open"
+        }, this.drawerHandle);
+
+        this.own(on(this.drawerHandle, 'click', lang.hitch(this, function () {
+          this.toggleDrawer();
+        })));
+      },
+      toggleDrawer: function () {
+        var style = "hide";
+        if (html.hasClass(this.bookMarkerContainer, style)) {
+          html.addClass(this.dropDown, "open");
+        } else {
+          html.removeClass(this.dropDown, "open");
+        }
+        html.toggleClass(this.bookMarkerContainer, style);
+      },*/
+      toggleDrawer: function () {
+        if (true === utils.isBookmarksDataEmpty(this.bookmarks)) {
+          html.addClass(this.domNode, "hide");
+        } else {
+          html.removeClass(this.domNode, "hide");
+        }
+      },
+      hideDrawer: function () {
+        html.addClass(this.bookMarkerContainer, "hide");
+      },
+      showDrawer: function () {
+        html.removeClass(this.bookMarkerContainer, "hide");
+      }
+    });
+  });

@@ -1,15 +1,434 @@
-// All material copyright ESRI, All Rights Reserved, unless otherwise specified.
-// See http://js.arcgis.com/3.15/esri/copyright.txt and http://www.arcgis.com/apps/webappbuilder/copyright.txt for details.
-//>>built
-define("dojo/_base/html dojo/dom-geometry dojo/_base/array esri/layers/TimeInfo jimu/utils esri/TimeExtent libs/storejs/store moment/moment".split(" "),function(g,h,n,f,p,q,l,m){var d={};d.intervalUnitOptions=[{label:window.jimuNls.timeUnit.year,value:f.UNIT_YEARS},{label:window.jimuNls.timeUnit.month,value:f.UNIT_MONTHS},{label:window.jimuNls.timeUnit.week,value:f.UNIT_WEEKS},{label:window.jimuNls.timeUnit.day,value:f.UNIT_DAYS},{label:window.jimuNls.timeUnit.hour,value:f.UNIT_HOURS},{label:window.jimuNls.timeUnit.minute,
-value:f.UNIT_MINUTES},{label:window.jimuNls.timeUnit.second,value:f.UNIT_SECONDS},{label:window.jimuNls.timeUnit.milliSecond,value:f.UNIT_MILLISECONDS}];d.isLayerEnabledTime=function(a,c,b){b||(b=c.getLayerInfoById(a.id));if(b)return a=b.layerObject,a=a.timeInfo&&a.timeInfo.timeExtent,c=!0,b=b.originOperLayer,b.itemProperties&&"undefined"!==typeof b.itemProperties.timeAnimation&&(c=!1),!1===b.timeAnimation&&(c=!1),!0===b.timeAnimation&&(c=!0),b.itemProperties&&"undefined"!==typeof b.itemProperties.timeAnimation&&
-"undefined"!==typeof b.timeAnimation&&(c=!0),!(!c||!a)};d.setLayersUseMapTimebyConfig=function(a,c){c=c.customLayersConfig;a=a.getLayerInfoArray();for(var b=0,d=c.length;b<d;b++)for(var f=c[b],g=0,h=a.length;g<h;g++){var k=a[g];f.id===k.id&&k.layerObject.setUseMapTime&&(!0===f.isTimeEnable?k.layerObject.setUseMapTime(!0):k.layerObject.setUseMapTime(!1))}};d.initPositionForTheme={DartTheme:{bottom:140},LaunchpadTheme:{bottom:120}};d.isRunInMobile=function(){return window.appInfo.isRunInMobile};d.isOutOfScreen=
-function(a,c){var b=h.getMarginBox(a.root);a=b.w;b=b.h;return c&&(c.top>=b||c.left>=a)?!0:!1};d._MINIMODE_HEIGHT=35;d.getMarginPosition=function(a,c,b){var e=h.getMarginBox(a.root);a=e.w;e=e.h;c=g.getContentBox(c);b.marginPosition={right:a-(c.w+b.left),bottom:e-(d._MINIMODE_HEIGHT+b.top)}};d.setMarginPosition=function(a,c,b){if(b.marginPosition){var e=h.getMarginBox(a.root);a=e.w;var e=e.h,f=g.getContentBox(c);b.top=e-(d._MINIMODE_HEIGHT+b.marginPosition.bottom);b.left=a-(f.w+b.marginPosition.right);
-0>b.top&&(b.top=0);0>b.left&&(b.left=0)}g.setStyle(c,"top",b.top+"px");g.setStyle(c,"left",b.left+"px")};d.initPosition=function(a,c,b){var e=window.getAppConfig(),f;e&&e.theme&&e.theme.name&&(f=e.theme.name);e=d.getInitTop(a,f);a=d.getInitLeft(a,c);b.top=e;b.left=a;g.setStyle(c,"top",b.top+"px");g.setStyle(c,"left",b.left+"px")};d.getInitTop=function(a,c){var b=0;return b=h.getMarginBox(a.root).h-(d.initPositionForTheme[c]?d.initPositionForTheme[c].bottom:60)-d._MINIMODE_HEIGHT};d.getInitLeft=function(a,
-c){a=h.getMarginBox(a.root);c=g.getContentBox(c);return a.w/2-c.w/2};d.isValidDate=function(a){return a instanceof Date&&!isNaN(a.getTime())};d.isValidDataStrByDateLocale=function(a){return"undefined NaN, NaN"===a?!1:!0};d.hasLiveData=function(a){return!!(a&&a.useMapTime&&a.timeInfo&&a.timeInfo.hasLiveData)};d.getCalendarTime=function(a,c){var b;if("time"===a.timeMode||"min"===a.timeMode||"max"===a.timeMode)b=new Date(a.time);else if("now"===a.timeMode||"today"===a.timeMode)if(b=c?new Date(c):new Date,
-b="today"===a.timeMode?new Date(b.getFullYear(),b.getMonth(),b.getDate(),0,0,0):b,a=a.calender,c="",a&&a.number&&a.operator&&a.unit){var d=a.unit;if(-1!==d.indexOf("esriTimeUnits"))(d=d.split("esriTimeUnits"))&&2===d.length&&(c=d[1]);else return console.log("unsupported unit:"+a.unit),new Date(b);"+"===a.operator?b=m(b).add(a.number,c).valueOf():"-"===a.operator&&(b=m(b).subtract(a.number,c).valueOf())}return new Date(b)};d.isConfigLiveMode=function(a){var c=!1,b=!1,e=!1===a.isHonorWebMap;a&&a.customTimeConfig&&
-a.customTimeConfig.startTime&&a.customTimeConfig.startTime.timeConfig&&a.customTimeConfig.startTime.timeConfig.timeMode&&(c=d.isLiveTimeMode(a.customTimeConfig.startTime.timeConfig.timeMode));a&&a.customTimeConfig&&a.customTimeConfig.endTime&&a.customTimeConfig.endTime.timeConfig&&a.customTimeConfig.endTime.timeConfig.timeMode&&(b=d.isLiveTimeMode(a.customTimeConfig.endTime.timeConfig.timeMode));return e&&(c||b)};d.isLiveTimeMode=function(a){return!a||"now"!==a&&"today"!==a&&"max"!==a&&"min"!==a?
-!1:!0};d.timeCalendarForBuilderConfig=function(a){if(!1===a.isHonorWebMap){var c,b;b=new Date;c=d.getCalendarTime(a.customTimeConfig.startTime.timeConfig,b);b=d.getCalendarTime(a.customTimeConfig.endTime.timeConfig,b);return{startTime:c,endTime:b,interval:null!==a.customTimeConfig.interval?a.customTimeConfig.interval:null,thumbCount:!0===a.customTimeConfig.displayAllData?1:2}}return null};d.getFullTimeExtent=function(a,c){var b=null;n.forEach(a,function(a){a&&(b?(b.startTime>a.startTime&&(b.startTime=
-new Date(a.startTime.getTime())),b.endTime<a.endTime&&(b.endTime=new Date(a.endTime.getTime()))):b=new q(new Date(a.startTime.getTime()),new Date(a.endTime.getTime())))});a=1;!0===c&&(a=0);b.startTime=new Date(b.startTime.getFullYear(),b.startTime.getMonth(),b.startTime.getDate(),b.startTime.getHours(),b.startTime.getMinutes(),0,0);b.endTime=new Date(b.endTime.getFullYear(),b.endTime.getMonth(),b.endTime.getDate(),b.endTime.getHours(),b.endTime.getMinutes()+a,0,0);return b};d.getAutoRefreshTime=function(a){var c=
-0,b="";if(a&&a.autoRefresh&&!0===a.autoRefresh.isAutoRefresh&&a.autoRefresh.interval&&a.autoRefresh.unit){var d=a.autoRefresh.unit;-1!==d.indexOf("esriTimeUnits")&&(d=d.split("esriTimeUnits"))&&2===d.length&&(b=d[1]);b=b.toUpperCase();"SECONDS"===b?c=a.autoRefresh.interval:"MINUTES"===b?c=60*a.autoRefresh.interval:"HOURS"===b?c=3600*a.autoRefresh.interval:"DAYS"===b&&(c=86400*a.autoRefresh.interval)}return 1E3*c};d.getKey=function(a){return"TimeSlider."+encodeURIComponent(p.getAppIdFromUrl())+"."+
-a};d.getCacheByKeys=function(a){return l.get(d.getKey(a))};d.saveToLocalCache=function(a,c){d.removeLocalCache(a);l.set(d.getKey(a),c)};d.removeLocalCache=function(a){d.getCacheByKeys(a)&&l.remove(d.getKey(a))};return d});
+///////////////////////////////////////////////////////////////////////////
+// Copyright © Esri. All Rights Reserved.
+//
+// Licensed under the Apache License Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+///////////////////////////////////////////////////////////////////////////
+
+define(['dojo/_base/html', 'dojo/dom-geometry', 'dojo/_base/array',
+  "esri/layers/TimeInfo", 'jimu/utils', 'esri/TimeExtent', 'libs/storejs/store', 'moment/moment'],
+  function (html, domGeometry, array, esriTimeInfo, jimuUtils, TimeExtent, store, moment) {
+
+    var mo = {};
+
+    mo.intervalUnitOptions = [{
+      "label": window.jimuNls.timeUnit.year,
+      "value": esriTimeInfo.UNIT_YEARS
+    }, {
+      "label": window.jimuNls.timeUnit.month,
+      "value": esriTimeInfo.UNIT_MONTHS
+    }, {
+      "label": window.jimuNls.timeUnit.week,
+      "value": esriTimeInfo.UNIT_WEEKS
+    }, {
+      "label": window.jimuNls.timeUnit.day,
+      "value": esriTimeInfo.UNIT_DAYS
+    }, {
+      "label": window.jimuNls.timeUnit.hour,
+      "value": esriTimeInfo.UNIT_HOURS
+    }, {
+      "label": window.jimuNls.timeUnit.minute,
+      "value": esriTimeInfo.UNIT_MINUTES
+    }, {
+      "label": window.jimuNls.timeUnit.second,
+      "value": esriTimeInfo.UNIT_SECONDS
+    }, {
+      "label": window.jimuNls.timeUnit.milliSecond,
+      "value": esriTimeInfo.UNIT_MILLISECONDS
+    }];
+
+    mo.isLayerEnabledTime = function (layer, layerInfosObj, layerInfo) {
+      if (!layerInfo) {
+        layerInfo = layerInfosObj.getLayerInfoById(layer.id);
+      }
+
+      if (!layerInfo) {
+        return;
+      }
+      var layerObjet = layerInfo.layerObject;
+      var isTimeEnabled = layerObjet.timeInfo && layerObjet.timeInfo.timeExtent; //&& !parameterList.layer.timeInfo.hasLiveData;
+      //var hasLiveData = layerObjet.timeInfo && layerObjet.timeInfo.hasLiveData;
+      var usesTime = true;
+
+      var originLayer = layerInfo.originOperLayer;
+      if (originLayer.itemProperties && "undefined" !== typeof originLayer.itemProperties.timeAnimation) {
+        usesTime = false;// arcgis-portal-app-master\src\js\arcgisonline\map\itemData.js Line#205
+      }
+      if (false === originLayer.timeAnimation) {
+        usesTime = false;
+      }
+      if (true === originLayer.timeAnimation) {
+        usesTime = true;
+      }
+      if ((originLayer.itemProperties && "undefined" !== typeof originLayer.itemProperties.timeAnimation) &&
+        "undefined" !== typeof originLayer.timeAnimation) {
+        usesTime = true;
+      }
+
+      //var hasLiveData = layerObjet.timeInfo && layerObjet.timeInfo.hasLiveData;
+      // var originLayer = layerInfo.originOperLayer;
+      // //1- Does the webmap contain a timeAnimation property, then do whatever it says.
+      // if (originLayer.itemProperties) {
+      //   usesTime = originLayer.timeAnimation;
+      // } else {
+      //   //2- If the webmap does not contain a timeAnimation property, check if the layer has an itemId.
+      //   if ("undefined" === typeof originLayer.itemProperties) {
+      //     //2.1	itemId does not exist then check hasLiveData on the service. If hasLiveData is true then do not show the time slider. Otherwise show time slider.
+      //     usesTime = hasLiveData;
+      //   } else {
+      //     //2.2	itemId does exist then check the item /data object. If it contains a timeAnimation property for the layer do whatever it says. If it does not contain timeAnimation then check hasLiveData and follow the rule from above.
+      //     if ("undefined" !== typeof originLayer.itemProperties.timeAnimation) {
+      //       usesTime = originLayer.itemProperties.timeAnimation;
+      //     } else {
+      //       usesTime = hasLiveData;
+      //     }
+      //   }
+      // }
+      return !!(usesTime && isTimeEnabled);
+    };
+
+    mo.setLayersUseMapTimebyConfig = function (layerInfosObj, config) {
+      var configLayers = config.customLayersConfig;
+      var infos = layerInfosObj.getLayerInfoArray();
+
+      for (var i = 0, len = configLayers.length; i < len; i++) {
+        var configLayer = configLayers[i];
+
+        for (var j = 0, lenJ = infos.length; j < lenJ; j++) {
+          var info = infos[j];
+          if (configLayer.id === info.id && info.layerObject.setUseMapTime) {
+
+            if (true === configLayer.isTimeEnable) {
+              info.layerObject.setUseMapTime(true);
+            } else {
+              info.layerObject.setUseMapTime(false);
+            }
+          }
+        }
+      }
+    };
+
+    mo.initPositionForTheme = {
+      "DartTheme": {
+        bottom: 140
+      },
+      'LaunchpadTheme': {
+        bottom: 120
+      }
+    };
+
+    mo.isRunInMobile = function () {
+      return window.appInfo.isRunInMobile;
+    };
+    mo.isOutOfScreen = function (map, position) {
+      var containerBox = domGeometry.getMarginBox(map.root);
+      var mapWidth = containerBox.w;
+      var mapHeight = containerBox.h;
+
+      if (position &&
+        (position.top >= mapHeight || position.left >= mapWidth)) {
+
+        return true;
+      } else {
+        return false;
+      }
+    };
+    mo._MINIMODE_HEIGHT = 35;//height of popup
+    mo.getMarginPosition = function (map, domNode, position){
+      var containerBox = domGeometry.getMarginBox(map.root);
+      var mapWidth = containerBox.w;
+      var mapHeight = containerBox.h;
+      var sliderContentBox = html.getContentBox(domNode);
+
+      position.marginPosition = {
+        right: mapWidth - (sliderContentBox.w + position.left),
+        bottom: mapHeight - (mo._MINIMODE_HEIGHT/*sliderContentBox.h*/ + position.top)
+        //right: (mapWidth - (sliderContentBox.w + position.left)) / mapWidth,
+        //bottom: (mapHeight - (mo._MINIMODE_HEIGHT/*sliderContentBox.h*/ + position.top)) / mapHeight
+      };
+    };
+    mo.setMarginPosition = function (map, domNode, position){
+      if (position.marginPosition) {
+        var containerBox = domGeometry.getMarginBox(map.root);
+        var mapWidth = containerBox.w;
+        var mapHeight = containerBox.h;
+        var sliderContentBox = html.getContentBox(domNode);
+        position.top = mapHeight - (mo._MINIMODE_HEIGHT/*sliderContentBox.h*/ + position.marginPosition.bottom);
+        position.left = mapWidth - (sliderContentBox.w + position.marginPosition.right);
+        //position.top = mapHeight - (position.marginPosition.bottom*mapWidth + mo._MINIMODE_HEIGHT);
+        //position.left = mapWidth - (position.marginPosition.right*mapHeight + sliderContentBox.w);
+        if (position.top < 0) {
+          position.top = 0;
+        }
+        if (position.left < 0) {
+          position.left = 0;
+        }
+      }
+
+      html.setStyle(domNode, 'top', position.top + 'px');
+      html.setStyle(domNode, 'left', position.left + 'px');
+    };
+    mo.initPosition = function (map, domNode, position) {
+      var appConfig = window.getAppConfig();
+      var theme;
+      if (appConfig && appConfig.theme && appConfig.theme.name) {
+        theme = appConfig.theme.name;
+      }
+
+      var top = mo.getInitTop(map, theme);
+      var left = mo.getInitLeft(map, domNode);
+      position.top = top;
+      position.left = left;
+      html.setStyle(domNode, 'top', position.top + 'px');
+      html.setStyle(domNode, 'left', position.left + 'px');
+    };
+    mo.getInitTop = function (map,/*domNode,*/theme) {
+      var top = 0;
+      var containerBox = domGeometry.getMarginBox(map.root);
+      // var sliderContentBox = html.getContentBox(domNode);
+      // var popupHeight = sliderContentBox.h;
+      var popupHeight = mo._MINIMODE_HEIGHT;//height of mini mode
+
+      var marginBottom = mo.initPositionForTheme[theme] ? mo.initPositionForTheme[theme].bottom : 60;
+      top = containerBox.h - marginBottom - popupHeight;
+
+      return top;
+    };
+    mo.getInitLeft = function (map, domNode/*, theme*/) {
+      var left = 0;
+      var containerBox = domGeometry.getMarginBox(map.root);
+      var sliderContentBox = html.getContentBox(domNode);
+
+      var middleOfScreenWidth = containerBox.w / 2;
+      var middleOfPopupWidth = sliderContentBox.w / 2;
+      left = middleOfScreenWidth - middleOfPopupWidth;
+
+      return left;
+    };
+
+    mo.isValidDate = function (date) {
+      return date instanceof Date && !isNaN(date.getTime());
+    };
+    mo.isValidDataStrByDateLocale = function(dataStr){
+      if ("undefined NaN, NaN" === dataStr) {
+        return false;
+      }
+
+      return true;
+    };
+
+    mo.hasLiveData = function (layer) {
+      // doesn't need to consider KMLLayers
+      return !!(layer && layer.useMapTime && layer.timeInfo && layer.timeInfo.hasLiveData);
+    };
+
+    mo.getCalendarTime = function (customTimeConfig, refTime) {
+      var time;
+      if ("time" === customTimeConfig.timeMode ||
+        "min" === customTimeConfig.timeMode || "max" === customTimeConfig.timeMode) {
+        //1 time mode
+        time = new Date(customTimeConfig.time);
+      } else if ("now" === customTimeConfig.timeMode || "today" === customTimeConfig.timeMode) {
+        //2 calendar mode
+        var tempTime = refTime ? new Date(refTime) : new Date();//use reference first
+
+        if ("today" === customTimeConfig.timeMode) {
+          time = new Date(tempTime.getFullYear(), tempTime.getMonth(), tempTime.getDate(), 0, 0, 0);// Date = Today Hour =0, Minute= 0, Second = 0
+        } else {//"now"
+          time = tempTime;
+        }
+
+        var calendar = customTimeConfig.calender;
+        var unit = "";
+        if (calendar && calendar.number && calendar.operator && calendar.unit) {
+          var cu = calendar.unit;
+          if (-1 !== cu.indexOf("esriTimeUnits")) {
+            var res = cu.split("esriTimeUnits");
+            if (res && res.length === 2) {
+              unit = res[1];
+            }
+          } else {
+            console.log("unsupported unit:" + calendar.unit);
+            return new Date(time);
+          }
+
+          if ("+" === calendar.operator) {
+            time = moment(time).add(calendar.number, unit).valueOf();
+          } else if ("-" === calendar.operator) {
+            time = moment(time).subtract(calendar.number, unit).valueOf();
+          }
+          //moment().add("-10", 'days').calendar();//"Yesterday at 5:18 PM"
+          //moment().add(1, 'd').format();//"2018-05-04T17:17:07+08:00"
+          //moment().add(1, 'd').valueOf();//1525425627984
+        }
+      }
+
+      return new Date(time);
+    };
+    mo.isConfigLiveMode = function (config) {
+      var startTime = false,
+        endTime = false;
+
+      var isCustomTime = (false === config.isHonorWebMap);
+
+      if (config && config.customTimeConfig && config.customTimeConfig.startTime &&
+        config.customTimeConfig.startTime.timeConfig && config.customTimeConfig.startTime.timeConfig.timeMode) {
+        startTime = mo.isLiveTimeMode(config.customTimeConfig.startTime.timeConfig.timeMode);
+      }
+      if (config && config.customTimeConfig && config.customTimeConfig.endTime &&
+        config.customTimeConfig.endTime.timeConfig && config.customTimeConfig.endTime.timeConfig.timeMode) {
+        endTime = mo.isLiveTimeMode(config.customTimeConfig.endTime.timeConfig.timeMode);
+      }
+
+      return isCustomTime && (startTime || endTime);
+    };
+    mo.isLiveTimeMode = function (mode) {
+      if (mode &&
+        ("now" === mode || "today" === mode || "max" === mode || "min" === mode)) {
+        return true;
+      }
+
+      return false;
+    };
+    mo.timeCalendarForBuilderConfig = function (config) {
+      if (false === config.isHonorWebMap) {
+        //custom layers & custom time
+        var strtTime, endTime, interval, thumbCount;
+
+        var refTime = new Date();
+        strtTime = mo.getCalendarTime(config.customTimeConfig.startTime.timeConfig, refTime);
+        endTime = mo.getCalendarTime(config.customTimeConfig.endTime.timeConfig, refTime);
+
+        //TODO check start < endtime
+        //if (strtTime === endTime) {
+        //endTime = endTime.setMinutes(endTime.getMinutes() + 1);
+        //endTime = endTime.setSeconds(endTime.getSeconds() + 1);
+        //endTime = new Date(endTime);
+        //}
+
+        if (null !== config.customTimeConfig.interval) {
+          interval = config.customTimeConfig.interval;
+        } else {
+          interval = null;
+        }
+
+        if (true === config.customTimeConfig.displayAllData) {
+          thumbCount = 1;
+        } else {
+          thumbCount = 2;
+        }
+
+        return {
+          startTime: strtTime,
+          endTime: endTime,
+          interval: interval,
+          thumbCount: thumbCount
+        };
+      } else {
+        return null;
+      }
+    };
+
+    mo.getFullTimeExtent = function(timeExtents, noRound){
+      var fullTimeExtent = null;
+      array.forEach(timeExtents, function (te) {
+        if (!te) {
+          return;
+        }
+
+        if (!fullTimeExtent) {
+          fullTimeExtent = new TimeExtent(new Date(te.startTime.getTime()),
+            new Date(te.endTime.getTime()));
+        } else {
+          if (fullTimeExtent.startTime > te.startTime) {
+            fullTimeExtent.startTime = new Date(te.startTime.getTime());
+          }
+          if (fullTimeExtent.endTime < te.endTime) {
+            fullTimeExtent.endTime = new Date(te.endTime.getTime());
+          }
+        }
+      });
+
+      //round off seconds
+      //mapViewer round the Minutes by default. but in timeCalendar setting, we don't want to round it
+      var roundTime = 1;
+      if (true === noRound) {
+        roundTime = 0;
+      }
+
+      fullTimeExtent.startTime = new Date(fullTimeExtent.startTime.getFullYear(),
+        fullTimeExtent.startTime.getMonth(), fullTimeExtent.startTime.getDate(),
+        fullTimeExtent.startTime.getHours(), fullTimeExtent.startTime.getMinutes(), 0, 0);
+      fullTimeExtent.endTime = new Date(fullTimeExtent.endTime.getFullYear(),
+        fullTimeExtent.endTime.getMonth(), fullTimeExtent.endTime.getDate(),
+        fullTimeExtent.endTime.getHours(), fullTimeExtent.endTime.getMinutes() + roundTime, 0, 0);
+
+      return fullTimeExtent;
+    };
+
+    mo.getAutoRefreshTime = function (config) {
+      var time = 0, unit = "";
+
+      var SECONDS = 1;
+      var MINUTES = SECONDS * 60;
+      var HOURS = MINUTES * 60;
+      var DAYS = HOURS * 24;
+
+      if (config && config.autoRefresh && true === config.autoRefresh.isAutoRefresh &&
+        config.autoRefresh.interval && config.autoRefresh.unit) {
+
+        var cu = config.autoRefresh.unit;
+        if (-1 !== cu.indexOf("esriTimeUnits")) {
+          var res = cu.split("esriTimeUnits");
+          if (res && res.length === 2) {
+            unit = res[1];
+          }
+        }
+
+        unit = unit.toUpperCase();
+
+        if ("SECONDS" === unit) {
+          time = config.autoRefresh.interval;
+        } else if ("MINUTES" === unit) {
+          time = config.autoRefresh.interval * MINUTES;
+        } else if ("HOURS" === unit) {
+          time = config.autoRefresh.interval * HOURS;
+        } else if ("DAYS" === unit) {
+          time = config.autoRefresh.interval * DAYS;
+        }
+      }
+
+      return time * 1000;
+    };
+
+    //store
+    mo.getKey = function (widgetId) {
+      var prefix = "TimeSlider";
+      var appId = encodeURIComponent(jimuUtils.getAppIdFromUrl());
+      return prefix + "." + appId + "." + widgetId;
+    };
+    mo.getCacheByKeys = function (widgetId) {
+      var cache = store.get(mo.getKey(widgetId));
+      return cache;
+    };
+    mo.saveToLocalCache = function (widgetId, stops) {
+      mo.removeLocalCache(widgetId);//clean
+      store.set(mo.getKey(widgetId), stops);//set indexs
+    };
+    mo.removeLocalCache = function (widgetId) {
+      var obj = mo.getCacheByKeys(widgetId);
+      if (obj) {
+        store.remove(mo.getKey(widgetId));
+      }
+    };
+    return mo;
+  });

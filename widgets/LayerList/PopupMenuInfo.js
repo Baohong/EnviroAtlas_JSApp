@@ -1,18 +1,607 @@
-// All material copyright ESRI, All Rights Reserved, unless otherwise specified.
-// See http://js.arcgis.com/3.15/esri/copyright.txt and http://www.arcgis.com/apps/webappbuilder/copyright.txt for details.
-//>>built
-define("dojo/_base/declare dojo/_base/array dojo/_base/lang dojo/Deferred dojo/promise/all jimu/WidgetManager jimu/portalUrlUtils esri/lang ./NlsStrings".split(" "),function(n,h,e,l,m,p,q,g,r){var k=n([],{_candidateMenuItems:null,_displayItems:null,_layerInfo:null,_layerType:null,_appConfig:null,constructor:function(a,b,c,f){this.nls=r.value;this._layerInfo=a;this._layerType=c;this.layerListWidget=f;this._initCandidateMenuItems();this._initDisplayItems(b)},_getATagLabel:function(){var a,b;a=this._layerInfo.getUrl();
-(b=this._layerInfo.isItemLayer())?(a=this._getItemDetailsPageUrl(b)||a,b=this.nls.itemShowItemDetails):!a||"CSVLayer"!==this._layerType&&"KMLLayer"!==this._layerType?(a=a&&"WMSLayer"===this._layerType?a+(-1<a.indexOf("?")?"\x26":"?")+"SERVICE\x3dWMS\x26REQUEST\x3dGetCapabilities":a&&"WFSLayer"===this._layerType?a+(-1<a.indexOf("?")?"\x26":"?")+"SERVICE\x3dWFS\x26REQUEST\x3dGetCapabilities":a?a:"",b=this.nls.itemDesc):b=this.nls.itemDownload;this._ATagLabelUrl=a;return'\x3ca class\x3d"menu-item-description" target\x3d"_blank" href\x3d"'+
-a+'"\x3e'+b+"\x3c/a\x3e"},_getItemDetailsPageUrl:function(a){var b="";return b=q.getItemDetailsPageUrl(a.portalUrl,a.itemId)},_initCandidateMenuItems:function(){this._candidateMenuItems=[{key:"separator",label:""},{key:"empty",label:this.nls.empty},{key:"zoomto",label:this.nls.itemZoomTo},{key:"transparency",label:this.nls.itemTransparency},{key:"setVisibilityRange",label:this.nls.itemSetVisibilityRange},{key:"moveup",label:this.nls.itemMoveUp},{key:"movedown",label:this.nls.itemMoveDown},{key:"table",
-label:this.nls.itemToAttributeTable},{key:"controlPopup",label:this.nls.removePopup},{key:"controlLabels",label:this.nls.showLabels},{key:"url",label:this._getATagLabel()}]},_initDisplayItems:function(a){this._displayItems=[];h.forEach(a,function(a){h.forEach(this._candidateMenuItems,function(b){a.key===b.key&&(this._displayItems.push(e.clone(b)),a.onClick&&(this._displayItem.onClick=a.onClick))},this)},this)},_getSupportTableInfoForAllSublayers:function(a){var b=[];a.traversal(function(a){var c=
-new l;a.getSupportTableInfo().then(function(b){b.layerInfo=a;c.resolve(b)});b.push(c)});return m(b)},_isSupportedByAT:function(a,b){return h.some(b,function(a){return a.isSupportedLayer?!0:!1})},getDeniedItems:function(){var a=new l,b=[];this.layerListWidget.layerListView.isFirstDisplayedLayerInfo(this._layerInfo)&&b.push({key:"moveup",denyType:"disable"});this.layerListWidget.layerListView.isLastDisplayedLayerInfo(this._layerInfo)&&b.push({key:"movedown",denyType:"disable"});this._ATagLabelUrl||
-b.push({key:"url",denyType:"disable"});this._layerInfo.canShowLabel()||b.push({key:"controlLabels",denyType:"hidden"});this._layerInfo.originOperLayer.featureCollection?b.push({key:"setVisibilityRange",denyType:"hidden"}):this._layerInfo.isRootLayer()||"esri.layers.ArcGISTiledMapServiceLayer"!==this._layerInfo.getRootLayerInfo().layerObject.declaredClass?this._layerInfo.isRootLayer()||"esri.layers.ArcGISDynamicMapServiceLayer"!==this._layerInfo.getRootLayerInfo().layerObject.declaredClass||this._layerInfo.getRootLayerInfo().layerObject.supportsDynamicLayers||
-b.push({key:"setVisibilityRange",denyType:"disable"}):b.push({key:"setVisibilityRange",denyType:"hidden"});var c=this._layerInfo.isSupportPopupNested(),f=this._getSupportTableInfoForAllSublayers(this._layerInfo);m({isPopupSupported:c,supportTableInfo:f}).then(e.hitch(this,function(c){c.isPopupSupported||b.push({key:"controlPopup",denyType:"hidden"});c=c.supportTableInfo;var d=this.layerListWidget.appConfig.getConfigElementsByName("AttributeTable")[0];d&&d.visible?this._isSupportedByAT(d,c)||b.push({key:"table",
-denyType:"disable"}):b.push({key:"table",denyType:"hidden"});a.resolve(b)}),function(){a.resolve(b)});return a},getDisplayItems:function(){return this._displayItems},onPopupMenuClick:function(a){var b={closeMenu:!0};switch(a.itemKey){case "zoomto":this._onItemZoomToClick(a);break;case "moveup":this._onMoveUpItemClick(a);break;case "movedown":this._onMoveDownItemClick(a);break;case "table":this._onTableItemClick(a);break;case "transparencyChanged":this._onTransparencyChanged(a);b.closeMenu=!1;break;
-case "controlPopup":this._onControlPopup();break;case "controlLabels":this._onControlLabels()}return b},_onItemZoomToClick:function(a){this._layerInfo.zoomTo()},_isValidExtent:function(a){var b=!1;g.isDefined(a)&&g.isDefined(a.xmin)&&isFinite(a.xmin)&&g.isDefined(a.ymin)&&isFinite(a.ymin)&&g.isDefined(a.xmax)&&isFinite(a.xmax)&&g.isDefined(a.ymax)&&isFinite(a.ymax)&&(b=!0);return b},_onMoveUpItemClick:function(a){this._layerInfo.isFirst||a.layerListView.moveUpLayer(this._layerInfo)},_onMoveDownItemClick:function(a){this._layerInfo.isLast||
-a.layerListView.moveDownLayer(this._layerInfo)},_onTableItemClick:function(a){this._getSupportTableInfoForAllSublayers(this._layerInfo).then(e.hitch(this,function(b){var c,f=this.layerListWidget.appConfig.getConfigElementsByName("AttributeTable")[0];this._isSupportedByAT(f,b)&&(c=p.getInstance(),h.forEach(b,function(b){b.isSupportedLayer&&c.triggerWidgetOpen(f.id).then(e.hitch(this,function(d){d&&c.activateWidget(d);a.layerListWidget.publishData({target:"AttributeTable",layer:b.layerInfo})}))},this))}))},
-_onTransparencyChanged:function(a){this.layerListWidget._denyLayerInfosOpacityResponseOneTime=!0;this._layerInfo.setOpacity(1-a.extraData.newTransValue)},_onControlPopup:function(a){this._layerInfo.isPopupNestedEnabled()?this._layerInfo.disablePopupNested():this._layerInfo.enablePopupNested();this._layerInfo.map.infoWindow.hide()},_onControlLabels:function(a){this._layerInfo.canShowLabel()&&(this._layerInfo.isShowLabels()?this._layerInfo.hideLabels():this._layerInfo.showLabels())}});k.create=function(a,
-b){var c=new l,f=a.isRootLayer(),g={RootLayer:[{key:"zoomto"},{key:"transparency"},{key:"setVisibilityRange"},{key:"separator"},{key:"controlPopup"},{key:"separator"},{key:"moveup"},{key:"movedown"},{key:"separator"},{key:"table"},{key:"separator"},{key:"url"}],RootLayerAndFeatureLayer:[{key:"zoomto"},{key:"transparency"},{key:"setVisibilityRange"},{key:"separator"},{key:"controlPopup"},{key:"separator"},{key:"controlLabels"},{key:"separator"},{key:"moveup"},{key:"movedown"},{key:"separator"},{key:"table"},
-{key:"separator"},{key:"url"}],FeatureLayer:[{key:"setVisibilityRange"},{key:"separator"},{key:"controlPopup"},{key:"separator"},{key:"table"},{key:"separator"},{key:"url"}],SublayerOfDynamicMapserviceLayer:[{key:"setVisibilityRange"},{key:"separator"},{key:"url"}],GroupLayer:[{key:"setVisibilityRange"},{key:"separator"},{key:"controlPopup"},{key:"separator"},{key:"table"},{key:"separator"},{key:"url"}],Table:[{key:"table"},{key:"separator"},{key:"url"}],BasemapLayer:[{key:"zoomto"},{key:"transparency"},
-{key:"separator"},{key:"url"}],"default":[{key:"controlPopup"},{key:"separator"},{key:"url",onClick:null}]};a.getLayerType().then(e.hitch(this,function(d){var e="",e=a.isBasemap()&&a.isRootLayer()?"BasemapLayer":a.isBasemap()?"default":!f||"FeatureLayer"!==d&&"CSVLayer"!==d&&"ArcGISImageServiceLayer"!==d&&"StreamLayer"!==d&&"ArcGISImageServiceVectorLayer"!==d?f?"RootLayer":"FeatureLayer"===d||"CSVLayer"===d?"FeatureLayer":a.isLeaf()&&a.getRootLayerInfo()&&a.getRootLayerInfo().layerObject&&"esri.layers.ArcGISDynamicMapServiceLayer"===
-a.getRootLayerInfo().layerObject.declaredClass?"SublayerOfDynamicMapserviceLayer":"GroupLayer"===d?"GroupLayer":"Table"===d?"Table":"default":"RootLayerAndFeatureLayer";c.resolve(new k(a,g[e],d,b))}),e.hitch(this,function(){c.resolve(new k(a,[{key:"empty"}]))}));return c};return k});
+///////////////////////////////////////////////////////////////////////////
+// Copyright © Esri. All Rights Reserved.
+//
+// Licensed under the Apache License Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+///////////////////////////////////////////////////////////////////////////
+
+define([
+  'dojo/_base/declare',
+  'dojo/_base/array',
+  'dojo/_base/lang',
+  'dojo/Deferred',
+  'dojo/promise/all',
+  'jimu/WidgetManager',
+  'jimu/portalUrlUtils',
+  'esri/lang',
+  './NlsStrings'
+], function(declare, array, lang, Deferred, all, WidgetManager, portalUrlUtils, esriLang,
+  NlsStrings) {
+  var clazz = declare([], {
+
+    _candidateMenuItems: null,
+    //_deniedItems: null,
+    _displayItems: null,
+    _layerInfo: null,
+    _layerType: null,
+    _appConfig: null,
+
+    constructor: function(layerInfo, displayItemInfos, layerType, layerListWidget) {
+      this.nls = NlsStrings.value;
+      this._layerInfo = layerInfo;
+      this._layerType = layerType;
+      this.layerListWidget = layerListWidget;
+      this._initCandidateMenuItems();
+      this._initDisplayItems(displayItemInfos);
+    },
+
+    _getATagLabel: function() {
+      var url;
+      var label;
+      var layerUrl = this._layerInfo.getUrl();
+      var basicItemInfo = this._layerInfo.isItemLayer();
+      if (basicItemInfo) {
+        url = this._getItemDetailsPageUrl(basicItemInfo) || layerUrl;
+        label = this.nls.itemShowItemDetails;
+      } else if (layerUrl &&
+        (this._layerType === "CSVLayer" || this._layerType === "KMLLayer")) {
+        url = layerUrl;
+        label = this.nls.itemDownload;
+      } else if (layerUrl && this._layerType === "WMSLayer") {
+        url = layerUrl + (layerUrl.indexOf("?") > -1 ? "&" : "?") + "SERVICE=WMS&REQUEST=GetCapabilities";
+        label = this.nls.itemDesc;
+      } else if (layerUrl && this._layerType === "WFSLayer") {
+        url = layerUrl + (layerUrl.indexOf("?") > -1 ? "&" : "?") + "SERVICE=WFS&REQUEST=GetCapabilities";
+        label = this.nls.itemDesc;
+      } else if (layerUrl) {
+        url = layerUrl;
+        label = this.nls.itemDesc;
+      } else {
+        url = '';
+        label = this.nls.itemDesc;
+      }
+      this._ATagLabelUrl = url;
+      return '<a class="menu-item-description" target="_blank" href="' +
+        url + '">' + label + '</a>';
+    },
+
+    _getItemDetailsPageUrl: function(basicItemInfo) {
+      var itemUrl = "";
+      itemUrl = portalUrlUtils.getItemDetailsPageUrl(basicItemInfo.portalUrl, basicItemInfo.itemId);
+      return itemUrl;
+    },
+
+    _initCandidateMenuItems: function() {
+      //descriptionTitle: NlsStrings.value.itemDesc,
+      // var layerObjectUrl = (this._layerInfo.layerObject && this._layerInfo.layerObject.url) ?
+      //                       this._layerInfo.layerObject.url :
+      //                       '';
+      this._candidateMenuItems = [{
+        key: 'separator',
+        label: ''
+      }, {
+        key: 'empty',
+        label: this.nls.empty
+      }, {
+        key: 'zoomto',
+        label: this.nls.itemZoomTo
+      }, {
+        key: 'transparency',
+        label: this.nls.itemTransparency
+      },  {
+        key: 'setVisibilityRange',
+        label: this.nls.itemSetVisibilityRange
+      }, {
+        key: 'moveup',
+        label: this.nls.itemMoveUp
+      }, {
+        key: 'movedown',
+        label: this.nls.itemMoveDown
+      }, {
+        key: 'table',
+        label: this.nls.itemToAttributeTable
+      }, {
+        key: 'controlPopup',
+        label: this.nls.removePopup
+      }, {
+        key: 'controlLabels',
+        label: this.nls.showLabels
+      }, {
+        key: 'url',
+        label: this._getATagLabel()
+      }];
+    },
+
+    _initDisplayItems: function(displayItemInfos) {
+      this._displayItems = [];
+      // according to candidate itmes to init displayItems
+      array.forEach(displayItemInfos, function(itemInfo) {
+        array.forEach(this._candidateMenuItems, function(item) {
+          if (itemInfo.key === item.key) {
+            this._displayItems.push(lang.clone(item));
+            if (itemInfo.onClick) {
+              this._displayItem.onClick = itemInfo.onClick;
+            }
+          }
+        }, this);
+      }, this);
+    },
+
+    _getSupportTableInfoForAllSublayers: function(layerInfo) {
+      var defs = [];
+      layerInfo.traversal(function(subLayerInfo) {
+        var def = new Deferred();
+        subLayerInfo.getSupportTableInfo().then(function(supportedInfo) {
+          supportedInfo.layerInfo = subLayerInfo;
+          def.resolve(supportedInfo);
+        });
+        defs.push(def);
+      });
+      return all(defs);
+    },
+
+    _isSupportedByAT: function(attributeTableWidget, allSupportedInfo) {
+      /*jshint unused: false*/
+      var isSupported = array.some(allSupportedInfo, function(supportTableInfo) {
+        if(supportTableInfo.isSupportedLayer) {
+          return true;
+        } else {
+          return false;
+        }
+      });
+      return isSupported;
+    },
+
+    /*
+    _isPopupSupported: function() {
+      var def = new Deferred();
+      var defs = [];
+      this._layerInfo.traversal(function(layerInfo) {
+        if(layerInfo.isLeaf()) {
+          defs.push(layerInfo.loadInfoTemplate());
+        }
+      });
+
+      all(defs).then(function(infoTemplates) {
+        array.some(infoTemplates, function(infoTemplates) {
+          if(infoTemplates) {
+            def.resolve(true);
+            return true;
+          } else {
+            def.resolve(false);
+            return false;
+          }
+        });
+      });
+      return def;
+    },
+    */
+
+    getDeniedItems: function() {
+      // summary:
+      //    the items that will be denied.
+      // description:
+      //    return Object = [{
+      //   key: String, popupMenuInfo key,
+      //   denyType: String, "disable" or "hidden"
+      // }]
+      var defRet = new Deferred();
+      var dynamicDeniedItems = [];
+
+      if (this.layerListWidget.layerListView.isFirstDisplayedLayerInfo(this._layerInfo)) {
+        dynamicDeniedItems.push({
+          'key': 'moveup',
+          'denyType': 'disable'
+        });
+      }
+      if (this.layerListWidget.layerListView.isLastDisplayedLayerInfo(this._layerInfo)) {
+        dynamicDeniedItems.push({
+          'key': 'movedown',
+          'denyType': 'disable'
+        });
+      }
+
+      if (!this._ATagLabelUrl) {
+        dynamicDeniedItems.push({
+          'key': 'url',
+          'denyType': 'disable'
+        });
+      }
+
+      // deny controlLabels
+      if (!this._layerInfo.canShowLabel()) {
+        dynamicDeniedItems.push({
+          'key': 'controlLabels',
+          'denyType': 'hidden'
+        });
+      }
+
+      // deny setVisibilityRange
+      if(this._layerInfo.originOperLayer.featureCollection) {
+        dynamicDeniedItems.push({
+          'key': 'setVisibilityRange',
+          'denyType': 'hidden'
+        });
+      } else if(!this._layerInfo.isRootLayer() &&
+          this._layerInfo.getRootLayerInfo().layerObject.declaredClass === "esri.layers.ArcGISTiledMapServiceLayer") {
+        dynamicDeniedItems.push({
+          'key': 'setVisibilityRange',
+          'denyType': 'hidden'
+        });
+      } else if(!this._layerInfo.isRootLayer() &&
+          this._layerInfo.getRootLayerInfo().layerObject.declaredClass === "esri.layers.ArcGISDynamicMapServiceLayer" &&
+          !this._layerInfo.getRootLayerInfo().layerObject.supportsDynamicLayers) {
+        dynamicDeniedItems.push({
+          'key': 'setVisibilityRange',
+          'denyType': 'disable'
+        });
+      }
+
+      //var loadInfoTemplateDef = this._layerInfo.loadInfoTemplate();
+      var isPopupSupportedDef = this._layerInfo.isSupportPopupNested();
+      var getSupportTableInfoDef = this._getSupportTableInfoForAllSublayers(this._layerInfo);
+
+      all({
+        //infoTemplate: loadInfoTemplateDef,
+        isPopupSupported: isPopupSupportedDef,
+        supportTableInfo: getSupportTableInfoDef
+      }).then(lang.hitch(this, function(result) {
+
+        // deny controlPopup
+        if (!result.isPopupSupported) {
+          dynamicDeniedItems.push({
+            'key': 'controlPopup',
+            'denyType': 'hidden'
+          });
+        }
+
+        // deny table.
+        var supportTableInfo = result.supportTableInfo;
+        var attributeTableWidget =
+              this.layerListWidget.appConfig.getConfigElementsByName("AttributeTable")[0];
+
+        if (!attributeTableWidget || !attributeTableWidget.visible) {
+          dynamicDeniedItems.push({
+            'key': 'table',
+            'denyType': 'hidden'
+          });
+        } else if (!this._isSupportedByAT(attributeTableWidget, supportTableInfo)) {
+          dynamicDeniedItems.push({
+            'key': 'table',
+            'denyType': 'disable'
+          });
+          /*
+          if(this._layerInfo.parentLayerInfo &&
+             this._layerInfo.parentLayerInfo.isMapNotesLayerInfo()) {
+            dynamicDeniedItems.push({
+              'key': 'table',
+              'denyType': 'hidden'
+            });
+          } else {
+            dynamicDeniedItems.push({
+              'key': 'table',
+              'denyType': 'disable'
+            });
+          }
+          */
+
+        }
+        defRet.resolve(dynamicDeniedItems);
+      }), function() {
+        defRet.resolve(dynamicDeniedItems);
+      });
+
+      return defRet;
+
+    },
+
+    getDisplayItems: function() {
+      return this._displayItems;
+    },
+
+    onPopupMenuClick: function(evt) {
+      var result = {
+        closeMenu: true
+      };
+      switch (evt.itemKey) {
+        case 'zoomto' /*this.nls.itemZoomTo'Zoom to'*/ :
+          this._onItemZoomToClick(evt);
+          break;
+        case 'moveup' /*this.nls.itemMoveUp'Move up'*/ :
+          this._onMoveUpItemClick(evt);
+          break;
+        case 'movedown' /*this.nls.itemMoveDown'Move down'*/ :
+          this._onMoveDownItemClick(evt);
+          break;
+        case 'table' /*this.nls.itemToAttributeTable'Open attribute table'*/ :
+          this._onTableItemClick(evt);
+          break;
+        case 'transparencyChanged':
+          this._onTransparencyChanged(evt);
+          result.closeMenu = false;
+          break;
+        case 'controlPopup':
+          this._onControlPopup();
+          break;
+        case 'controlLabels':
+          this._onControlLabels();
+          break;
+
+      }
+      return result;
+    },
+
+    /**********************************
+     * Respond events respectively.
+     *
+     * event format:
+      // evt = {
+      //   itemKey: item key
+      //   extraData: estra data,
+      //   layerListWidget: layerListWidget,
+      //   layerListView: layerListView
+      // }, result;
+     **********************************/
+    _onItemZoomToClick: function(evt) {
+      /*jshint unused: false*/
+      this._layerInfo.zoomTo();
+    },
+
+    _isValidExtent: function(extent){
+      var isValid = false;
+      if(esriLang.isDefined(extent)){
+        if(esriLang.isDefined(extent.xmin) && isFinite(extent.xmin) &&
+           esriLang.isDefined(extent.ymin) && isFinite(extent.ymin) &&
+           esriLang.isDefined(extent.xmax) && isFinite(extent.xmax) &&
+           esriLang.isDefined(extent.ymax) && isFinite(extent.ymax)){
+          isValid = true;
+        }
+      }
+      return isValid;
+    },
+
+    _onMoveUpItemClick: function(evt) {
+      if (!this._layerInfo.isFirst) {
+        evt.layerListView.moveUpLayer(this._layerInfo);
+      }
+    },
+
+    _onMoveDownItemClick: function(evt) {
+      if (!this._layerInfo.isLast) {
+        evt.layerListView.moveDownLayer(this._layerInfo);
+      }
+    },
+
+    _onTableItemClick: function(evt) {
+      this._getSupportTableInfoForAllSublayers(this._layerInfo).then(lang.hitch(this, function(allSupportTableInfo) {
+        var widgetManager;
+        var attributeTableWidgetEle =
+                    this.layerListWidget.appConfig.getConfigElementsByName("AttributeTable")[0];
+        if(this._isSupportedByAT(attributeTableWidgetEle, allSupportTableInfo)) {
+          widgetManager = WidgetManager.getInstance();
+
+          array.forEach(allSupportTableInfo, function(supportTableInfo) {
+            if(supportTableInfo.isSupportedLayer) {
+              widgetManager.triggerWidgetOpen(attributeTableWidgetEle.id)
+              .then(lang.hitch(this, function(atWidget) {
+                if (atWidget) {
+                  widgetManager.activateWidget(atWidget);
+                }
+                evt.layerListWidget.publishData({
+                  'target': 'AttributeTable',
+                  'layer': supportTableInfo.layerInfo
+                });
+              }));
+            }
+          }, this);
+
+        }
+      }));
+    },
+
+    _onTransparencyChanged: function(evt) {
+      this.layerListWidget._denyLayerInfosOpacityResponseOneTime = true;
+      this._layerInfo.setOpacity(1 - evt.extraData.newTransValue);
+    },
+
+    _onControlPopup: function(evt) {
+      /*jshint unused: false*/
+      //if (this._layerInfo.controlPopupInfo.enablePopup) {
+      if(this._layerInfo.isPopupNestedEnabled()) {
+        this._layerInfo.disablePopupNested();
+      } else {
+        this._layerInfo.enablePopupNested();
+      }
+      this._layerInfo.map.infoWindow.hide();
+    },
+
+    _onControlLabels: function(evt) {
+      /*jshint unused: false*/
+      if(this._layerInfo.canShowLabel()) {
+        if(this._layerInfo.isShowLabels()) {
+          this._layerInfo.hideLabels();
+        } else {
+          this._layerInfo.showLabels();
+        }
+      }
+    }
+  });
+
+  clazz.create = function(layerInfo, layerListWidget) {
+    var retDef = new Deferred();
+    var isRootLayer = layerInfo.isRootLayer();
+    var defaultItemInfos = [{
+        key: 'controlPopup'
+      }, {
+        key: 'separator'
+      }, {
+        key: 'url',
+        onClick: null
+      }];
+
+    var itemInfoCategoreList = {
+      'RootLayer': [{
+        key: 'zoomto'
+      }, {
+        key: 'transparency'
+      }, {
+        key: 'setVisibilityRange'
+      }, {
+        key: 'separator'
+      }, {
+        key: 'controlPopup'
+      }, {
+        key: 'separator'
+      }, {
+        key: 'moveup'
+      }, {
+        key: 'movedown'
+      }, {
+        key: 'separator'
+      }, {
+        key: 'table'
+      }, {
+        key: 'separator'
+      }, {
+        key: 'url'
+      }],
+      'RootLayerAndFeatureLayer': [{
+        key: 'zoomto'
+      }, {
+        key: 'transparency'
+      }, {
+        key: 'setVisibilityRange'
+      }, {
+        key: 'separator'
+      }, {
+        key: 'controlPopup'
+      }, {
+        key: 'separator'
+      }, {
+        key: 'controlLabels'
+      }, {
+        key: 'separator'
+      }, {
+        key: 'moveup'
+      }, {
+        key: 'movedown'
+      }, {
+        key: 'separator'
+      }, {
+        key: 'table'
+      }, {
+        key: 'separator'
+      }, {
+        key: 'url'
+      }],
+      'FeatureLayer': [{
+        key: 'setVisibilityRange'
+      }, {
+        key: 'separator'
+      },{
+        key: 'controlPopup'
+      }, {
+        key: 'separator'
+      }, {
+        key: 'table'
+      }, {
+        key: 'separator'
+      }, {
+        key: 'url'
+      }],
+      'SublayerOfDynamicMapserviceLayer': [{
+        key: 'setVisibilityRange'
+      }, {
+        key: 'separator'
+      }, {
+        key: 'url'
+      }],
+      'GroupLayer': [{
+        key: 'setVisibilityRange'
+      }, {
+        key: 'separator'
+      }, {
+        key: 'controlPopup'
+      }, {
+        key: 'separator'
+      }, {
+        key: 'table'
+      }, {
+        key: 'separator'
+      }, {
+        key: 'url'
+      }],
+      'Table': [{
+        key: 'table'
+      }, {
+        key: 'separator'
+      }, {
+        key: 'url'
+      }],
+      'BasemapLayer': [{
+        key: 'zoomto'
+      }, {
+        key: 'transparency'
+      }, {
+        key: 'separator'
+      }, {
+        key: 'url'
+      }],
+      'default': defaultItemInfos
+    };
+
+    layerInfo.getLayerType().then(lang.hitch(this, function(layerType) {
+      var itemInfoCategory = "";
+      if (layerInfo.isBasemap() && layerInfo.isRootLayer()) {
+        itemInfoCategory = "BasemapLayer";
+      } else if(layerInfo.isBasemap()) {
+        itemInfoCategory = "default";
+      } else if (isRootLayer &&
+          (layerType === "FeatureLayer" ||
+            layerType === "CSVLayer" ||
+            layerType === "ArcGISImageServiceLayer" ||
+            layerType === "StreamLayer" ||
+            layerType === "ArcGISImageServiceVectorLayer")) {
+        itemInfoCategory = "RootLayerAndFeatureLayer";
+      } else if (isRootLayer) {
+        itemInfoCategory = "RootLayer";
+      } else if (layerType === "FeatureLayer" || layerType === "CSVLayer") {
+        itemInfoCategory = "FeatureLayer";
+      } else if (layerInfo.isLeaf() &&
+                layerInfo.getRootLayerInfo() &&
+                layerInfo.getRootLayerInfo().layerObject &&
+                layerInfo.getRootLayerInfo().layerObject.declaredClass === "esri.layers.ArcGISDynamicMapServiceLayer") {
+        itemInfoCategory = "SublayerOfDynamicMapserviceLayer";
+      } else if (layerType === "GroupLayer") {
+        itemInfoCategory = "GroupLayer";
+      } else if (layerType === "Table") {
+        itemInfoCategory = "Table";
+      } else {
+        //default condition
+        itemInfoCategory = "default";
+      }
+      retDef.resolve(new clazz(layerInfo,
+        itemInfoCategoreList[itemInfoCategory],
+        layerType,
+        layerListWidget));
+    }), lang.hitch(this, function() {
+      //return default popupmenu info.
+      retDef.resolve(new clazz(layerInfo, [{
+        key: 'empty'
+      }]));
+    }));
+    return retDef;
+  };
+
+
+  return clazz;
+});

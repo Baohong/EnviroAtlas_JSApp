@@ -1,13 +1,229 @@
-// All material copyright ESRI, All Rights Reserved, unless otherwise specified.
-// See http://js.arcgis.com/3.15/esri/copyright.txt and http://www.arcgis.com/apps/webappbuilder/copyright.txt for details.
-//>>built
-require({cache:{"url:widgets/Bookmark/setting/Layout.html":'\x3cdiv class\x3d"layout"\x3e\r\n  \x3cdiv class\x3d"title"\x3e${nls.displayBookmarksAs}\x3c/div\x3e\r\n\r\n  \x3cdiv class\x3d"content verticalCenter"\x3e\r\n    \x3cdiv type\x3d"checkbox" checked\x3d"false" class\x3d"checkbox"\r\n      data-dojo-type\x3d"jimu/dijit/CheckBox" data-dojo-attach-point\x3d"layoutCards_checkBox"\x3e\x3c/div\x3e\r\n    \x3cdiv class\x3d"label verticalCenter" data-dojo-attach-point\x3d"layoutCards" title\x3d"${nls.cardsTips}"\x3e\r\n      \x3cdiv class\x3d"layout-btns"\x3e\r\n        \x3cdiv class\x3d"cards"\x3e\x3c/div\x3e\r\n      \x3c/div\x3e\r\n      ${nls.cards}\r\n      \x3cdiv data-dojo-attach-point\x3d"cardsDefaultSetting" class\x3d"default-setting transparent"\x3e\r\n        \x3cdiv data-dojo-attach-point\x3d"cards_makeAsDefault" class\x3d"set-default hide" title\x3d"${nls.makeAsDefault}"\x3e${nls.makeAsDefault}\x3c/div\x3e\r\n        \x3cdiv data-dojo-attach-point\x3d"cards_default" class\x3d"default hide" title\x3d"${nls.default}"\x3e${nls.default}\x3c/div\x3e\r\n      \x3c/div\x3e\r\n    \x3c/div\x3e\r\n\r\n    \x3cdiv type\x3d"checkbox" checked\x3d"false" class\x3d"checkbox"\r\n      data-dojo-type\x3d"jimu/dijit/CheckBox" data-dojo-attach-point\x3d"layoutList_checkBox"\x3e\x3c/div\x3e\r\n    \x3cdiv class\x3d"label verticalCenter" data-dojo-attach-point\x3d"layoutList" title\x3d"${nls.listTips}"\x3e\r\n      \x3cdiv class\x3d"layout-btns"\x3e\r\n        \x3cdiv class\x3d"list"\x3e\x3c/div\x3e\r\n      \x3c/div\x3e\r\n      ${nls.list}\r\n      \x3cdiv data-dojo-attach-point\x3d"listDefaultSetting" class\x3d"default-setting transparent"\x3e\r\n        \x3cdiv data-dojo-attach-point\x3d"list_makeAsDefault" class\x3d"set-default hide" title\x3d"${nls.makeAsDefault}"\x3e${nls.makeAsDefault}\x3c/div\x3e\r\n        \x3cdiv data-dojo-attach-point\x3d"list_default" class\x3d"default hide" title\x3d"${nls.default}"\x3e${nls.default}\x3c/div\x3e\r\n      \x3c/div\x3e\r\n    \x3c/div\x3e\r\n  \x3c/div\x3e\r\n\x3c/div\x3e'}});
-define("dojo/_base/declare dojo/_base/lang dojo/_base/html jimu/BaseWidgetSetting dijit/_WidgetsInTemplateMixin dojo/on dojo/text!./Layout.html ../utils".split(" "),function(f,c,d,g,h,b,k,e){return f([g,h],{templateString:k,startup:function(){this.own(b(this.layoutCards_checkBox,"change",c.hitch(this,function(){this._fixLayoutModeByCheckBoxChanged("cards");this._keepLayoutSelected(this.layoutCards_checkBox)})));this.own(b(this.layoutList_checkBox,"change",c.hitch(this,function(){this._fixLayoutModeByCheckBoxChanged("list");
-this._keepLayoutSelected(this.layoutList_checkBox)})));this.own(b(this.layoutCards,"click",c.hitch(this,function(){e.toogleCheckboxChecked(this.layoutCards_checkBox);this._keepLayoutSelected(this.layoutCards_checkBox)})));this.own(b(this.layoutList,"click",c.hitch(this,function(){e.toogleCheckboxChecked(this.layoutList_checkBox);this._keepLayoutSelected(this.layoutList_checkBox)})));this.own(b(this.layoutCards,"mouseover",c.hitch(this,function(){this._isCardAndListChecked()&&d.removeClass(this.cardsDefaultSetting,
-"transparent")})));this.own(b(this.layoutCards,"mouseout",c.hitch(this,function(){"list"===this.config.layout.defaultMode&&d.addClass(this.cardsDefaultSetting,"transparent")})));this.own(b(this.layoutList,"mouseover",c.hitch(this,function(){this._isCardAndListChecked()&&d.removeClass(this.listDefaultSetting,"transparent")})));this.own(b(this.layoutList,"mouseout",c.hitch(this,function(){"cards"===this.config.layout.defaultMode&&d.addClass(this.listDefaultSetting,"transparent")})));this.own(b(this.cardsDefaultSetting,
-"click",c.hitch(this,function(a){a&&a.stopPropagation&&a.preventDefault&&(a.stopPropagation(),a.preventDefault());this._whetherToggleDefaultLayout("cards")&&(this.config.layout.defaultMode="cards",this._setDefault("cards"))})));this.own(b(this.listDefaultSetting,"click",c.hitch(this,function(a){a&&a.stopPropagation&&a.preventDefault&&(a.stopPropagation(),a.preventDefault());this._whetherToggleDefaultLayout("list")&&(this.config.layout.defaultMode="list",this._setDefault("list"))})));this.inherited(arguments)},
-setConfig:function(a){this.config.layout=a.layout;this.config.layout&&(!0===this.config.layout.cards&&this.layoutCards_checkBox.setValue(!0),!0===this.config.layout.list&&this.layoutList_checkBox.setValue(!0));this._setDefault(this.config.layout.defaultMode)},getConfig:function(){this.config.layout.cards=!0===this.layoutCards_checkBox.checked?!0:!1;this.config.layout.list=!0===this.layoutList_checkBox.checked?!0:!1;return this.config.layout},_keepLayoutSelected:function(a){!1===this.layoutCards_checkBox.checked&&
-!1===this.layoutList_checkBox.checked&&e.toogleCheckboxChecked(a)},_setDefault:function(a){var c="",c="cards"===a?"list":"cards";d.removeClass(this[a+"DefaultSetting"],"transparent");var b=this[a+"_makeAsDefault"];b&&d.addClass(b,"hide");(b=this[a+"_default"])&&d.removeClass(b,"hide");d.addClass(this[c+"DefaultSetting"],"transparent");(b=this[c+"_makeAsDefault"])&&d.removeClass(b,"hide");(b=this[c+"_default"])&&d.addClass(b,"hide");this._isCardAndListChecked()||(d.addClass(this[a+"DefaultSetting"],
-"transparent"),d.addClass(this[c+"DefaultSetting"],"transparent"))},_whetherToggleDefaultLayout:function(a){var b;b="cards"===a?this.layoutCards_checkBox:this.layoutList_checkBox;return("cards"===a?"list":"cards")===this.config.layout.defaultMode&&!0===b.checked?!0:!1},_fixLayoutModeByCheckBoxChanged:function(a){this._isCardAndListChecked()?"list"===this.config.layout.defaultMode?d.removeClass(this.listDefaultSetting,"transparent"):d.removeClass(this.cardsDefaultSetting,"transparent"):(d.addClass(this.listDefaultSetting,
-"transparent"),d.addClass(this.cardsDefaultSetting,"transparent"));"cards"===a?!1===this.layoutCards_checkBox.checked&&!0===this.layoutList_checkBox.checked&&"cards"===this.config.layout.defaultMode&&(this.config.layout.defaultMode="list",this._setDefault("list")):!1===this.layoutList_checkBox.checked&&!0===this.layoutCards_checkBox.checked&&"list"===this.config.layout.defaultMode&&(this.config.layout.defaultMode="cards",this._setDefault("cards"))},_isCardAndListChecked:function(){return!0===this.layoutCards_checkBox.getValue()&&
-!0===this.layoutList_checkBox.getValue()?!0:!1}})});
+///////////////////////////////////////////////////////////////////////////
+// Copyright © Esri. All Rights Reserved.
+//
+// Licensed under the Apache License Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+///////////////////////////////////////////////////////////////////////////
+
+define(['dojo/_base/declare',
+  'dojo/_base/lang',
+  'dojo/_base/html',
+  "jimu/BaseWidgetSetting",
+  "dijit/_WidgetsInTemplateMixin",
+  'dojo/on',
+  "dojo/text!./Layout.html",
+  '../utils'
+],
+  function (declare, lang, html,
+    BaseWidgetSetting, _WidgetsInTemplateMixin,
+    on, template, utils) {
+    var clazz = declare([BaseWidgetSetting, _WidgetsInTemplateMixin], {
+      templateString: template,
+
+      startup: function () {
+        //checkboxes
+        this.own(on(this.layoutCards_checkBox, 'change', lang.hitch(this, function () {
+          this._fixLayoutModeByCheckBoxChanged("cards");
+          this._keepLayoutSelected(this.layoutCards_checkBox);
+        })));
+        this.own(on(this.layoutList_checkBox, 'change', lang.hitch(this, function () {
+          this._fixLayoutModeByCheckBoxChanged("list");
+          this._keepLayoutSelected(this.layoutList_checkBox);
+        })));
+
+        //icon block
+        this.own(on(this.layoutCards, 'click', lang.hitch(this, function () {
+          utils.toogleCheckboxChecked(this.layoutCards_checkBox);
+          this._keepLayoutSelected(this.layoutCards_checkBox);
+        })));
+        this.own(on(this.layoutList, 'click', lang.hitch(this, function () {
+          utils.toogleCheckboxChecked(this.layoutList_checkBox);
+          this._keepLayoutSelected(this.layoutList_checkBox);
+        })));
+
+        //default layout setting
+        this.own(on(this.layoutCards, 'mouseover', lang.hitch(this, function () {
+          if (this._isCardAndListChecked()) {
+            html.removeClass(this.cardsDefaultSetting, "transparent");
+          }
+        })));
+        this.own(on(this.layoutCards, 'mouseout', lang.hitch(this, function () {
+          if ("list" === this.config.layout.defaultMode) {
+            html.addClass(this.cardsDefaultSetting, "transparent");
+          }
+        })));
+        this.own(on(this.layoutList, 'mouseover', lang.hitch(this, function () {
+          if (this._isCardAndListChecked()) {
+            html.removeClass(this.listDefaultSetting, "transparent");
+          }
+        })));
+        this.own(on(this.layoutList, 'mouseout', lang.hitch(this, function () {
+          if ("cards" === this.config.layout.defaultMode) {
+            html.addClass(this.listDefaultSetting, "transparent");
+          }
+        })));
+        this.own(on(this.cardsDefaultSetting, "click", lang.hitch(this, function (evt) {
+          if (evt && evt.stopPropagation && evt.preventDefault) {
+            evt.stopPropagation();
+            evt.preventDefault();
+          }
+          if (this._whetherToggleDefaultLayout("cards")) {
+            this.config.layout.defaultMode = "cards";
+            this._setDefault("cards");
+          }
+        })));
+        this.own(on(this.listDefaultSetting, "click", lang.hitch(this, function (evt) {
+          if (evt && evt.stopPropagation && evt.preventDefault) {
+            evt.stopPropagation();
+            evt.preventDefault();
+          }
+          if (this._whetherToggleDefaultLayout("list")) {
+            this.config.layout.defaultMode = "list";
+            this._setDefault("list");
+          }
+        })));
+
+        this.inherited(arguments);
+      },
+
+      setConfig: function (config) {
+        this.config.layout = config.layout;
+
+        if (this.config.layout) {
+          if (true === this.config.layout.cards) {
+            this.layoutCards_checkBox.setValue(true);
+          }
+          if (true === this.config.layout.list) {
+            this.layoutList_checkBox.setValue(true);
+          }
+        }
+
+        //ui
+        this._setDefault(this.config.layout.defaultMode);
+      },
+      getConfig: function () {
+        if (true === this.layoutCards_checkBox.checked) {
+          this.config.layout.cards = true;
+        } else {
+          this.config.layout.cards = false;
+        }
+        if (true === this.layoutList_checkBox.checked) {
+          this.config.layout.list = true;
+        } else {
+          this.config.layout.list = false;
+        }
+
+        return this.config.layout;
+      },
+      _keepLayoutSelected: function (dijit) {
+        if (false === this.layoutCards_checkBox.checked && false === this.layoutList_checkBox.checked) {
+          utils.toogleCheckboxChecked(dijit);
+        }
+      },
+
+
+      //default layout setting
+      _setDefault: function (type) {
+        var otherType = "";
+        if (type === "cards") {
+          otherType = "list";
+        } else {
+          otherType = "cards";
+        }
+        //1 target block
+        html.removeClass(this[type + "DefaultSetting"], "transparent");
+        var setDefaultNode = this[type + "_makeAsDefault"];
+        if (setDefaultNode) {
+          html.addClass(setDefaultNode, "hide");
+        }
+        var defaultNode = this[type + "_default"];
+        if (defaultNode) {
+          html.removeClass(defaultNode, "hide");
+        }
+        //2 other block
+        html.addClass(this[otherType + "DefaultSetting"], "transparent");
+        setDefaultNode = this[otherType + "_makeAsDefault"];
+        if (setDefaultNode) {
+          html.removeClass(setDefaultNode, "hide");
+        }
+        defaultNode = this[otherType + "_default"];
+        if (defaultNode) {
+          html.addClass(defaultNode, "hide");
+        }
+
+        //transparent when choose only 1
+        if (this._isCardAndListChecked()) {
+
+        } else {
+          html.addClass(this[type + "DefaultSetting"], "transparent");
+          html.addClass(this[otherType + "DefaultSetting"], "transparent");
+        }
+      },
+      //whether set defaultLayout, after label clicked
+      _whetherToggleDefaultLayout: function (type) {
+        var checkBox;
+        if (type === "cards") {
+          checkBox = this.layoutCards_checkBox;
+        } else {
+          checkBox = this.layoutList_checkBox;
+        }
+        var otherType = "";//TODO
+        if (type === "cards") {
+          otherType = "list";
+        } else {
+          otherType = "cards";
+        }
+
+        if (otherType === this.config.layout.defaultMode && true === checkBox.checked) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+      //fix defaultLayout, when checkbox status changed
+      _fixLayoutModeByCheckBoxChanged: function (type) {
+        //transparent when choose only 1
+        if (this._isCardAndListChecked()) {
+          if(this.config.layout.defaultMode === "list"){
+            html.removeClass(this.listDefaultSetting, "transparent");
+          } else {
+            html.removeClass(this.cardsDefaultSetting, "transparent");
+          }
+        } else {
+          html.addClass(this.listDefaultSetting, "transparent");
+          html.addClass(this.cardsDefaultSetting, "transparent");
+        }
+
+        if ("cards" === type) {
+          if (false === this.layoutCards_checkBox.checked && true === this.layoutList_checkBox.checked &&
+            "cards" === this.config.layout.defaultMode) {
+            this.config.layout.defaultMode = "list";
+            this._setDefault("list");
+          }
+        } else {
+          if (false === this.layoutList_checkBox.checked && true === this.layoutCards_checkBox.checked &&
+            "list" === this.config.layout.defaultMode) {
+            this.config.layout.defaultMode = "cards";
+            this._setDefault("cards");
+          }
+        }
+      },
+      _isCardAndListChecked: function(){
+        if (true === this.layoutCards_checkBox.getValue() && true === this.layoutList_checkBox.getValue()) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    });
+    return clazz;
+  });

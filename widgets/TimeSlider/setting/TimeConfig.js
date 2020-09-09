@@ -1,13 +1,301 @@
-// All material copyright ESRI, All Rights Reserved, unless otherwise specified.
-// See http://js.arcgis.com/3.15/esri/copyright.txt and http://www.arcgis.com/apps/webappbuilder/copyright.txt for details.
-//>>built
-require({cache:{"url:widgets/TimeSlider/setting/TimeConfig.html":'\x3cdiv class\x3d"time-config-container" data-dojo-attach-point\x3d"timeConfigContainer"\x3e\r\n  \x3cdiv class\x3d"title"\x3e${nls.timeSpan}\x3c/div\x3e\r\n\r\n  \x3cdiv class\x3d"error-info"\x3e\r\n    \x3cdiv data-dojo-attach-point\x3d"errorIcon" class\x3d"error-icon"\x3e\x3c/div\x3e\r\n    \x3cdiv\x3e${nls.calenderError}\x3c/div\x3e\r\n  \x3c/div\x3e\r\n\r\n  \x3cdiv class\x3d"time-span"\x3e\r\n    \x3cdiv class\x3d"time-items items"\x3e\r\n      \x3cdiv class\x3d"time-tips"\x3e${nls.startTime}\x3c/div\x3e\r\n      \x3cdiv data-dojo-attach-point\x3d"startTimeCalendar"\x3e\x3c/div\x3e\r\n    \x3c/div\x3e\r\n    \x3cdiv class\x3d"time-items items"\x3e\r\n      \x3cdiv class\x3d"time-tips"\x3e${nls.endTime}\x3c/div\x3e\r\n      \x3cdiv data-dojo-attach-point\x3d"endTimeCalendar"\x3e\x3c/div\x3e\r\n    \x3c/div\x3e\r\n  \x3c/div\x3e\r\n\r\n  \x3cdiv class\x3d"title"\x3e${nls.timeDisplay}\x3c/div\x3e\r\n  \x3cdiv class\x3d"time-display"\x3e\r\n    \x3cdiv class\x3d"time-tips"\x3e${nls.interval}\x3c/div\x3e\r\n    \x3cinput type\x3d"text" data-dojo-type\x3d"dijit/form/NumberSpinner" value\x3d"0"  required\x3d"true"\r\n      data-dojo-attach-point\x3d"intervalNumber" data-dojo-props\x3d"smallDelta:1,intermediateChanges:true,constraints: {min:0, places:0},trim:true"\r\n      class\x3d"time-selector calender-number calendar-inputs customdate "\x3e\r\n\r\n    \x3cdiv class\x3d"time-tips"\x3e${nls.unit}\x3c/div\x3e\r\n    \x3cdiv data-dojo-attach-point\x3d"intervalUnits"\x3e\x3c/div\x3e\r\n  \x3c/div\x3e\r\n\r\n  \x3cdiv class\x3d"clearFix items"\x3e\r\n    \x3cdiv data-dojo-attach-point\x3d"displayAllTheData" class\x3d"display-all"\x3e\x3c/div\x3e\r\n  \x3c/div\x3e\r\n\x3c/div\x3e'}});
-define("dojo/_base/declare dojo/_base/lang dojo/_base/html jimu/BaseWidgetSetting dijit/_WidgetsInTemplateMixin dojo/on dojo/text!./TimeConfig.html ../utils ./TimeCalendar esri/TimeExtent jimu/dijit/CheckBox dijit/form/Select dijit/form/ValidationTextBox".split(" "),function(k,d,e,l,m,f,n,c,g,h,p,q){return k([l,m],{templateString:n,_KEEP_VALUE_FLAG:!1,postCreate:function(){this.startTimeCalendar=new g({mode:"min",nls:this.nls,map:this.map,config:this.config,parent:this},this.startTimeCalendar);this.endTimeCalendar=
-new g({mode:"max",nls:this.nls,map:this.map,config:this.config,parent:this},this.endTimeCalendar);this.own(f(this.startTimeCalendar,"haveloaded,change",d.hitch(this,function(a){this._updateInterval(a.type)})));this.own(f(this.endTimeCalendar,"haveloaded,change",d.hitch(this,function(a){this._updateInterval(a.type)})));this.own(f(this.intervalNumber,"change",d.hitch(this,function(){this._setKeepValueFlag(!0)})));this.intervalUnits=new q({options:c.intervalUnitOptions,"class":"calendar-inputs"},this.intervalUnits);
-this.own(f(this.intervalUnits,"change",d.hitch(this,function(){this._setKeepValueFlag(!0)})));this.displayAllTheData=new p({label:this.nls.displayAllData,checked:!1},this.displayAllTheData);this.displayAllTheData.startup();this.startTimeCalendar.startup();this.endTimeCalendar.startup();this.inherited(arguments)},setConfig:function(a){"undefined"!==typeof a.keepValueFlag&&this._setKeepValueFlag(a.keepValueFlag);"undefined"!==typeof a.startTime&&this.startTimeCalendar.setConfig(a.startTime.timeConfig);
-"undefined"!==typeof a.endTime&&this.endTimeCalendar.setConfig(a.endTime.timeConfig);if("undefined"!==typeof a.interval)this.intervalNumber.set("value",a.interval.number,!1),this.intervalUnits.set("value",a.interval.units,!1);else{var b=new Date,d=c.getCalendarTime(this.startTimeCalendar.getConfig(),b),b=c.getCalendarTime(this.endTimeCalendar.getConfig(),b);this.findDefaultInterval(new h(d,b))}"undefined"!==typeof a.displayAllData?this.displayAllTheData.setValue(!!a.displayAllData,!1):this.displayAllTheData.setValue(!1,
-!1)},updateConfigByLyaers:function(a){"undefined"!==typeof a.startTime&&this.startTimeCalendar.setConfig(a.startTime.timeConfig);"undefined"!==typeof a.endTime&&this.endTimeCalendar.setConfig(a.endTime.timeConfig);this._updateInterval()},_updateInterval:function(a){this._cleanErrorTips();"haveloaded"===a&&(this.intervalNumber.intermediateChanges=!1);if(!1!==this.isValid()&&!this._getKeepValueFlag()){var b=new Date;a=c.getCalendarTime(this.startTimeCalendar.getConfig(),b);b=c.getCalendarTime(this.endTimeCalendar.getConfig(),
-b);a=this.findDefaultInterval(new h(new Date(a),new Date(b)));this.intervalNumber.set("value",a.interval,!1);this.intervalUnits.set("value",a.units,!1)}},isValid:function(){var a=new Date,b=c.getCalendarTime(this.startTimeCalendar.getConfig(),a),a=c.getCalendarTime(this.endTimeCalendar.getConfig(),a);if(!c.isValidDate(b))return this.startTimeCalendar.numberSpinner.set("state","Error"),!1;if(!c.isValidDate(a))return this.endTimeCalendar.numberSpinner.set("state","Error"),!1;if(!this.startTimeCalendar.isValid()||
-!this.endTimeCalendar.isValid()||!this.intervalNumber.isValid())return!1;var d=e.hasClass(this.timeConfigContainer,"error");if(b.valueOf()>a.valueOf())return d||e.addClass(this.timeConfigContainer,"error"),!1;e.removeClass(this.timeConfigContainer,"error");return!0},_cleanErrorTips:function(){e.removeClass(this.timeConfigContainer,"error")},getConfig:function(){return{keepValueFlag:this._getKeepValueFlag(),startTime:{timeConfig:this.startTimeCalendar.getConfig()},endTime:{timeConfig:this.endTimeCalendar.getConfig()},
-interval:{number:this.intervalNumber.getValue(),units:this.intervalUnits.getValue()},displayAllData:this.displayAllTheData.getValue()}},getLayersTimeExtent:function(){return this.parent.getLayersTimeExtent()},_setKeepValueFlag:function(a){this._KEEP_VALUE_FLAG=a},_getKeepValueFlag:function(){return!!this._KEEP_VALUE_FLAG},findDefaultInterval:function(a){var b;a=(a.endTime.getTime()-a.startTime.getTime())/10;31104E6<a?(a=Math.round(a/31104E6),b="esriTimeUnitsYears"):2592E6<a?(a=Math.round(a/2592E6),
-b="esriTimeUnitsMonths"):6048E5<a?(a=Math.round(a/6048E5),b="esriTimeUnitsWeeks"):864E5<a?(a=Math.round(a/864E5),b="esriTimeUnitsDays"):36E5<a?(a=Math.round(a/36E5),b="esriTimeUnitsHours"):6E4<a?(a=Math.round(a/6E4),b="esriTimeUnitsMinutes"):1E3<a?(a=Math.round(a/1E3),b="esriTimeUnitsSeconds"):(a=Math.round(a),b="esriTimeUnitsMilliseconds");return{interval:a,units:b}}})});
+///////////////////////////////////////////////////////////////////////////
+// Copyright © Esri. All Rights Reserved.
+//
+// Licensed under the Apache License Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+///////////////////////////////////////////////////////////////////////////
+
+define(['dojo/_base/declare',
+  'dojo/_base/lang',
+  'dojo/_base/html',
+  "jimu/BaseWidgetSetting",
+  "dijit/_WidgetsInTemplateMixin",
+  'dojo/on',
+  "dojo/text!./TimeConfig.html",
+  "../utils",
+  './TimeCalendar',
+  'esri/TimeExtent',
+  "jimu/dijit/CheckBox",
+  "dijit/form/Select",
+  "dijit/form/ValidationTextBox"
+],
+  function (declare, lang, html,
+    BaseWidgetSetting, _WidgetsInTemplateMixin,
+    on, template, utils, TimeCalendar, TimeExtent,
+    CheckBox, Select) {
+    var clazz = declare([BaseWidgetSetting, _WidgetsInTemplateMixin], {
+      templateString: template,
+      /*
+        configFromat = {
+          startTime:{
+            timeConfig: TimeCalendar.config
+          },
+          endTime:{
+            timeConfig: TimeCalendar.config
+          },
+          interval:{
+            number: null //number
+            units:""//esriTimeInfo.X
+          }
+          displayAllData: false//t / f
+        }
+      */
+      _KEEP_VALUE_FLAG: false,//set true, afer user change any setting
+
+      postCreate: function () {
+        this.startTimeCalendar = new TimeCalendar({
+          mode: "min",
+          nls: this.nls,
+          map: this.map,
+          config: this.config,
+          parent: this
+        }, this.startTimeCalendar);
+
+        this.endTimeCalendar = new TimeCalendar({
+          mode: "max",
+          nls: this.nls,
+          map: this.map,
+          config: this.config,
+          parent: this
+        }, this.endTimeCalendar);
+
+        this.own(on(this.startTimeCalendar, "haveloaded,change", lang.hitch(this, function (evt) {
+          this._updateInterval(evt.type);
+        })));
+
+        this.own(on(this.endTimeCalendar, "haveloaded,change", lang.hitch(this, function (evt) {
+          this._updateInterval(evt.type);
+        })));
+
+        //interval
+        this.own(on(this.intervalNumber, "change", lang.hitch(this, function () {
+          this._setKeepValueFlag(true);
+        })));
+        this.intervalUnits = new Select({
+          options: utils.intervalUnitOptions,
+          "class": "calendar-inputs"
+        }, this.intervalUnits);
+        this.own(on(this.intervalUnits, "change", lang.hitch(this, function () {
+          this._setKeepValueFlag(true);
+        })));
+
+        this.displayAllTheData = new CheckBox({
+          label: this.nls.displayAllData,
+          checked: false
+        }, this.displayAllTheData);
+        this.displayAllTheData.startup();
+
+        //init
+        this.startTimeCalendar.startup();
+        this.endTimeCalendar.startup();
+
+        this.inherited(arguments);
+      },
+
+      setConfig: function (config) {
+        if ("undefined" !== typeof config.keepValueFlag) {
+          this._setKeepValueFlag(config.keepValueFlag);
+        }
+
+        if ("undefined" !== typeof config.startTime) {
+          this.startTimeCalendar.setConfig(config.startTime.timeConfig);
+        }
+        if ("undefined" !== typeof config.endTime) {
+          this.endTimeCalendar.setConfig(config.endTime.timeConfig);
+        }
+
+        if ("undefined" !== typeof config.interval) {
+          this.intervalNumber.set("value", config.interval.number, false);
+          this.intervalUnits.set("value", config.interval.units, false);
+        } else {
+          var refTime = new Date();
+          var startTime = utils.getCalendarTime(this.startTimeCalendar.getConfig(), refTime);
+          var endTime = utils.getCalendarTime(this.endTimeCalendar.getConfig(), refTime);
+
+          this.findDefaultInterval(new TimeExtent(startTime, endTime));
+        }
+        if ("undefined" !== typeof config.displayAllData) {
+          this.displayAllTheData.setValue(!!config.displayAllData, false);
+        } else {
+          this.displayAllTheData.setValue(false, false);
+        }
+      },
+      updateConfigByLyaers: function (config) {
+        if ("undefined" !== typeof config.startTime) {
+          this.startTimeCalendar.setConfig(config.startTime.timeConfig);
+        }
+        if ("undefined" !== typeof config.endTime) {
+          this.endTimeCalendar.setConfig(config.endTime.timeConfig);
+        }
+
+        this._updateInterval();
+      },
+      _updateInterval: function (evtType) {
+        this._cleanErrorTips();
+
+        if (evtType === "haveloaded") {
+          this.intervalNumber.intermediateChanges = false;//skip bug dijit/form/NumberSpinner.set("value", XXX, false);
+        }
+
+        if (false === this.isValid()) {
+          return;
+        }
+        if (this._getKeepValueFlag()) {
+          return;
+        }
+
+        var refTime = new Date();
+        var startTime = utils.getCalendarTime(this.startTimeCalendar.getConfig(), refTime);
+        var endTime = utils.getCalendarTime(this.endTimeCalendar.getConfig(), refTime);
+
+        var interval = this.findDefaultInterval(new TimeExtent(new Date(startTime), new Date(endTime)));
+        this.intervalNumber.set("value", interval.interval, false);
+        this.intervalUnits.set("value", interval.units, false);
+      },
+
+      isValid: function () {
+        var refTime = new Date();
+        var startTime = utils.getCalendarTime(this.startTimeCalendar.getConfig(), refTime);
+        var endTime = utils.getCalendarTime(this.endTimeCalendar.getConfig(), refTime);
+
+        //1 inValid time
+        if (!utils.isValidDate(startTime)) {
+          this.startTimeCalendar.numberSpinner.set("state", "Error");
+          return false;
+        }
+        if (!utils.isValidDate(endTime)) {
+          this.endTimeCalendar.numberSpinner.set("state", "Error");
+          return false;
+        }
+
+        //2 inValid value
+        if (!this.startTimeCalendar.isValid() || !this.endTimeCalendar.isValid() || !this.intervalNumber.isValid()) {
+          return false;
+        }
+
+        //3 startTime should be <= endTime
+        var hadError = html.hasClass(this.timeConfigContainer, "error");
+        if (startTime.valueOf() > endTime.valueOf()) {
+          if (!hadError) {//avoid to popup too many errors
+            html.addClass(this.timeConfigContainer, "error");
+          }
+          return false;
+        } else {
+          html.removeClass(this.timeConfigContainer, "error");
+          return true;
+        }
+      },
+      _cleanErrorTips: function () {
+        html.removeClass(this.timeConfigContainer, "error");
+      },
+
+      getConfig: function () {
+        var testConfig = {
+          keepValueFlag: this._getKeepValueFlag(),
+          startTime: {
+            timeConfig: this.startTimeCalendar.getConfig()
+          },
+          endTime: {
+            timeConfig: this.endTimeCalendar.getConfig()
+          },
+          interval: {
+            number: this.intervalNumber.getValue(),//number
+            units: this.intervalUnits.getValue()//esriTimeInfo.X
+          },
+          displayAllData: this.displayAllTheData.getValue()//t / f
+        };
+        return testConfig;
+      },
+
+      getLayersTimeExtent: function () {
+        var te = this.parent.getLayersTimeExtent();
+        return te;
+      },
+
+      //read only falg
+      _setKeepValueFlag: function (flag) {
+        this._KEEP_VALUE_FLAG = flag;
+      },
+      _getKeepValueFlag: function () {
+        return !!this._KEEP_VALUE_FLAG;
+      },
+
+      //TODO
+      findDefaultInterval: function (fullTimeExtent) {
+        var interval;
+        var units;
+        var timePerStop = (fullTimeExtent.endTime.getTime() - fullTimeExtent.startTime.getTime()) / 10;
+        //var century = 1000 * 60 * 60 * 24 * 30 * 12 * 100;
+        //if (timePerStop > century) {
+        //  interval = Math.round(timePerStop / century);
+        //  units = "esriTimeUnitsCenturies";
+        //} else {
+        //  var decade = 1000 * 60 * 60 * 24 * 30 * 12 * 10;
+        //  if (timePerStop > decade) {
+        //    interval = Math.round(timePerStop / decade);
+        //    units = "esriTimeUnitsDecades";
+        //  } else {
+        var year = 1000 * 60 * 60 * 24 * 30 * 12;
+        if (timePerStop > year) {
+          interval = Math.round(timePerStop / year);
+          units = "esriTimeUnitsYears";
+        } else {
+          var month = 1000 * 60 * 60 * 24 * 30;
+          if (timePerStop > month) {
+            interval = Math.round(timePerStop / month);
+            units = "esriTimeUnitsMonths";
+          } else {
+            var week = 1000 * 60 * 60 * 24 * 7;
+            if (timePerStop > week) {
+              interval = Math.round(timePerStop / week);
+              units = "esriTimeUnitsWeeks";
+            } else {
+              var day = 1000 * 60 * 60 * 24;
+              if (timePerStop > day) {
+                interval = Math.round(timePerStop / day);
+                units = "esriTimeUnitsDays";
+              } else {
+                var hour = 1000 * 60 * 60;
+                if (timePerStop > hour) {
+                  interval = Math.round(timePerStop / hour);
+                  units = "esriTimeUnitsHours";
+                } else {
+                  var minute = 1000 * 60;
+                  if (timePerStop > minute) {
+                    interval = Math.round(timePerStop / minute);
+                    units = "esriTimeUnitsMinutes";
+                  } else {
+                    var second = 1000;
+                    if (timePerStop > second) {
+                      interval = Math.round(timePerStop / second);
+                      units = "esriTimeUnitsSeconds";
+                    } else {
+                      interval = Math.round(timePerStop);
+                      units = "esriTimeUnitsMilliseconds";
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        //  }
+        //}
+
+        return {
+          interval: interval,
+          units: units
+        };
+      }
+    });
+    return clazz;
+  });

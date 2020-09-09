@@ -1,9 +1,205 @@
-// All material copyright ESRI, All Rights Reserved, unless otherwise specified.
-// See http://js.arcgis.com/3.15/esri/copyright.txt and http://www.arcgis.com/apps/webappbuilder/copyright.txt for details.
-//>>built
-require({cache:{"url:widgets/Bookmark/HeadBar.html":'\x3cdiv class\x3d"header"\x3e\r\n\t\x3cdiv data-dojo-attach-point\x3d"editableBtns" class\x3d"editable-btns"\x3e\r\n\t\t\x3cdiv data-dojo-attach-point\x3d"addBtn" class\x3d"add hide" title\x3d"${nls.labelBookmarkName}" tabindex\x3d"0" role\x3d"button"\x3e${nls.addBtn}\x3c/div\x3e\r\n\t\x3c/div\x3e\r\n\r\n\t\x3cdiv class\x3d"oper-btns"\x3e\r\n\t\t\x3cdiv data-dojo-attach-point\x3d"filter" class\x3d"filter-container hide"\x3e\r\n\t\t\t\x3cdiv class\x3d"filter-input"\x3e\r\n\t\t\t\t\x3cdiv data-dojo-attach-point\x3d"filterInput" data-dojo-type\x3d"dijit/form/ValidationTextBox"\r\n\t\t\t\t\tplaceHolder\x3d"${nls.searchBookmark}" required\x3d"false"\x3e\x3c/div\x3e\r\n\t\t\t\t\x3cdiv class\x3d"search" data-dojo-attach-point\x3d"filterBtn" title\x3d"${nls.searchBookmark}"\x3e\x3c/div\x3e\r\n\t\t\t\x3c/div\x3e\r\n\t\t\x3c/div\x3e\r\n\t\t\x3c!--\x3cdiv data-dojo-attach-point\x3d"commonFunBtns" class\x3d"common-fun-btns"\x3e\r\n\t\t\t\x3cdiv data-dojo-attach-point\x3d"syncBtn" class\x3d"head-btns sync-btn" title\x3d"${nls.syncTip}"\x3e\x3c/div\x3e\r\n\t\t\t\x3cdiv data-dojo-attach-point\x3d"backToInitBtn" class\x3d"head-btns back-to-init hide" title\x3d""\x3e\x3c/div\x3e--\x3e\r\n\t\t\x3cdiv data-dojo-attach-point\x3d"displayMode" class\x3d"display-mode"\x3e\r\n\t\t\t\x3cdiv data-dojo-attach-point\x3d"cardsBtn" class\x3d"head-btns cards hide" title\x3d"${nls.cardsTips}" tabindex\x3d"0" role\x3d"button"\x3e\x3c/div\x3e\r\n\t\t\t\x3cdiv data-dojo-attach-point\x3d"listBtn" class\x3d"head-btns list hide" title\x3d"${nls.listTips}" tabindex\x3d"0" role\x3d"button"\x3e\x3c/div\x3e\r\n\t\t\x3c/div\x3e\r\n\t\x3c/div\x3e\r\n\t\x3c!--\x3cdiv data-dojo-attach-point\x3d"editBtns" class\x3d"edit-btns"\x3e\r\n\t\t\t\x3cdiv data-dojo-attach-point\x3d"renameBtn" class\x3d"head-btns rename" title\x3d"rename"\x3e\x3c/div\x3e\r\n\t\t\t\x3cdiv data-dojo-attach-point\x3d"deleteBtn" class\x3d"head-btns delete" title\x3d"delete"\x3e\x3c/div\x3e\r\n\t\t\x3c/div\x3e\r\n\t\x3c/div\x3e--\x3e\r\n\x3c/div\x3e'}});
-define("dojo/Evented dojo/_base/declare dojo/_base/lang dojo/_base/html dojo/on ./a11y/HeadBar dijit/_WidgetBase dijit/_TemplatedMixin dijit/_WidgetsInTemplateMixin dojo/text!./HeadBar.html".split(" "),function(b,f,c,a,d,g,h,k,l,m){b=f([h,k,l,b],{baseClass:"dojoDndSource dojoDndTarget dojoDndContainer",templateString:m,nls:null,map:null,bookmarksContainer:null,layout:null,editingName:!1,initMapState:null,postMixInProperties:function(){this.nls=c.mixin(this.nls,window.jimuNls.common)},startup:function(){this.inherited(arguments);
-this.refreshUI();this.a11y_initEvents();this.own(d(this.filterInput,"blur",c.hitch(this,this.onFilterChange)));this.own(d(this.filterInput,"keyUp",c.hitch(this,this.onFilterChange)))},refreshUI:function(){this.editable?(a.addClass(this.domNode,"editable"),a.removeClass(this.addBtn,"hide")):(a.removeClass(this.domNode,"editable"),a.addClass(this.addBtn,"hide"));this._toggleLayoutBtnDisplay(this.layout.defaultMode);!1!==this.editable||!0===this.layout.list&&!0===this.layout.cards?a.removeClass(this.domNode,
-"hide"):a.addClass(this.domNode,"hide")},_toggleLayoutBtnDisplay:function(e){a.addClass(this.listBtn,"hide");a.addClass(this.cardsBtn,"hide");"list"===e?this.listMode():this.cardsMode();!0===this.layout.list&&!0===this.layout.cards?("list"===e?a.removeClass(this.cardsBtn,"hide"):a.removeClass(this.listBtn,"hide"),a.addClass(this.displayMode,"two-modes")):a.removeClass(this.displayMode,"two-modes")},cardsMode:function(){a.removeClass(this.bookmarksContainer,"list");a.addClass(this.bookmarksContainer,
-"cards");a.addClass(this.domNode,"list");a.removeClass(this.domNode,"cards");this.emit("layout-cards")},listMode:function(){a.removeClass(this.bookmarksContainer,"cards");a.addClass(this.bookmarksContainer,"list");a.addClass(this.domNode,"cards");a.removeClass(this.domNode,"list");this.emit("layout-list")},addingBookmark:function(){this.emit("add")},onFilterChange:function(){var a=this.filterInput.getValue();this.emit("filter-change",a)},onFilterBlur:function(){var a=this.filterInput.getValue();this.emit("filter-blur",
-a)}});b.extend(g);return b});
+///////////////////////////////////////////////////////////////////////////
+// Copyright © Esri. All Rights Reserved.
+//
+// Licensed under the Apache License Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+///////////////////////////////////////////////////////////////////////////
+
+define([
+  'dojo/Evented',
+  'dojo/_base/declare',
+  'dojo/_base/lang',
+  'dojo/_base/html',
+  'dojo/on',
+  "./a11y/HeadBar",
+  //'dojo/keys',
+  //"dijit/a11yclick",
+  //'esri/SpatialReference',
+  'dijit/_WidgetBase',
+  'dijit/_TemplatedMixin',
+  "dijit/_WidgetsInTemplateMixin",
+  "dojo/text!./HeadBar.html"
+  //'./utils'
+],
+  function (Evented, declare, lang, html, on, a11y,/*keys, a11yclick, SpatialReference,*/
+    _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, template/*, utils*/) {
+
+    var clazz = declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, Evented], {
+      baseClass: 'dojoDndSource dojoDndTarget dojoDndContainer',
+      templateString: template,
+      nls: null,
+      map: null,
+      bookmarksContainer: null,
+      //editable: false,
+      layout: null,
+
+      //isAddingBookmark: false,//adding and haven't cancel
+      //isEnableRename: false,
+      editingName: false,//is typing the name
+      //isEnableDelete: false,
+
+      initMapState: null,
+
+      postMixInProperties: function () {
+        this.nls = lang.mixin(this.nls, window.jimuNls.common);
+      },
+      startup: function () {
+        this.inherited(arguments);
+
+        this.refreshUI();
+
+        this.a11y_initEvents();
+
+        //this.own(on(this.filterInput, 'change', lang.hitch(this, this.onFilterChange)));
+        this.own(on(this.filterInput, 'blur', lang.hitch(this, this.onFilterChange)));
+        this.own(on(this.filterInput, 'keyUp', lang.hitch(this, this.onFilterChange)));
+        //this.own(on(this.filterBtn, 'click', lang.hitch(this, this.onFilterChange)));
+
+        //TODO ==>keep start ==>
+        // this.own(on(this.backToInitBtn, 'click', lang.hitch(this, function () {
+        //   require(['esri/geometry/Extent'], lang.hitch(this, function (Extent) {
+        //     var layerOptions = this.initMapState.layers;
+
+        //     utils.layerInfosRestoreState(isUse, layerOptions);
+        //     if (this.initMapState.extent) {
+        //       this.map.setExtent(new Extent(this.initMapState.extent));
+        //     }
+        //   }));
+        //   //html.removeClass(this.backToInitBtn, "marked");
+        //   //this._listenExtentChangeOnce();
+        //   this.emit("goto-init-extent");
+        // })));
+        //this._listenExtentChangeOnce();
+        //TODO ==>keep end ==>
+      },
+
+      refreshUI: function () {
+        if (this.editable) {
+          html.addClass(this.domNode, "editable");
+          html.removeClass(this.addBtn, "hide");
+        } else {
+          html.removeClass(this.domNode, "editable");
+          html.addClass(this.addBtn, "hide");
+        }
+
+        //runtime layout mode recorder
+        // var lastLayout = utils.getLastLayout();
+        // if ("undefined" === typeof lastLayout) {
+        //   //no record in cache, so use defaultMode
+        //   this._toggleLayoutBtnDisplay(this.layout.defaultMode);
+        // } else {
+        //   if (true === this.layout[lastLayout]) {
+        //     //use runtime cache first
+        //     this._toggleLayoutBtnDisplay(lastLayout);
+        //   } else {
+        //     //config has changed, use new config
+        //     if (true === this.layout.cards) {
+        //       this._toggleLayoutBtnDisplay("cards");
+        //     } else {
+        //       this._toggleLayoutBtnDisplay("list");
+        //     }
+        //   }
+        // }
+        this._toggleLayoutBtnDisplay(this.layout.defaultMode);//use default layout in config, only
+
+        if (false === this.editable &&
+          !(true === this.layout.list && true === this.layout.cards)) {
+          html.addClass(this.domNode, "hide");
+        } else {
+          html.removeClass(this.domNode, "hide");
+        }
+      },
+      _toggleLayoutBtnDisplay: function (mode) {
+        html.addClass(this.listBtn, "hide");
+        html.addClass(this.cardsBtn, "hide");
+
+        if ("list" === mode) {
+          this.listMode();
+        } else {
+          this.cardsMode();
+        }
+
+        //icons ui
+        if (true === this.layout.list && true === this.layout.cards) {
+          if ("list" === mode) {
+            html.removeClass(this.cardsBtn, "hide");
+          } else {
+            html.removeClass(this.listBtn, "hide");
+          }
+
+          html.addClass(this.displayMode, "two-modes");
+        } else {
+          html.removeClass(this.displayMode, "two-modes");
+        }
+      },
+      cardsMode: function () {
+        html.removeClass(this.bookmarksContainer, "list");
+        html.addClass(this.bookmarksContainer, "cards");
+
+        html.addClass(this.domNode, "list");
+        html.removeClass(this.domNode, "cards");
+
+        this.emit("layout-cards");
+      },
+      listMode: function () {
+        html.removeClass(this.bookmarksContainer, "cards");
+        html.addClass(this.bookmarksContainer, "list");
+
+        html.addClass(this.domNode, "cards");
+        html.removeClass(this.domNode, "list");
+
+        this.emit("layout-list");
+      },
+      // toogleMobileDisplay: function (isMobile) {
+      //   if (isMobile) {
+      //     html.addClass(this.displayMode, "hide");
+      //   } else {
+      //     html.removeClass(this.displayMode, "hide");
+      //   }
+      // },
+
+      //add
+      addingBookmark: function () {
+        //this.isAddingBookmark = true;
+        //html.addClass(this.domNode, "adding");
+        this.emit("add");
+      },
+      // cancelAddingBookmark: function () {
+      //   this.isAddingBookmark = false;
+      //   //html.removeClass(this.domNode, "adding");
+      // },
+      onFilterChange: function () {
+        var val = this.filterInput.getValue();
+        this.emit("filter-change", val);
+      },
+      onFilterBlur: function () {
+        var val = this.filterInput.getValue();
+        this.emit("filter-blur", val);
+      }
+      // updateInitMapState: function () {
+      //   this.initMapState = {
+      //     extent: this.map.extent.toJson(),
+      //     layers: {}
+      //   };
+
+      //   this.initMapState.layers = utils.getlayerInfos();
+      // },
+      // _listenExtentChangeOnce: function () {
+      //   this.own(on.once(this.map, 'extent-change', lang.hitch(this, function () {
+      //     html.addClass(this.backToInitBtn, "marked");
+      //   })));
+      // }
+    });
+
+    clazz.extend(a11y);//for a11y
+    return clazz;
+  });

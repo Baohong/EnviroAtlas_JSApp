@@ -1,11 +1,205 @@
-// All material copyright ESRI, All Rights Reserved, unless otherwise specified.
-// See http://js.arcgis.com/3.15/esri/copyright.txt and http://www.arcgis.com/apps/webappbuilder/copyright.txt for details.
-//>>built
-require({cache:{"url:widgets/Bookmark/setting/Import.html":'\x3cdiv class\x3d"import jimu-widget-bookmark"\x3e\r\n  \x3cdiv class\x3d"import-tips"\x3e${nls.importFromWeb}\x3c/div\x3e\r\n\r\n  \x3cdiv data-dojo-attach-point\x3d"bookmarksInWebmap" class\x3d"bookmarks-in-webmap"\x3e\r\n    \x3cdiv class\x3d"select-all-cb"\x3e\r\n      \x3cdiv type\x3d"checkbox" checked\x3d"false" id\x3d"all" data-dojo-type\x3d"jimu/dijit/CheckBox" data-dojo-attach-point\x3d"all"\x3e\x3c/div\x3e\r\n      \x3clabel class\x3d"all-label" for\x3d"all"\x3e${nls.selectAll}\x3c/label\x3e\r\n    \x3c/div\x3e\r\n\r\n    \x3cdiv data-dojo-attach-point\x3d"bookMarkerContainer" class\x3d"bookmarker-container editing"\x3e\x3c/div\x3e\r\n  \x3c/div\x3e\r\n\r\n  \x3cdiv data-dojo-attach-point\x3d"noBookmark" class\x3d"no-bookmark"\x3e${nls.noBookmarkInWebMap}\x3c/div\x3e\r\n\x3c/div\x3e'}});
-define("dojo/_base/declare dojo/_base/lang dojo/_base/html dojo/_base/array dojo/on dijit/_WidgetsInTemplateMixin jimu/BaseWidgetSetting jimu/utils ../utils ../ItemNode dojo/text!./Import.html libs/Sortable".split(" "),function(h,b,c,g,e,k,l,m,f,n,p,q){return h([l,k],{baseClass:"jimu-Bookmark-Import",templateString:p,bookmarks:[],_selectedBookMarksNumber:0,postCreate:function(){this.inherited(arguments);this.sortableBookMarkerNodes=q.create(this.bookMarkerContainer,{handle:".drag-masker",sort:!1,
-disabled:!this._init_editing,animation:100});this.bookmarks=f.readBookmarksInWebmap(this.map);this.displayBookmarks(this.bookmarks);this.bookmarks&&0===this.bookmarks.length?c.addClass(this.bookmarksInWebmap,"hide"):c.addClass(this.noBookmark,"hide");this.own(e(this.all,"change",b.hitch(this,function(){this._selectOrUnselectAll()})))},startup:function(){this.bookmarksInSetting&&this.bookmarksInSetting.forEach(b.hitch(this,function(a){if((a=f.findBookMarkByNameAndExtent(a,this.bookmarks))&&a.bookmark)a.bookmark.itemNode.onSelected()}))},
-getConfig:function(){var a=[];this.bookmarks.forEach(b.hitch(this,function(d){d.itemNode&&d.itemNode.domNode&&c.hasClass(d.itemNode.domNode,"selected")&&(delete d.itemNode,d=b.clone(d),a.push(d))}));return a},_isSelectedAll:function(){return this.bookmarks.length===this._selectedBookMarksNumber},_selectOrUnselectAll:function(){this._isSelectedAll()?(this.bookmarks.forEach(b.hitch(this,function(a){a.itemNode&&a.itemNode.domNode&&c.hasClass(a.itemNode.domNode,"selected")&&c.removeClass(a.itemNode.domNode,
-"selected")})),this._selectedBookMarksNumber=0):this.bookmarks.forEach(b.hitch(this,function(a){a.itemNode&&a.itemNode.domNode&&!1===c.hasClass(a.itemNode.domNode,"selected")&&(c.addClass(a.itemNode.domNode,"selected"),this._selectedBookMarksNumber++)}))},destroy:function(){g.forEach(this.bookmarks,function(a){a.itemNode&&a.itemNode.destroy()},this);this.bookmarks=[];this.sortableBookMarkerNodes&&(this.sortableBookMarkerNodes.destroy(),this.sortableBookMarkerNodes=null);this.inherited(arguments)},
-displayBookmarks:function(a){a.reverse();g.forEach(a,function(a,b){b=this._createBookMarkNode(a,b);a.itemNode=b},this);a.forEach(b.hitch(this,function(a){a.itemNode&&a.itemNode.domNode&&c.place(a.itemNode.domNode,this.bookMarkerContainer,"first")}))},_createBookMarkNode:function(a,d){var c;c=a.thumbnail||"undefined"!==typeof a.thumbnail&&""!==a.thumbnail?m.processUrlInWidgetConfig(a.thumbnail,this.folderUrl):this.folderUrl+"images/thumbnail_default.png";a=new n({dataId:d,img:c,label:a.displayName||
-a.name,display:{selectedBtn:!0,editBtn:!1,deleteBtn:!1},nls:this.nls});this.own(e(a,"click",b.hitch(this,b.partial(this._onBookmarkClick,a))));this.own(e(a,"selected",b.hitch(this,b.partial(this._onBookmarkSelected,a))));this.own(e(a,"unselected",b.hitch(this,b.partial(this._onBookmarkUnSelected,a))));return a},_onBookmarkClick:function(a){a.onSelected()},_onBookmarkSelected:function(){this._selectedBookMarksNumber++;this._isDisableOK()},_onBookmarkUnSelected:function(){this._selectedBookMarksNumber--;
-this._isDisableOK()},_isDisableOK:function(){this.popup&&(0<this._selectedBookMarksNumber?this.popup.enableButton(0):this.popup.disableButton(0),f.setCheckboxWithoutEvent(this.all,this._isSelectedAll()))}})});
+///////////////////////////////////////////////////////////////////////////
+// Copyright © Esri. All Rights Reserved.
+//
+// Licensed under the Apache License Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+///////////////////////////////////////////////////////////////////////////
+define(
+  ["dojo/_base/declare",
+    "dojo/_base/lang",
+    'dojo/_base/html',
+    'dojo/_base/array',
+    "dojo/on",
+    "dijit/_WidgetsInTemplateMixin",
+    "jimu/BaseWidgetSetting",
+    'jimu/utils',
+    '../utils',
+    '../ItemNode',
+    "dojo/text!./Import.html",
+    'libs/Sortable'
+  ],
+  function (
+    declare, lang, html, array, on, _WidgetsInTemplateMixin, BaseWidgetSetting,
+    jimuUtils, utils, ItemNode, template, Sortable
+  ) {
+    //var Sortable = window.Sortable;
+    return declare([BaseWidgetSetting, _WidgetsInTemplateMixin], {
+      baseClass: "jimu-Bookmark-Import",
+      templateString: template,
+      bookmarks: [],
+      _selectedBookMarksNumber: 0,
+
+      postCreate: function () {
+        this.inherited(arguments);
+
+        this.sortableBookMarkerNodes = Sortable.create(this.bookMarkerContainer, {
+          handle: ".drag-masker",
+          sort: false,
+          disabled: !this._init_editing,//enable dnd in edit mode
+          animation: 100/*,
+          onSort: lang.hitch(this, function () {
+            this.saveBookMarkersBySortable(true);
+          })*/
+        });
+        this.bookmarks = utils.readBookmarksInWebmap(this.map);
+
+        this.displayBookmarks(this.bookmarks);
+
+        if (this.bookmarks && 0 === this.bookmarks.length) {
+          html.addClass(this.bookmarksInWebmap, "hide");
+        } else {
+          html.addClass(this.noBookmark, "hide");
+        }
+
+        this.own(on(this.all, 'change', lang.hitch(this, function () {
+          this._selectOrUnselectAll();
+        })));
+      },
+
+      startup: function () {
+        if (this.bookmarksInSetting) {
+          this.bookmarksInSetting.forEach(lang.hitch(this, function (bookmark) {
+            var bm = utils.findBookMarkByNameAndExtent(bookmark, this.bookmarks);
+            if (bm && bm.bookmark) {
+              bm.bookmark.itemNode.onSelected();//mark as selected
+            }
+          }));
+        }
+      },
+      // setConfig: function (/*bookmarks*/) {
+      // },
+      getConfig: function () {
+        var selectedBookmarks = [];//results
+        this.bookmarks.forEach(lang.hitch(this, function (bookmark) {
+          if (bookmark.itemNode && bookmark.itemNode.domNode) {
+            if (html.hasClass(bookmark.itemNode.domNode, "selected")) {
+              delete bookmark.itemNode;
+              var clonedBookmarks = lang.clone(bookmark);
+              selectedBookmarks.push(clonedBookmarks);
+            }
+          }
+        }));
+
+        return selectedBookmarks;
+      },
+
+      _isSelectedAll: function () {
+        return (this.bookmarks.length === this._selectedBookMarksNumber);
+      },
+      _selectOrUnselectAll: function () {
+        if (!this._isSelectedAll()) {
+          //select all
+          this.bookmarks.forEach(lang.hitch(this, function (bookmark) {
+            if (bookmark.itemNode && bookmark.itemNode.domNode) {
+              if (false === html.hasClass(bookmark.itemNode.domNode, "selected")) {
+                html.addClass(bookmark.itemNode.domNode, "selected");
+
+                this._selectedBookMarksNumber++;
+              }
+            }
+          }));
+        } else {
+          //unselect all
+          this.bookmarks.forEach(lang.hitch(this, function (bookmark) {
+            if (bookmark.itemNode && bookmark.itemNode.domNode) {
+              if (html.hasClass(bookmark.itemNode.domNode, "selected")) {
+                html.removeClass(bookmark.itemNode.domNode, "selected");
+              }
+            }
+          }));
+
+          this._selectedBookMarksNumber = 0;
+        }
+      },
+      destroy: function () {
+        array.forEach(this.bookmarks, function (bookmark) {
+          if (bookmark.itemNode) {
+            bookmark.itemNode.destroy();
+          }
+        }, this);
+        this.bookmarks = [];
+        if (this.sortableBookMarkerNodes) {
+          this.sortableBookMarkerNodes.destroy();
+          this.sortableBookMarkerNodes = null;
+        }
+        this.inherited(arguments);
+      },
+
+
+      displayBookmarks: function (bookmarks) {
+        //this.empty();
+        //inserted doms is a stack, so inverse
+        bookmarks.reverse();
+        //utils.processDuplicateName(this.bookmarks);
+        array.forEach(bookmarks, function (bookmark, idx) {
+          var bookMarkNode = this._createBookMarkNode(bookmark, idx);
+          bookmark.itemNode = bookMarkNode;
+        }, this);
+
+        bookmarks.forEach(lang.hitch(this, function (bookmark) {
+          if (bookmark.itemNode && bookmark.itemNode.domNode) {
+            html.place(bookmark.itemNode.domNode, this.bookMarkerContainer, "first");
+          }
+        }));
+      },
+
+      //********************  itemNode  ************************/
+      _createBookMarkNode: function (bookmark, idx) {
+        var thumbnail, node;
+
+        if (bookmark.thumbnail ||
+          ("undefined" !== typeof bookmark.thumbnail && "" !== bookmark.thumbnail)) {
+          thumbnail = jimuUtils.processUrlInWidgetConfig(bookmark.thumbnail, this.folderUrl);
+        } else {
+          thumbnail = this.folderUrl + 'images/thumbnail_default.png';
+        }
+
+        node = new ItemNode({
+          dataId: idx,
+          img: thumbnail,
+          label: bookmark.displayName || bookmark.name,
+          display: {
+            selectedBtn: true,
+            editBtn: false,
+            deleteBtn: false
+          },
+          nls: this.nls
+        });
+        this.own(on(node, 'click', lang.hitch(this, lang.partial(this._onBookmarkClick, node))));
+        this.own(on(node, 'selected', lang.hitch(this, lang.partial(this._onBookmarkSelected, node))));
+        this.own(on(node, 'unselected', lang.hitch(this, lang.partial(this._onBookmarkUnSelected, node))));
+        return node;
+      },
+      _onBookmarkClick: function (node) {
+        node.onSelected();
+      },
+      _onBookmarkSelected: function () {
+        this._selectedBookMarksNumber++;
+        this._isDisableOK();
+      },
+      _onBookmarkUnSelected: function () {
+        this._selectedBookMarksNumber--;
+        this._isDisableOK();
+      },
+      _isDisableOK: function () {
+        if (this.popup) {
+          if (this._selectedBookMarksNumber > 0) {
+            this.popup.enableButton(0);
+          } else {
+            this.popup.disableButton(0);
+          }
+
+          utils.setCheckboxWithoutEvent(this.all, this._isSelectedAll());
+        }
+      }
+    });
+  });

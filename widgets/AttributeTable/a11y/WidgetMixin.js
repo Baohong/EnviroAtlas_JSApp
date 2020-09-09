@@ -1,17 +1,505 @@
-// All material copyright ESRI, All Rights Reserved, unless otherwise specified.
-// See http://js.arcgis.com/3.15/esri/copyright.txt and http://www.arcgis.com/apps/webappbuilder/copyright.txt for details.
-//>>built
-define("dojo/_base/declare dojo/_base/array dojo/_base/lang dojo/_base/html dojo/on dojo/aspect dojo/keys dijit/focus dojo/topic jimu/utils jimu/LayoutManager".split(" "),function(q,n,c,h,f,r,d,k,p,e,t){return q(null,{_layoutManager:null,_focusedTab:null,focusToDisplay:!1,hasBeenActivated:!1,postCreate:function(){this.inherited(arguments);this._layoutManager=t.getInstance();this.focusToDisplay=!0;this.hasBeenActivated=this.config.initiallyExpand;this.own(f(this.domNode,"keydown",c.hitch(this,function(a){h.hasClass(a.target,
-this.baseClass)&&a.keyCode===d.ENTER&&(this.focusToDisplay=!1,this.hasBeenActivated=!0,this.showing||(this.widgetManager.activateWidget(this),this._switchTable()))})));this.own(f(this.domNode,"focus",c.hitch(this,function(){e.isInNavMode()&&this.focusToDisplay&&!this.showing&&(this.widgetManager.activateWidget(this),this._switchTable())})));this.own(f(this.domNode,"blur",c.hitch(this,function(){e.isInNavMode()&&this.focusToDisplay&&this.showing&&(this.hasBeenActivated||this._switchTable());this.focusToDisplay=
-!0;this.showing||(this.hasBeenActivated=!1)})));this.own(p.subscribe(this.id+"_table_created",c.hitch(this,function(a){this._applyA11y2Grid(a&&a.grid,a&&a.context)})),p.subscribe(this.id+"_toolbar_created",c.hitch(this,function(a){this._applyA11y2Toolbar(a&&a.toolbar,a&&a.context)})))},applyA11y:function(){this._isOnlyTable()&&h.removeAttr(this.domNode,"tabindex");this.switchBtn&&this.own(f(this.switchBtn,"keydown",c.hitch(this,function(a){a.keyCode===d.ENTER&&(this._switchTable(),this.focusToDisplay=
-this.showing,this.__focus2WidgetNode())})));this.tabContainer&&this.tabContainer.hasChildren()?this._applyA11y2TabContainer(this.tabContainer):this.NoTableMessageDiv&&(h.setAttr(this.NoTableMessageDiv,{tabindex:"0"}),e.initFirstFocusNode(this.domNode,this.NoTableMessageDiv),e.initLastFocusNode(this.domNode,this.NoTableMessageDiv),this.own(f(this.NoTableMessageDiv,"keydown",c.hitch(this,function(a){a.keyCode===d.ESCAPE&&this.__escape2WidgetSwitch(a)}))),this._isOnlyTable()&&k.focus(this.NoTableMessageDiv))},
-_applyA11y2TabContainer:function(a){if(a){var b=this,m=function(g){g&&(n.forEach(a.tablist.getChildren(),function(a){!a.active&&a.closeButton&&a.id!==g.id&&h.setAttr(a.closeNode,"tabindex",-1)}),h.setAttr(g.closeNode,"tabindex",0))},u=a.tablist.onkeydown;a.tablist.onkeydown=function(a,m){var c=null,l=!1;switch(a.keyCode){case d.LEFT_ARROW:case d.UP_ARROW:a._djpage||(c=!1);break;case d.PAGE_UP:a.ctrlKey&&(c=!1);break;case d.RIGHT_ARROW:case d.DOWN_ARROW:a._djpage||(c=!0);break;case d.PAGE_DOWN:a.ctrlKey&&
-(c=!0);break;case d.HOME:for(var g=this.getChildren(),e=0;e<g.length;e++){var f=g[e];if(!f.disabled){k.focus(f.focusNode);b._focusedTab=f;break}}a.stopPropagation();a.preventDefault();break;case d.END:g=this.getChildren();for(e=g.length-1;0<=e;e--)if(f=g[e],!f.disabled){k.focus(f.focusNode);b._focusedTab=f;break}a.stopPropagation();a.preventDefault();break;case d.DELETE:case 87:this._currentChild.closable&&(a.keyCode==d.DELETE||a.ctrlKey)&&(a.stopPropagation(),a.preventDefault());break;case d.ENTER:case d.SPACE:b.tabForwardStep=
-0;break;case d.ESCAPE:"Close"===a.target.title?b._focusedTab&&k.focus(b._focusedTab.focusNode):b.__escape2WidgetSwitch(a);a.stopPropagation();a.preventDefault();break;case d.TAB:if(b.isLoading()){a.stopPropagation();a.preventDefault();return}break;default:l=!0}if(null!==c){this.isLeftToRight()||this.tabPosition&&!/top|bottom/.test(this.tabPosition)||(c=!c);var g=this.getChildren(),e=n.indexOf(g,this.pane2button(b._focusedTab?b._focusedTab.page&&b._focusedTab.page.id:this._currentChild.id)),f=g[e],
-h;do e=(e+(c?1:g.length-1))%g.length,h=g[e];while(h.disabled&&h!==f);b._focusedTab=h;k.focus(b._focusedTab.focusNode);a.stopPropagation();a.preventDefault()}l&&u.apply(this,arguments)};if(a.hasChildren()){n.forEach(a.getChildren(),c.hitch(this,function(a){a.controlButton.checked||h.setAttr(a.controlButton.focusNode,"aria-selected","false");a.closable&&h.setAttr(a.controlButton.closeNode,"role","button")}));var l=a.tablist.getChildren()[0];this._focusedTab=l;e.initFirstFocusNode(this.domNode,l.focusNode);
-l.closeNode&&m(l);!this._isOnlyTable()||"LaunchpadTheme"!==this.appConfig.theme.name&&"BillboardTheme"!==this.appConfig.theme.name||k.focus(l.focusNode)}this.own(r.after(a,"selectChild",function(){var a=c.getObject("controlButton",!1,this.selectedChildWidget);a&&(e.initFirstFocusNode(b.domNode,a.focusNode),a.closeNode&&m(a));b._focusedTab=a}),f(a.tablist,"blur",c.hitch(this,function(){this._focusedTab=null})))}},_applyA11y2Toolbar:function(a,b){a&&(c.mixin(a,{_onLeftArrow:function(){},_onRightArrow:function(){}}),
-this.own(f(a,"keydown",c.hitch(this,function(b){if(b.keyCode===d.TAB){if(b.shiftKey){if(b.target.id===a._getFirstFocusableChild().id)return}else if(b.target.id===a._getLastFocusableChild().id)return;b.shiftKey?a.focusPrev():a.focusNext();b.stopPropagation();b.preventDefault()}else b.keyCode===d.ESCAPE&&this.__escape2ActiveTab(b)}))),b&&b.toggleColumnsMenuItem&&this.own(f(b.toggleColumnsMenuItem,"click",c.hitch(this,function(a){e.isInNavMode()&&this.__applyA11y2GridHiderMenu(this._activeTable&&this._activeTable.grid)}))))},
-_applyA11y2Grid:function(a,b){if(a&&a.hiderToggleNode&&a.hiderMenuNode){var m=a.hiderToggleNode,k=a.hiderMenuNode;e.initLastFocusNode(this.domNode,m);a._customEvtHandlersInitialized||(this.own(f(a,"keydown",c.hitch(this,function(a){a.keyCode===d.ESCAPE&&this.__escape2ActiveTab(a)})),f(m,"keydown",c.hitch(this,function(b){if(b.keyCode===d.SPACE||b.keyCode===d.ENTER)a._toggleColumnHiderMenu(),this.__applyA11y2GridHiderMenu(a),b.stopPropagation(),b.preventDefault()})),f(k,"keydown",c.hitch(this,function(b){b.keyCode===
-d.ESCAPE&&(m.focus(),a._hiderMenuOpened&&a._toggleColumnHiderMenu(b),b.stopPropagation(),b.preventDefault())}))),a._customEvtHandlersInitialized=!0);this._focusedTab&&this._focusedTab.checked&&b&&h.setAttr(this._focusedTab.focusNode,"aria-labelledby",this._focusedTab.focusNode.id+" "+this.id+"_"+b.id+"_footer")}},__escape2WidgetSwitch:function(a){this.switchBtn?this.switchBtn.focus():e.isDomFocusable(this.domNode)?this.__focus2WidgetNode():this._controllerDiv&&this._controllerDiv.focus();if(this.closeable&&
-this._isOnlyTable()&&this.widgetManager){var b;n.some(this._layoutManager&&this._layoutManager.layoutManager&&this._layoutManager.layoutManager.onScreenWidgetIcons,c.hitch(this,function(a){if(a&&a.widgetConfig&&a.widgetConfig.id===this.id)return b=a,!0}));b?b.domNode.focus():this.widgetManager.closeWidget(this)}a&&(a.stopPropagation(),a.preventDefault())},__focus2WidgetNode:function(){this.domNode.focus()},__escape2ActiveTab:function(a){e.focusFirstFocusNode(this.domNode);a&&(a.stopPropagation(),
-a.preventDefault())},__applyA11y2GridHiderMenu:function(a){if(a&&a._hiderMenuOpened&&(a=a.hiderMenuNode,a.children&&0<a.children.length)){var b=a.children[0],c=a.children[a.children.length-1],d=b.querySelector("input");e.initFirstFocusNode(a,b.querySelector("input"));e.initLastFocusNode(a,c.querySelector("input"));d&&d.focus()}},__focusOnActiveTab:function(){setTimeout(c.hitch(this,function(){e.focusFirstFocusNode(this.domNode)}),600)}})});
+define([
+	'dojo/_base/declare',
+	'dojo/_base/array',
+	'dojo/_base/lang',
+	'dojo/_base/html',
+	'dojo/on',
+	'dojo/aspect',
+	'dojo/keys',
+	'dijit/focus',
+	'dojo/topic',
+	'jimu/utils',
+	'jimu/LayoutManager'
+], function (declare, array, lang, html, on, aspect, keys, focus, topic, jimuUtils, LayoutManager) {
+	return declare(null, {
+
+		_layoutManager: null,
+		_focusedTab: null,
+		focusToDisplay: false,
+		hasBeenActivated: false, //widget has been manually activated, such as by pressing the ENTER key
+
+		postCreate: function() {
+			this.inherited(arguments);
+
+			this._layoutManager = LayoutManager.getInstance();
+
+			this.focusToDisplay = true;
+			this.hasBeenActivated = this.config.initiallyExpand;
+
+			this.own(on(this.domNode, 'keydown', lang.hitch(this, function (evt) {
+				if(html.hasClass(evt.target, this.baseClass) && evt.keyCode === keys.ENTER) {
+					this.focusToDisplay = false;
+					this.hasBeenActivated = true;
+					if(!this.showing) {
+						this.widgetManager.activateWidget(this);//active it to add z-index for dashboardTheme
+						this._switchTable(); //show widget temporarily
+					}
+				}
+			})));
+			this.own(on(this.domNode, 'focus', lang.hitch(this, function () {
+				if(jimuUtils.isInNavMode() && this.focusToDisplay && !this.showing) {
+					this.widgetManager.activateWidget(this); //active it to add z-index for dashboardTheme
+					this._switchTable(); //show widget temporarily
+				}
+			})));
+			this.own(on(this.domNode, 'blur', lang.hitch(this, function () {
+				if(jimuUtils.isInNavMode() && this.focusToDisplay && this.showing) {
+					if(!this.hasBeenActivated) {
+						this._switchTable(); //hide widget
+					}
+				}
+				this.focusToDisplay = true; // turn it back on
+				// turn flags off when the widget is mimimized
+				if(!this.showing) {
+					this.hasBeenActivated = false;
+				}
+			})));
+
+			this.own(
+				// listen to event when a feature table is created / activated
+				topic.subscribe(this.id + '_table_created', lang.hitch(this, function(args) {
+					var grid = args && args.grid;
+					this._applyA11y2Grid(grid, args && args.context);
+				})),
+				// listen to event when a toolbar is created / activated
+				topic.subscribe(this.id + '_toolbar_created', lang.hitch(this, function(args) {
+					var toolbar = args && args.toolbar;
+					this._applyA11y2Toolbar(toolbar, args && args.context);
+				}))
+			);
+		},
+
+		applyA11y: function () {
+
+			// handle Launchpad and Billboard themes
+			if(this._isOnlyTable()){
+				html.removeAttr(this.domNode, 'tabindex');
+			}
+
+			// step 1:
+			//
+			if(this.switchBtn) {
+				this.own(
+					on(this.switchBtn, 'keydown', lang.hitch(this, function (e) {
+						if(e.keyCode === keys.ENTER) {
+							this._switchTable();
+							this.focusToDisplay = this.showing;
+							this.__focus2WidgetNode();
+						}
+					}))
+				);
+			}
+
+			// step 2: tab container or no data message
+			//
+			if(this.tabContainer && this.tabContainer.hasChildren()) {
+				this._applyA11y2TabContainer(this.tabContainer);
+			} else {
+				if(this.NoTableMessageDiv) {
+					html.setAttr(this.NoTableMessageDiv, {tabindex: '0'});
+					jimuUtils.initFirstFocusNode(this.domNode, this.NoTableMessageDiv);
+					jimuUtils.initLastFocusNode(this.domNode, this.NoTableMessageDiv);
+					this.own(
+						on(this.NoTableMessageDiv, 'keydown', lang.hitch(this, function (evt) {
+							if(evt.keyCode === keys.ESCAPE) {
+								this.__escape2WidgetSwitch(evt);
+							}
+						}))
+					);
+					if(this._isOnlyTable()){
+						focus.focus(this.NoTableMessageDiv);
+					}
+				}
+			}
+		},
+
+		_applyA11y2TabContainer: function(tabContainer) {
+			if(!tabContainer) return;
+
+			var self = this;
+
+			var _activeCloseButtonTabIndex = function(activeControlButton) {
+				if(!activeControlButton) return;
+
+				// mute tab indexes for all other tabs
+				array.forEach(tabContainer.tablist.getChildren(), function(controlButton) {
+					if(!controlButton.active &&
+						controlButton.closeButton &&
+						controlButton.id !== activeControlButton.id
+					) {
+						html.setAttr(controlButton.closeNode, 'tabindex', -1);
+					}
+				});
+				// activate tab index for the active tab
+				html.setAttr(activeControlButton.closeNode, 'tabindex', 0);
+			};
+
+			// step 1:
+			// monkey patch the StackController in the tabContainer
+			//
+			var oldOnkeyDownMethod = tabContainer.tablist.onkeydown;
+
+			// override the "adjacent" method in dijit/layout/StackController
+			var __stackAdjacent = function(forward, context){
+				if(!context.isLeftToRight() &&
+					(!context.tabPosition || /top|bottom/.test(context.tabPosition))
+					) {
+					forward = !forward;
+				}
+				var children = context.getChildren();
+				var idx = array.indexOf(children, context.pane2button(
+					self._focusedTab ?
+					self._focusedTab.page && self._focusedTab.page.id :
+						context._currentChild.id)),
+					current = children[idx];
+				var child;
+
+				do{
+					idx = (idx + (forward ? 1 : children.length - 1)) % children.length;
+					child = children[idx];
+				}while(child.disabled && child !== current);
+
+				return child;
+			};
+
+			tabContainer.tablist.onkeydown = function(e, fromContainer) {
+				var forward = null, applyOldMethod = false;
+				switch(e.keyCode) {
+					case keys.LEFT_ARROW:
+					case keys.UP_ARROW:
+						if(!e._djpage){
+							forward = false;
+						}
+						break;
+					case keys.PAGE_UP:
+						if(e.ctrlKey){
+							forward = false;
+						}
+						break;
+					case keys.RIGHT_ARROW:
+					case keys.DOWN_ARROW:
+						if(!e._djpage){
+							forward = true;
+						}
+						break;
+					case keys.PAGE_DOWN:
+						if(e.ctrlKey){
+							forward = true;
+						}
+						break;
+					case keys.HOME:
+						var children = this.getChildren();
+						for(var idx = 0; idx < children.length; idx++){
+							var child = children[idx];
+							if(!child.disabled){
+								focus.focus(child.focusNode);
+								self._focusedTab = child;
+								break;
+							}
+						}
+						e.stopPropagation();
+						e.preventDefault();
+						break;
+					case keys.END:
+						var children = this.getChildren();
+						for(var idx = children.length - 1; idx >= 0; idx--){
+							var child = children[idx];
+							if(!child.disabled){
+								focus.focus(child.focusNode);
+								self._focusedTab = child;
+								break;
+							}
+						}
+						e.stopPropagation();
+						e.preventDefault();
+						break;
+					case keys.DELETE:
+					case "W".charCodeAt(0):    // ctrl-W
+						// remove default delete keyboard behavior
+						if(this._currentChild.closable &&
+							(e.keyCode == keys.DELETE || e.ctrlKey)){
+							e.stopPropagation();
+							e.preventDefault();
+						}
+						break;
+					case keys.ENTER:
+					case keys.SPACE:
+						self.tabForwardStep = 0;
+						break;
+					case keys.ESCAPE:
+						if(e.target.title === 'Close') {
+							self._focusedTab && focus.focus(self._focusedTab.focusNode);
+						} else {
+							self.__escape2WidgetSwitch(e);
+						}
+						e.stopPropagation();
+						e.preventDefault();
+						break;
+					case keys.TAB:
+						if(self.isLoading()) {
+							e.stopPropagation();
+							e.preventDefault();
+							return;
+						}
+						break;
+					default:
+						applyOldMethod = true;
+				}
+
+				if(forward !== null) {
+					self._focusedTab = __stackAdjacent(forward, this);
+					focus.focus(self._focusedTab.focusNode);
+
+					e.stopPropagation();
+					e.preventDefault();
+				}
+
+				if(applyOldMethod) {
+					oldOnkeyDownMethod.apply(this, arguments);
+				}
+			};
+
+			// step 2:
+			// make first tab as the first focusable node in widget
+			//
+			if(tabContainer.hasChildren()) {
+				array.forEach(tabContainer.getChildren(), lang.hitch(this, function(tab) {
+					if(!tab.controlButton.checked) {
+						html.setAttr(tab.controlButton.focusNode, 'aria-selected', 'false');
+					}
+					if(tab.closable) {
+						html.setAttr(tab.controlButton.closeNode, 'role', 'button');
+					}
+				}));
+
+				var firstTabChild = tabContainer.tablist.getChildren()[0];
+
+				this._focusedTab = firstTabChild;
+				jimuUtils.initFirstFocusNode(this.domNode, firstTabChild.focusNode);
+				if(firstTabChild.closeNode) {
+					_activeCloseButtonTabIndex(firstTabChild);
+				}
+				if(this._isOnlyTable() &&
+					 (this.appConfig.theme.name ==='LaunchpadTheme' ||
+						this.appConfig.theme.name ==='BillboardTheme')) { // TODO: have a better check?
+					focus.focus(firstTabChild.focusNode);
+				}
+			}
+
+			// step 3:
+			// attach event handlers
+			//
+
+			this.own(
+				aspect.after(tabContainer, 'selectChild', function() {
+					var controlButton = lang.getObject(
+						'controlButton',
+						false,
+						this.selectedChildWidget);
+					if(controlButton) {
+						jimuUtils.initFirstFocusNode(self.domNode, controlButton.focusNode);
+						if(controlButton.closeNode) {
+							_activeCloseButtonTabIndex(controlButton);
+						}
+					}
+
+					self._focusedTab = controlButton;
+				}),
+				// reset _focusedTab when tablist loses focus
+				on(tabContainer.tablist, 'blur', lang.hitch(this, function() {
+					this._focusedTab = null;
+				}))
+				// // reset _focusedTab when tablist loses focus
+				// on(tabContainer.tablist, 'keydown', lang.hitch(this, function(e) {
+				// 	if(e.keyCode === keys.ESCAPE) {
+				// 		if(e.target.title === 'Close') {
+				// 			this._focusedTab && focus.focus(this._focusedTab.focusNode);
+				// 		} else {
+				// 			this.__escape2WidgetSwitch(e);
+				// 		}
+				// 		e.stopPropagation();
+				// 		e.preventDefault();
+				// 	}
+				// }))
+			);
+		},
+
+		_applyA11y2Toolbar: function(toolbar, context) {
+			if(!toolbar) {
+				return;
+			}
+			// step 1:
+			// override the default on left / right arrow click navigation
+			//
+			lang.mixin(toolbar, {
+				_onLeftArrow: function() {/* null */},
+				_onRightArrow: function() {/* null */}
+			});
+
+			// step 2:
+			// attach keyboard event handlers
+			//
+			this.own(
+				on(toolbar, 'keydown', lang.hitch(this, function(e) {
+					if(e.keyCode === keys.TAB) {
+						if(e.shiftKey) {
+							if(e.target.id === toolbar._getFirstFocusableChild().id) {
+								return;
+							}
+						} else {
+							if(e.target.id === toolbar._getLastFocusableChild().id) {
+								return;
+							}
+						}
+						e.shiftKey ? toolbar.focusPrev() : toolbar.focusNext();
+						e.stopPropagation();
+						e.preventDefault();
+					} else if(e.keyCode === keys.ESCAPE) {
+						this.__escape2ActiveTab(e);
+					}
+				}))
+			);
+			if(context && context.toggleColumnsMenuItem) {
+				this.own(
+					on(context.toggleColumnsMenuItem, 'click', lang.hitch(this, function(e) {
+						if(jimuUtils.isInNavMode()) {
+							var grid  = this._activeTable && this._activeTable.grid;
+							this.__applyA11y2GridHiderMenu(grid);
+						}
+					}))
+				)
+			}
+		},
+
+		_applyA11y2Grid: function(grid, context) {
+			if(!grid || !grid.hiderToggleNode || !grid.hiderMenuNode) {
+				return;
+			}
+
+			var toggleNode = grid.hiderToggleNode,
+					menuNode = grid.hiderMenuNode;
+
+			// step 1:
+			// set last focus node to the column hider button in the active grid
+			// as the last focusable node in the widget
+			//
+			jimuUtils.initLastFocusNode(this.domNode, toggleNode);
+
+			// step 2:
+			// attach keyboard handlers
+			//
+			if(!grid._customEvtHandlersInitialized) {
+				this.own(
+					on(grid, 'keydown', lang.hitch(this, function(e) {
+						if(e.keyCode === keys.ESCAPE) {
+							this.__escape2ActiveTab(e);
+						}
+					})),
+					on(toggleNode, 'keydown', lang.hitch(this, function(e) {
+						if(e.keyCode === keys.SPACE || e.keyCode === keys.ENTER) {
+							grid._toggleColumnHiderMenu();
+							this.__applyA11y2GridHiderMenu(grid);
+							e.stopPropagation();
+							e.preventDefault();
+						}
+					})),
+					on(menuNode, 'keydown', lang.hitch(this, function(e) {
+						if(e.keyCode === keys.ESCAPE) {
+							toggleNode.focus();
+							if(grid._hiderMenuOpened) {
+								grid._toggleColumnHiderMenu(e);
+							}
+							e.stopPropagation();
+							e.preventDefault();
+						}
+					}))
+				);
+				grid._customEvtHandlersInitialized = true;
+			}
+
+			if(this._focusedTab && this._focusedTab.checked && context) {
+				html.setAttr(
+					this._focusedTab.focusNode,
+					'aria-labelledby',
+					this._focusedTab.focusNode.id + ' ' + this.id + '_' + context.id + '_footer'
+				);
+			}
+		},
+
+		__escape2WidgetSwitch: function(e) {
+			if(this.switchBtn) {
+				this.switchBtn.focus();
+			} else {
+				if(jimuUtils.isDomFocusable(this.domNode)) {
+					this.__focus2WidgetNode();
+				} else {
+					this._controllerDiv && this._controllerDiv.focus();
+				}
+			}
+
+			if(this.closeable && this._isOnlyTable()) {
+				if(this.widgetManager) {
+					var oncreenIcons = this._layoutManager &&
+					this._layoutManager.layoutManager &&
+					this._layoutManager.layoutManager.onScreenWidgetIcons;
+					var widgetonScreenIcon;
+					array.some(oncreenIcons, lang.hitch(this, function(iconObj) {
+						if(iconObj && iconObj.widgetConfig && iconObj.widgetConfig.id === this.id) {
+							widgetonScreenIcon = iconObj;
+							return true;
+						}
+					}));
+					if(widgetonScreenIcon) {
+						widgetonScreenIcon.domNode.focus();
+					} else {
+						this.widgetManager.closeWidget(this); // close widget to focus the icon
+					}
+				}
+			}
+
+			if(e) {
+				e.stopPropagation();
+				e.preventDefault();
+			}
+		},
+
+		__focus2WidgetNode: function() {
+			this.domNode.focus();
+		},
+
+		__escape2ActiveTab: function(e) {
+			jimuUtils.focusFirstFocusNode(this.domNode);
+			if(e) {
+				e.stopPropagation();
+				e.preventDefault();
+			}
+		},
+
+		__applyA11y2GridHiderMenu: function(grid) {
+			if(grid && grid._hiderMenuOpened) {
+				var menuNode = grid.hiderMenuNode;
+				var isMenuHasChild = menuNode.children && menuNode.children.length > 0;
+				if(isMenuHasChild) {
+					var firstChild = menuNode.children[0],
+							lastChild = menuNode.children[menuNode.children.length - 1];
+					var firstChildCheck = firstChild.querySelector('input');
+
+					// init focusable nodes in the column hider menu
+					jimuUtils.initFirstFocusNode(menuNode, firstChild.querySelector('input'));
+					jimuUtils.initLastFocusNode(menuNode, lastChild.querySelector('input'));
+
+					if(firstChildCheck) {
+						firstChildCheck.focus();
+					}
+				}
+			}
+		},
+
+		__focusOnActiveTab: function(){
+			setTimeout(lang.hitch(this, function(){
+				jimuUtils.focusFirstFocusNode(this.domNode);
+			}),600);
+		}
+
+	});
+});

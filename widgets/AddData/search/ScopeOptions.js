@@ -1,9 +1,188 @@
-// All material copyright ESRI, All Rights Reserved, unless otherwise specified.
-// See http://js.arcgis.com/3.15/esri/copyright.txt and http://www.arcgis.com/apps/webappbuilder/copyright.txt for details.
-//>>built
-require({cache:{"url:widgets/AddData/search/templates/ScopeOptions.html":'\x3cdiv class\x3d"search-scope-options"\x3e\r\n  \x3ca href\x3d"#" class\x3d"scope-placeholder"\r\n    data-dojo-attach-point\x3d"scopePlaceholder"\r\n    data-dojo-attach-event\x3d"onClick: scopePlaceholderClicked"\x3e\r\n    \x3cspan data-dojo-attach-point\x3d"scopePlaceholderText"\x3e\x3c/span\x3e\r\n    \x3cspan class\x3d"dropdown-arrow"\x3e\x3c/span\x3e\r\n  \x3c/a\x3e\r\n  \x3cdiv class\x3d"btn-group" data-dojo-attach-point\x3d"btnGroup"\x3e\r\n    \x3cbutton type\x3d"button" class\x3d"btn btn-sm btn-default" name\x3d"${id}_scope"\r\n      data-dojo-attach-point\x3d"MyContentToggle"\r\n      data-dojo-attach-event\x3d"onClick: optionClicked"\r\n      data-option-name\x3d"MyContent"\x3e\r\n      ${i18n.search.scopeOptions.myContent}\r\n    \x3c/button\x3e\r\n    \x3cbutton type\x3d"button" class\x3d"btn btn-sm btn-default" name\x3d"${id}_scope"\r\n      data-dojo-attach-point\x3d"MyOrganizationToggle"\r\n      data-dojo-attach-event\x3d"onClick: optionClicked"\r\n      data-option-name\x3d"MyOrganization"\x3e\r\n      ${i18n.search.scopeOptions.myOrganization}\r\n    \x3c/button\x3e\r\n    \x3cbutton type\x3d"button" class\x3d"btn btn-sm btn-default" name\x3d"${id}_scope"\r\n      data-dojo-attach-point\x3d"CuratedToggle"\r\n      data-dojo-attach-event\x3d"onClick: optionClicked"\r\n      data-option-name\x3d"Curated"\x3e\r\n      ${i18n.search.scopeOptions.curated}\r\n    \x3c/button\x3e\r\n    \x3cbutton type\x3d"button" class\x3d"btn btn-sm btn-default" name\x3d"${id}_scope"\r\n      data-dojo-attach-point\x3d"ArcGISOnlineToggle"\r\n      data-dojo-attach-event\x3d"onClick: optionClicked"\r\n      data-option-name\x3d"ArcGISOnline"\x3e\r\n      ${i18n.search.scopeOptions.ArcGISOnline}\r\n    \x3c/button\x3e\r\n  \x3c/div\x3e\r\n\x3c/div\x3e\r\n'}});
-define("dojo/_base/declare dojo/_base/lang dojo/_base/array dojo/dom-class ./SearchComponent dojo/text!./templates/ScopeOptions.html dojo/i18n!../nls/strings ./util".split(" "),function(q,m,n,d,r,t,p,f){return q([r],{i18n:p,templateString:t,curatedFilter:null,postCreate:function(){this.inherited(arguments)},startup:function(){this._started||(this.inherited(arguments),this.initOptions())},hideDropdown:function(){d.remove(this.scopePlaceholder,"opened");d.remove(this.btnGroup,"show")},initOptions:function(){var a=
-this.searchPane.searchContext,g="string"===typeof a.username&&0<a.username.length,c=this.getConfig().scopeOptions;this.curatedFilter=c.Curated.filter;var b=null,a=function(a,d){var e=c[a];e&&e.allow?("string"===typeof e.label&&0<m.trim(e.label).length?f.setNodeText(d,m.trim(e.label)):g||"MyOrganization"!==a||f.setNodeText(d,p.search.scopeOptions.anonymousContent),c.defaultScope===a&&(b=d)):d.style.display="none"};a("MyContent",this.MyContentToggle);a("MyOrganization",this.MyOrganizationToggle);a("Curated",
-this.CuratedToggle);a("ArcGISOnline",this.ArcGISOnlineToggle);b||(c.MyOrganization.allow?b=this.MyOrganizationToggle:c.ArcGISOnline.allow?b=this.ArcGISOnlineToggle:c.Curated.allow?b=this.CuratedToggle:c.MyContent.allow&&(b=this.MyContentToggle));b&&(d.add(b,"active"),this.scopePlaceholderText.innerHTML=b.innerHTML)},optionClicked:function(a){this.toggleClassName(a);this.hideDropdown();this.search()},scopePlaceholderClicked:function(a){a.preventDefault();d.contains(this.scopePlaceholder,"opened")?
-this.hideDropdown():this.showDropdown()},showDropdown:function(){d.add(this.scopePlaceholder,"opened");d.add(this.btnGroup,"show")},toggleClassName:function(a){n.forEach(this.btnGroup.children,function(a){d.remove(a,"active")});d.add(a.target,"active");this.scopePlaceholderText.innerHTML=a.target.innerHTML},appendQueryParams:function(a,g){var c=null;n.some(this.btnGroup.children,function(a){if(d.contains(a,"active"))return c=a.getAttribute("data-option-name"),!0});"undefined"===typeof c&&(c=null);
-var b=null,h=this.curatedFilter,k=this.searchPane.searchContext,e=k.username,l=k.orgId;"MyContent"===c?"string"===typeof e&&0<e.length&&(b="(owner:"+f.escapeForLucene(e)+")"):"MyOrganization"===c?"string"===typeof l&&0<l.length&&(b="(orgid:"+f.escapeForLucene(l)+")"):"Curated"===c?"string"===typeof h&&0<h.length&&(b=h):"ArcGISOnline"===c&&k.allowArcGISOnline&&(g.scopeIsArcGISOnline=!0);null!==b&&0<b.length&&(b="("+b+")",a.q=null!==a.q&&0<a.q.length?a.q+(" AND "+b):b)}})});
+///////////////////////////////////////////////////////////////////////////
+// Copyright © Esri. All Rights Reserved.
+//
+// Licensed under the Apache License Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+///////////////////////////////////////////////////////////////////////////
+define(["dojo/_base/declare",
+    "dojo/_base/lang",
+    "dojo/_base/array",
+    "dojo/dom-class",
+    "./SearchComponent",
+    "dojo/text!./templates/ScopeOptions.html",
+    "dojo/i18n!../nls/strings",
+    "./util"
+  ],
+  function(declare, lang, array, domClass, SearchComponent, template, i18n, util) {
+
+    return declare([SearchComponent], {
+
+      i18n: i18n,
+      templateString: template,
+      curatedFilter: null,
+
+      postCreate: function() {
+        this.inherited(arguments);
+      },
+
+      startup: function() {
+        if (this._started) {
+          return;
+        }
+        this.inherited(arguments);
+        this.initOptions();
+        //console.warn("ScopeOptions.startup",this.searchPane.portal);
+      },
+
+      hideDropdown: function() {
+        domClass.remove(this.scopePlaceholder, "opened");
+        domClass.remove(this.btnGroup, "show");
+      },
+
+      initOptions: function() {
+        var context = this.searchPane.searchContext;
+        var hasUsername = (typeof context.username === "string" && context.username.length > 0);
+        //var hasOrgId = (typeof context.orgId === "string" && context.orgId.length > 0);
+        var options = this.getConfig().scopeOptions;
+        this.curatedFilter = options.Curated.filter;
+        var activeNode = null;
+
+        var initOption = function(name, node) {
+          var opt = options[name];
+          if (opt && opt.allow) {
+            if (typeof opt.label === "string" && lang.trim(opt.label). length > 0) {
+              util.setNodeText(node,lang.trim(opt.label));
+            } else {
+              if (!hasUsername && name === "MyOrganization") {
+                // "My Organization as a label doesn't make sense
+                util.setNodeText(node,i18n.search.scopeOptions.anonymousContent);
+              }
+            }
+            if (options.defaultScope === name) {
+              activeNode = node;
+            }
+          } else {
+            node.style.display = "none";
+          }
+        };
+        initOption("MyContent", this.MyContentToggle);
+        initOption("MyOrganization", this.MyOrganizationToggle);
+        initOption("Curated", this.CuratedToggle);
+        initOption("ArcGISOnline", this.ArcGISOnlineToggle);
+
+        if (!activeNode) {
+          if (options.MyOrganization.allow) {
+            activeNode = this.MyOrganizationToggle;
+          } else if (options.ArcGISOnline.allow) {
+            activeNode = this.ArcGISOnlineToggle;
+          } else if (options.Curated.allow) {
+            activeNode = this.CuratedToggle;
+          } else if (options.MyContent.allow) {
+            activeNode = this.MyContentToggle;
+          }
+        }
+        if (activeNode) {
+          domClass.add(activeNode, "active");
+          this.scopePlaceholderText.innerHTML = activeNode.innerHTML;
+        }
+      },
+
+      optionClicked: function(evt) {
+        this.toggleClassName(evt);
+        this.hideDropdown();
+        this.search();
+      },
+
+      scopePlaceholderClicked: function(evt) {
+        evt.preventDefault();
+        if (domClass.contains(this.scopePlaceholder, "opened")) {
+          this.hideDropdown();
+        } else {
+          this.showDropdown();
+        }
+      },
+
+      showDropdown: function() {
+        // this.btnGroup.style.top = this.domNode.clientHeight + "px";
+        domClass.add(this.scopePlaceholder, "opened");
+        domClass.add(this.btnGroup, "show");
+      },
+
+      toggleClassName: function(evt) {
+        array.forEach(this.btnGroup.children, function(node) {
+          domClass.remove(node, "active");
+        });
+        domClass.add(evt.target, "active");
+        this.scopePlaceholderText.innerHTML = evt.target.innerHTML;
+      },
+
+      /* SearchComponent API ============================================= */
+
+      appendQueryParams: function(params, task) {
+        var scope = null;
+        array.some(this.btnGroup.children, function(node) {
+          if (domClass.contains(node, "active")) {
+            scope = node.getAttribute("data-option-name");
+            return true;
+          }
+        });
+        if (typeof scope === "undefined") {
+          scope = null;
+        }
+        //console.warn("scope",scope);
+
+        var q = null;
+        var curatedFilter = this.curatedFilter;
+        var context = this.searchPane.searchContext;
+        var username = context.username;
+        var orgId = context.orgId;
+        var considerOrg = true;
+
+        // Issue #14908
+        // if (context.portal && context.portal.isPortal) {
+        //   considerOrg = false;
+        // }
+
+        if (scope === "MyContent") {
+          if (typeof username === "string" && username.length > 0) {
+            q = "(owner:" + util.escapeForLucene(username) + ")";
+          }
+
+        } else if (scope === "MyOrganization") {
+          if (considerOrg && typeof orgId === "string" && orgId.length > 0) {
+            q = "(orgid:" + util.escapeForLucene(orgId) + ")";
+          }
+
+        } else if (scope === "Curated") {
+          if (typeof curatedFilter === "string" && curatedFilter.length > 0) {
+            q = curatedFilter;
+          }
+
+        } else if (scope === "ArcGISOnline") {
+          if (context.allowArcGISOnline) {
+            task.scopeIsArcGISOnline = true;
+          }
+        }
+
+        if (q !== null && q.length > 0) {
+          q = "(" + q + ")";
+          if (params.q !== null && params.q.length > 0) {
+            params.q += " AND " + q;
+          } else {
+            params.q = q;
+          }
+        }
+      }
+
+    });
+
+  });
