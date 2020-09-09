@@ -16,12 +16,15 @@
 define(["dojo/_base/declare",
     "dojo/_base/lang",
     "dojo/_base/array",
+    'dojo/_base/html',
     "dojo/on",
     "dojo/keys",
     "dojo/Deferred",
     "dojo/promise/all",
     "dojo/dom-class",
     "dojo/window",
+    "dojo/dom",
+    "dojo/dom-style",
     "dijit/Viewport",
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
@@ -40,20 +43,25 @@ define(["dojo/_base/declare",
     "esri/layers/KMLLayer",
     "esri/layers/StreamLayer",
     "esri/layers/VectorTileLayer",
+    "esri/layers/WFSLayer",
     "esri/layers/WMSLayer",
     "esri/layers/WMTSLayer",
     "esri/InfoTemplate",
+    "jimu/WidgetManager",
     "jimu/dijit/Message",
     "dijit/form/Select"
   ],
-  function(declare, lang, array, on, keys, Deferred, all, domClass, win,
-    Viewport, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
-    template, i18n, LayerLoader, util, ArcGISDynamicMapServiceLayer,
+  function(declare, lang, array, html, on, keys, Deferred, all, domClass, win, dom, domStyle, Viewport,
+    _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, template, i18n,
+    LayerLoader, util, ArcGISDynamicMapServiceLayer,
     ArcGISImageServiceLayer, ArcGISTiledMapServiceLayer, CSVLayer,
     FeatureLayer, GeoRSSLayer, ImageParameters, KMLLayer, StreamLayer,
-    VectorTileLayer, WMSLayer, WMTSLayer,
-    InfoTemplate, Message) {
-
+    VectorTileLayer, WFSLayer, WMSLayer, WMTSLayer,
+    InfoTemplate, WidgetManager, Message, Select) {
+    var widgetJsonTimeSlider = {
+        id: 'widgets_TimeSlider_Widget_32',
+        uri: "widgets/TimeSlider/Widget"
+    };
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
 
       i18n: i18n,
@@ -126,8 +134,8 @@ define(["dojo/_base/declare",
         if (!ok) {
           return;
         }
-
-        domClass.add(btn, "disabled");
+        window.hashAddedURLToType[url] = type;
+        //domClass.add(btn, "disabled");//this line is removed so that the button will work for saveSession with multiple added URL
         self._setStatus(i18n.search.item.messages.adding);
         var dfd = new Deferred();
         var map = this.wabWidget.map;
@@ -159,6 +167,12 @@ define(["dojo/_base/declare",
               //console.warn("msg",error.message);
               self._setStatus(error.message);
               console.log("");
+              if (!(url in window.faildedOutsideLayerDictionary)){
+			  	  window.faildedOutsideLayerDictionary[url] = url;
+			  }	
+			  self.AddData.publishData({
+	        	message: "openFailedLayer"
+	    	  });                                             
             }
           }
         });
@@ -184,20 +198,89 @@ define(["dojo/_base/declare",
         }
       },
 
+      _findServiceName: function(evt){
+        var urlS = evt.target.value;
+        if(evt.target.value == ""){
+          domStyle.set(this.lNameFrame, "display", "none");
+        }else{
+          if(urlS.indexOf("/MapServer")>0){
+            domStyle.set(this.lNameFrame, "display", "block");
+            //look for existing EnviroAtlas layers
+            var eaIDinSearchFilter = "";
+            for (var key in window.hashURL){//window.hashURL[layer.eaID.toString()] = eaURL; 
+			  if (window.hashURL[key]==urlS) {
+			  	eaIDinSearchFilter = key;
+			  	break;
+			  }
+			}//end of looking for existing EnviroAtlas layers
+			if (eaIDinSearchFilter != "") {
+				this.nameTextBox.value = window.hashEAIDToTitle[eaIDinSearchFilter];
+			} else {
+	            var stringArray = urlS.split("/");
+	            if (stringArray[stringArray.length -2]=="MapServer"){
+	                this.nameTextBox.value = stringArray[stringArray.length -3] + "-" + stringArray[stringArray.length -1];
+	            } else {
+	            	this.nameTextBox.value = stringArray[stringArray.length -2];
+	            }				
+			}
+
+          }else if(urlS.indexOf("/FeatureServer")>0){
+            domStyle.set(this.lNameFrame, "display", "block");
+            var stringArray = urlS.split("/");
+            if (stringArray[stringArray.length -2]=="FeatureServer"){
+                this.nameTextBox.value = stringArray[stringArray.length -3] + "-" + stringArray[stringArray.length -1];
+            } else {
+            this.nameTextBox.value = stringArray[stringArray.length -2];
+            }
+          }else if(urlS.indexOf("/ImageServer")>0){
+            domStyle.set(this.lNameFrame, "display", "block");
+            var stringArray = urlS.split("/");
+            this.nameTextBox.value = stringArray[stringArray.length -2];
+          }
+        }
+      },               
+      
       _handleAdd: function(dfd, map, type, url) {
         url = util.checkMixedContent(url);
         var lc = url.toLowerCase();
         var loader = new LayerLoader();
-        var id = loader._generateLayerId();
+        //var id = loader._generateLayerId();
+        var id = this.nameTextBox.value;
+        if (id.trim()=="") {
+        	window.addedLayerIndex = window.addedLayerIndex + 1;
+        	id = window.addedLayerIdPrefix + window.addedLayerIndex.toString();
+        }
+        window.hashAddedURLToId[url] = id;
         var self = this,
           layer = null;
 
         if (type === "ArcGIS") {
           if (lc.indexOf("/featureserver") > 0 || lc.indexOf("/mapserver") > 0) {
             loader._readRestInfo(url).then(function(info) {
+              if (info && (info.timeInfo!=undefined)) {//this is a time-aware layer       
+              	   timeAwareLayer = new esri.layers.FeatureLayer(url, {
+			          mode: esri.layers.FeatureLayer.MODE_SNAPSHOT,
+			          outFields: ["*"]
+			       });
+			       timeAwareLayer.id = window.timeSliderLayerId;
+			       timeAwareLayer.on('update-end', function(evt) {
+				       	var wm = WidgetManager.getInstance();
+				       	wm.loadWidget(widgetJsonTimeSlider)
+                        .then(lang.hitch(this, function(widget){
+                          var position = {
+                            relativeTo: "map"                            
+                          };
+                          position.bottom = "50px";
+                          position.left = "100px";
+                          widget.setPosition(position);
+                          wm.openWidget(widget);
+                        }));
+					});
+			       	map.addLayers([timeAwareLayer]);                
+              }
+              else {//else , this is not time-aware layer
               //console.warn("restInfo",info);
-              if (info && typeof info.type === "string" &&
-                 (info.type === "Feature Layer" || info.type === "Table")) {
+              if (info && typeof info.type === "string" && info.type === "Feature Layer") {
                 layer = new FeatureLayer(url, {
                   id: id,
                   outFields: ["*"],
@@ -215,6 +298,7 @@ define(["dojo/_base/declare",
                       infoTemplate: new InfoTemplate()
                     });
                     dfds.push(loader._waitForLayer(lyr));
+                    window.hashAddedURLToId[url] = lyr.id;
                   });
                   array.forEach(info.tables, function(li) {
                     var tbl = new FeatureLayer(url + "/" + li.id, {
@@ -232,6 +316,8 @@ define(["dojo/_base/declare",
                     array.forEach(lyrs, function(lyr) {
                       loader._setFeatureLayerInfoTemplate(lyr);
                       lyr.xtnAddData = true;
+                      window.layerID_Portal_WebMap.push(lyr.id);
+                      window.hashAddedURLToId[url] = lyr.id;
                       map.addLayer(lyr);
                     });
                     dfd.resolve(lyrs);
@@ -256,6 +342,7 @@ define(["dojo/_base/declare",
                   self._waitThenAdd(dfd, map, type, loader, layer);
                 }
               }
+	          }//end of else , this is not time-aware layer
             }).otherwise(function(error) {
               dfd.reject(error);
             });
@@ -376,19 +463,39 @@ define(["dojo/_base/declare",
 
       _waitThenAdd: function(dfd, map, type, loader, layer) {
         //console.warn("_waitThenAdd",type,layer);
+        var na;
         loader._waitForLayer(layer).then(function(lyr) {
           //console.warn("_waitThenAdd.ok",lyr);
+          //var templates = null;
           if (type === "WMS") {
             loader._setWMSVisibleLayers(lyr);
-          } else if (lyr && lyr.declaredClass === "esri.layers.ArcGISDynamicMapServiceLayer") {
-            loader._setDynamicLayerInfoTemplates(lyr);
-          //} else if (lyr && lyr.declaredClass === "esri.layers.ArcGISTiledMapServiceLayer") {
+          } else if (lyr &&
+            (lyr.declaredClass === "esri.layers.ArcGISDynamicMapServiceLayer" ||
+            lyr.declaredClass === "esri.layers.ArcGISTiledMapServiceLayer")) {
+            na = true;
+            /*
+            if (lyr.infoTemplates === null) {
+              array.forEach(lyr.layerInfos, function(lInfo) {
+                if (templates === null) {
+                  templates = {};
+                }
+                templates[lInfo.id] = {
+                  infoTemplate: new InfoTemplate()
+                };
+              });
+              if (templates) {
+                lyr.infoTemplates = templates;
+              }
+            }
+            */
           } else if (lyr && lyr.declaredClass === "esri.layers.FeatureLayer") {
             loader._setFeatureLayerInfoTemplate(lyr);
           } else if (lyr && lyr.declaredClass === "esri.layers.CSVLayer") {
             loader._setFeatureLayerInfoTemplate(lyr);
           }
+          window.layerID_Portal_WebMap.push(lyr.id);
           lyr.xtnAddData = true;
+          lyr.title = lyr.id;
           if (type === "KML") {
             var mapSR = map.spatialReference, outSR = lyr._outSR;
             var projOk = (mapSR && outSR) && (mapSR.equals(outSR) ||

@@ -55,6 +55,7 @@ define(["dojo/_base/declare",
         var options = this.getConfig().scopeOptions;
         this.curatedFilter = options.Curated.filter;
         var activeNode = null;
+        options.MyOrganization.allow = true; //Override function in widget.js to disable this.
 
         var initOption = function(name, node) {
           var opt = options[name];
@@ -144,8 +145,9 @@ define(["dojo/_base/declare",
         var curatedFilter = this.curatedFilter;
         var context = this.searchPane.searchContext;
         var username = context.username;
-        var orgId = context.orgId;
-        var considerOrg = true;
+        var orgId = "cJ9YHowT8TU7DUyn" //context.orgId;
+        var considerOrg = false;// original value of WAB 2.17 is true;
+	
 
         // Issue #14908
         // if (context.portal && context.portal.isPortal) {

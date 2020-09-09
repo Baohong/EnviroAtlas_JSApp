@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// Copyright © 2014 - 2018 Esri. All Rights Reserved.
+// Copyright Â© Esri. All Rights Reserved.
 //
 // Licensed under the Apache License Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ define(["dojo/_base/declare",
     "dojo/_base/lang",
     "dojo/_base/array",
     "dojo/promise/all",
-    'dojo/_base/html',
     "dojo/Deferred",
     "dojo/json",
     "dojo/i18n!../nls/strings",
@@ -45,19 +44,15 @@ define(["dojo/_base/declare",
     "esri/renderers/jsonUtils",
     "esri/geometry/Extent",
     "esri/SpatialReference",
-    "jimu/utils",
-    "jimu/WidgetManager",
-    'jimu/PanelManager'
+    "jimu/utils"
   ],
-  function(declare, lang, array, all, html, Deferred, djJson, i18n, util, esriLang, esriRequest, agsUtils,
+  function(declare, lang, array, all, Deferred, djJson, i18n, util, esriLang, esriRequest, agsUtils,
     ArcGISDynamicMapServiceLayer, ArcGISImageServiceLayer, ArcGISTiledMapServiceLayer,
     DynamicLayerInfo, FeatureLayer, ImageParameters, ImageServiceParameters, KMLLayer,
-    LayerDrawingOptions, MosaicRule, RasterFunction, VectorTileLayer, WFSLayer, WMSLayer, WMSLayerInfo, PopupTemplate, 
-    InfoTemplate, jsonRendererUtils, Extent, SpatialReference, jimuUtils, WidgetManager, PanelManager) {
-    var widgetJsonTimeSlider = {
-        id: 'widgets_TimeSlider_Widget_32',
-        uri: "widgets/TimeSlider/Widget"
-    };
+    LayerDrawingOptions, MosaicRule, RasterFunction, VectorTileLayer,
+    WFSLayer, WMSLayer, WMSLayerInfo,
+    PopupTemplate, InfoTemplate, jsonRendererUtils, Extent, SpatialReference, jimuUtils) {
+
     return declare(null, {
 
       item: null,
@@ -131,11 +126,11 @@ define(["dojo/_base/declare",
              (result.type === "Feature Layer" || result.type === "Table")) {
             // a single layer registered from a service /FeatureServer/1 or /MapServer/2
             var layer = new FeatureLayer(serviceUrl, {
-              mode: esri.layers.FeatureLayer.MODE_SNAPSHOT,
               id: self._generateLayerId(),
               outFields: ["*"]
             });
             layerDfds.push(self._waitForLayer(layer));
+
           } else {
             var list = [];
             if (result && result.layers && result.layers.length > 0) {
@@ -158,7 +153,6 @@ define(["dojo/_base/declare",
                 }
                 if (bAdd) {
                   var layer = new FeatureLayer(serviceUrl + "/" + lyr.id, {
-                    mode: esri.layers.FeatureLayer.MODE_SNAPSHOT,
                     id: self._generateLayerId(),
                     outFields: ["*"]
                   });
@@ -299,23 +293,6 @@ define(["dojo/_base/declare",
         //console.warn("map",this.map);
         var item = this.item;
         if (layer) {
-          if ((layer.timeInfo != null)) {
-			     layer.on('update-end', function(evt) {
-			       	//window.timeSliderLayerId = evt.target.id;
-                        var wm = WidgetManager.getInstance();
-                        wm.loadWidget(widgetJsonTimeSlider)
-                        .then(lang.hitch(this, function(widget){
-                              var position = {
-                                relativeTo: "map"                            
-                              };
-                              position.bottom = "50px";
-                              position.left = "100px";
-                              widget.setPosition(position);
-                              wm.openWidget(widget);
-                        }));
-	
-				});
-		  }        	
           layer.xtnItemId = item.id;
           layer.xtnAddData = true;
           if (!layer.arcgisProps && item) {
@@ -327,7 +304,7 @@ define(["dojo/_base/declare",
           if (!esriLang.isDefined(layer.title)) {
             layer.title = item.title;
           }
-          window.layerID_Portal_WebMap.push(layer.id);
+
           layer._wabProperties =  {
             itemLayerInfo: {
               itemId: item.id,
@@ -1253,13 +1230,6 @@ define(["dojo/_base/declare",
         //console.warn("_waitForLayer");
         handles.push(layer.on("load", function(layerLoaded) {
           //console.warn("_waitForLayer.load",layerLoaded);
-          
-            //Show Layer List Widget
-            var widgetName = 'LayerList';
-            var pm = PanelManager.getInstance();
-            var widgets = pm.widgetManager.appConfig.getConfigElementsByName(widgetName);
-            pm.showPanel(widgets[0]);
-          
           clearHandles();
           dfd.resolve(layerLoaded.layer);
         }));

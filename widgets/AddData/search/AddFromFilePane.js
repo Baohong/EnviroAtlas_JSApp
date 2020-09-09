@@ -20,6 +20,7 @@ define(["dojo/_base/declare",
     "dojo/on",
     "dojo/Deferred",
     "dojo/dom-class",
+    "dojo/dom-style",
     "dijit/Viewport",
     "dojo/sniff",
     "dijit/_WidgetBase",
@@ -37,7 +38,7 @@ define(["dojo/_base/declare",
     "jimu/dijit/Message",
     "jimu/dijit/CheckBox"
   ],
-  function(declare, lang, array, dojoJson, on, Deferred, domClass, Viewport, sniff,
+  function(declare, lang, array, dojoJson, on, Deferred, domClass, domStyle, Viewport, sniff,
     _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,template, i18n,
      LayerLoader, util, kernel, esriRequest, FeatureLayer, KMLLayer, scaleUtils,
      Message) {
@@ -49,6 +50,7 @@ define(["dojo/_base/declare",
       wabWidget: null,
       maxRecordCount: 1000,
       maxRecordThreshold: 100000,
+      fileInfo: null,
       SHAPETYPE_ICONS: [{
         "type": "shapefile",
         "url": "images/filetypes/zip.svg"
@@ -130,7 +132,9 @@ define(["dojo/_base/declare",
             self._setBusy(true);
             var fileInfo = self._getFileInfo();
             if (fileInfo.ok) {
-              self._execute(fileInfo);
+              domStyle.set(self.lNameFrame, "display", "block");
+              self.nameTextBox.value = fileInfo.baseFileName;
+              self.fileInfo = fileInfo;
             }
           }
         }));
@@ -164,7 +168,9 @@ define(["dojo/_base/declare",
             self._setBusy(true);
             var fileInfo = self._getFileInfo(event);
             if (fileInfo.ok) {
-              self._execute(fileInfo);
+              domStyle.set(self.lNameFrame, "display", "block");
+              self.nameTextBox.value = fileInfo.baseFileName;
+              self.fileInfo = fileInfo;
             }
           }
         }));
@@ -244,6 +250,17 @@ define(["dojo/_base/declare",
               .replace("{filename}",job.baseFileName)
               .replace("{name}",featureLayer.name);
           }
+          featureLayer.id = window.uploadedFeatLayerIdPrefix + featureLayer.name;
+          // record the fields
+	      var fields = "";
+	      for (index = 0, len = featureCollection.layers[0].layerDefinition.fields.length; index < len; ++index) {
+	        	fields = fields + featureCollection.layers[0].layerDefinition.fields[index].name + ":" + featureCollection.layers[0].layerDefinition.fields[index].type + ";";
+	        }
+	      fields = fields.substring(0, fields.length - 1);
+	      window.hashFieldsAddedFeatureLayer[featureLayer.id] = fields;
+	      window.hashGeometryTypeAddedFeatLyr[featureLayer.id] = featureLayer.geometryType;
+        
+          window.uploadedFileColl.push(featureLayer.id);
           loader._setFeatureLayerInfoTemplate(featureLayer,null,null);
           if (featureLayer.fullExtent) {
             var extentCenter = featureLayer.fullExtent.getCenter();
@@ -632,6 +649,12 @@ define(["dojo/_base/declare",
         if(this.wabWidget) {
           this.wabWidget._setStatus(msg);
         }
+      },
+      
+      addClicked: function() {
+        var self = this;
+        self.fileInfo.baseFileName = this.nameTextBox.value;
+        self._execute(self.fileInfo);
       }
 
     });
