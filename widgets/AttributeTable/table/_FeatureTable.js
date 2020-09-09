@@ -140,6 +140,13 @@ define([
   keys,
   has
 ) {
+  var blinker = function (id, times){
+	    var color=document.getElementById(id).style.backgroundColor;
+	    document.getElementById(id).style.backgroundColor="yellow";
+	    setTimeout(function(){document.getElementById(id).style.backgroundColor=color;}, 200);
+	    if ( 1 < times )
+	    setTimeout(function(){blinker(id, times-1);},400);
+  };
   return declare([_WidgetBase, Evented], {
     baseClass: 'jimu-widget-attributetable-feature-table',
     _defaultFeatureCount: 2000, //default max records by one request
@@ -417,7 +424,18 @@ define([
         })
       });
       toolbar.addChild(this.matchingCheckBox);
-
+      var element =  document.getElementById('queryByCommToggleButton');
+	  if (typeof(element) == 'undefined' || element == null)
+	  {
+      this.queryByCommButton = new ToggleButton({//toggle button for communityQuery
+          id: "queryByCommToggleButton",
+          label: this.nls.queryByCommu,
+          showLabel: true,
+          iconClass: "esriAttributeTableFilterImage",
+          onClick: lang.hitch(this, this.onClickQueryByCommuButton)
+        });
+        toolbar.addChild(this.queryByCommButton);      
+	  }
       this.zoomButton = new Button({
         label: this.nls.zoomto,
         iconClass: "esriAttributeTableZoomImage",
@@ -431,14 +449,19 @@ define([
         onClick: lang.hitch(this, this.clearSelection, true, true)
       });
       toolbar.addChild(this.clearSelectionButton);
-
+      element =  document.getElementById('refreshButton');
+	  if (typeof(element) == 'undefined' || element == null)
+	  {
       this.refreshButton = new Button({
+      	id: "refreshButton",
         label: this.nls.refresh,
         showLabel: true,
         iconClass: "esriAttributeTableRefreshImage",
         onClick: lang.hitch(this, this.refresh)
       });
       toolbar.addChild(this.refreshButton);
+     }
+      
 
       // this.closeButton = new Button({
       //   title: this.nls.closeMessage,
@@ -1015,6 +1038,7 @@ define([
 
       this.showRelatedRecordsMenuItem.set('disabled', true);
       if (this.layerInfo && this.isSupportQueryToServer() &&
+        selectionRows && selectionRows.length > 0 &&
         this.layer && this.layer.objectIdField) {
         if (this._relatedDef && !this._relatedDef.isFulfilled()) {
           this._relatedDef.cancel();
@@ -1026,7 +1050,9 @@ define([
           if (!this.domNode) {
             return;
           }
-          if (this.tableCreated && tableInfos && tableInfos.length > 0) {
+          var selectionRows = this.getSelectedRows();
+          if (this.tableCreated && tableInfos && tableInfos.length > 0 &&
+            selectionRows && selectionRows.length > 0) {
             this.showRelatedRecordsMenuItem.set('disabled', false);
           }
         }));
@@ -1147,6 +1173,7 @@ define([
     },
 
     refresh: function() {
+	  document.getElementById("refreshButton").style.backgroundColor="white";
       if (this.grid) {
         this.grid.clearSelection();
         // this.clearSelection(false);
@@ -1160,13 +1187,41 @@ define([
         layerInfoId: this.layerInfo.id
       });
     },
+    onClickQueryByCommuButton: function() {
+      	var button = document.getElementById("queryByCommToggleButton");
+        //submit.value = 'Loading...';
+      	if (window.attributeByOneCommu == false) {
+      		window.attributeByOneCommu = true;
+      		this.queryByCommButton.set("label", this.nls.clearQueryByCommu);
+      	} else {
+      		window.attributeByOneCommu = false;
+      		this.queryByCommButton.set("label", this.nls.queryByCommu);
+      	}
+        /*var table = this.getCurrentTable();
+        if (!table) {
+          return;
+        }
 
-    exportToCSV: function(fileName, richTextFieldsToClear) {
+        if (table.grid) {
+          table.grid.clearSelection();
+        }
+
+        if (table instanceof _FeatureTable) {
+          this.startQuery(this.layersIndex, this.config.layerInfos[this.layersIndex].extent);
+        } */
+       this.grid.clearSelection();
+       blinker("refreshButton", 4);
+       this.startQuery(this.layersIndex, this.config.layerInfos[this.layersIndex].extent);
+       //this.refresh();
+    },
+    exportToCSV: function(fileName) {
       if (!this.layerInfo || !this.layer || !this.tableCreated) {
         var def = new Deferred();
         def.reject();
         return def;
       }
+      var _outFields = null;
+      var pk = this.layer.objectIdField;
       // var types = this.layer.types;
       return this.getSelectedRowsData().then(lang.hitch(
           this,
@@ -1807,6 +1862,9 @@ define([
       query.returnGeometry = false;
       query.returnIdsOnly = true;
       query.where = this._getLayerFilterExpression();
+	  if ((window.communitySelected != window.strAllCommunity) && (window.attributeByOneCommu == true) && (query.where == "1=1")){
+	      	query.where = "UPPER(CommST) LIKE UPPER('%" + window.communitySelected + "%')";
+	  }       
       if (this.layer._orderByFields || pk) {
         query.orderByFields = this.layer._orderByFields || [pk + " ASC"];
       }
@@ -2998,7 +3056,17 @@ define([
       if (layerFilter) {
         return layerFilter;
       }
+      if ((window.communitySelected != window.strAllCommunity) && (window.attributeByOneCommu == true)){
+      	 if (layerFilter) {
 
+	      	expr= "(UPPER(CommST) LIKE UPPER('%" + window.communitySelected + "%')) AND (" + layerFilter + ")" ;
+	     }
+	     else
+	     {
+	      	expr= "UPPER(CommST) LIKE UPPER('%" + window.communitySelected + "%')";
+	     }
+	     return expr;
+	  } 
       return "1=1";
     },
 
