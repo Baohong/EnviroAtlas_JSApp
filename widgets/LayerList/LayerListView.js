@@ -26,18 +26,21 @@ define([
   'dijit/focus',
   'dojo/query',
   'jimu/dijit/CheckBox',
+  'jimu/PanelManager',
   'jimu/dijit/DropMenu',
   'jimu/dijit/LoadingShelter',
-  'jimu/utils',
   './PopupMenu',
   'dijit/_TemplatedMixin',
+  'jimu/utils',
   'dojo/text!./LayerListView.html',
+  'dojo/dom-attr',
   'dojo/dom-class',
   'dojo/dom-style',
   './NlsStrings'
 ], function(_WidgetBase, declare, lang, array, html, domConstruct, on, keys, focusUtil, query,
-  CheckBox, DropMenu, LoadingShelter, jimuUtils, PopupMenu, _TemplatedMixin, template,
-  domClass, domStyle, NlsStrings) {
+  CheckBox, PanelManager, DropMenu, LoadingShelter, PopupMenu, _TemplatedMixin, jimuUtils, template,
+  domAttr, domClass, domStyle, NlsStrings) {
+  	var received = "";
 
   return declare([_WidgetBase, _TemplatedMixin], {
     templateString: template,
@@ -48,9 +51,8 @@ define([
     //   layerInfoObjectId: {// layerDomNode
     //     layerTrNode: domNode,
     //     layerContentTrNode: domeNode,
-    //     layerNodeEventHandles: [],
-    //     layerNodeReferredDijits: [],
-    //     layerInfo
+    //     layerNodeEventHandles: []
+    //     layerNodeReferredDijits: []
     //   }
     // }
     _layerDomNodeStorage: null,
@@ -79,11 +81,21 @@ define([
         this._layerIndexs[layerInfo.id] = count++;
       }));
     },
-
     refresh: function() {
       this._removeLayerNodes();
       array.forEach(this.operLayerInfos.getLayerInfoArray(), function(layerInfo) {
-        this.drawListNode(layerInfo, 0, this.layerListTable);
+        //this.drawListNode(layerInfo, 0, this.layerListTable);
+        var refHrNode = query("[class~='hrClass']", this.domNode)[0];
+        var refHrNodeNonGraphic = query("[class~='hrClassNonGraphic']", this.domNode)[0];
+        //if ((layerInfo.layerObject.type) && (layerInfo.layerObject.type.toUpperCase() == "FEATURE LAYER")) {
+        if (((layerInfo.layerObject.type) && (layerInfo.layerObject.type.toUpperCase() == "FEATURE LAYER")) ||((layerInfo.layerObject.url != null)&&(layerInfo.layerObject.url.toUpperCase().indexOf("FEATURESERVER"))&&(layerInfo.layerObject.url.toUpperCase().indexOf("ARCGIS.COM")))) {
+
+        	this.drawListNode(layerInfo, 0, refHrNode,'before');
+        }
+        else {
+
+        	this.drawListNode(layerInfo, 0, refHrNodeNonGraphic,'before');
+        }
       }, this);
 
       if(this.config.showBasemap) {
@@ -108,9 +120,9 @@ define([
     drawListNode: function(layerInfo, level, toTableNode, position) {
       var nodeAndSubNode, showLegendDiv;
       if(this.isLayerHiddenInWidget(layerInfo) || !this.layerFilter.isValidLayerInfo(layerInfo)) {
+          //alert("do nothing;");
         return;
       }
-
       nodeAndSubNode = this._layerDomNodeStorage[layerInfo.getObjectId()];
       if((layerInfo.isRootLayer() || layerInfo.isTable)  && nodeAndSubNode) {
         domConstruct.place(nodeAndSubNode.layerTrNode, toTableNode, position);
@@ -137,11 +149,9 @@ define([
     },
 
     addLayerNode: function(layerInfo, level, toTableNode, position) {
-      //jshint unused:false
-
       var layerIndex = this._layerIndexs[layerInfo.id];
       var layerTrNode, layerTdNode, ckSelectDiv, ckSelect, imageNoLegendDiv, handle,
-        imageGroupDiv, imageNoLegendNode, popupMenuNode, i, imageShowLegendDiv, divLabel;
+        imageGroupDiv, imageNoLegendNode, popupMenuNode, i, imageShowLegendDiv, popupMenu, divLabel, eaId;
 
       var rootLayerInfo = layerInfo.getRootLayerInfo();
       // if(!this._layerNodeHandles[rootLayerInfo.id]) {
@@ -162,7 +172,7 @@ define([
       var layerTrNodeClass = "layer-tr-node-" + layerInfo.id;
       var layerOrTableString = layerInfo.isTable ? window.jimuNls.common.table : window.jimuNls.common.layer;
       layerTrNode = domConstruct.create('tr', {
-        'class': 'jimu-widget-row layer-row' +
+        'class': 'jimu-widget-row layer-row ' +
           ( /*visible*/ false ? 'jimu-widget-row-selected ' : ' ') + layerTrNodeClass + '',
         //(!this._firstLayerNode ? ' firstFocusNode' : ' '),
         'tabindex': 0,
@@ -200,11 +210,19 @@ define([
       ckSelectDiv = domConstruct.create('div', {
         'class': 'div-select jimu-float-leading'
       }, layerTdNode);
-
+		layerId = layerInfo.id;
+		if (layerId.indexOf(window.layerIdPrefix) >= 0) {
+		    eaId = layerId.replace(window.layerIdPrefix, "");                     	
+		} 
+		     
       ckSelect = new CheckBox({
+        checked: layerInfo.isVisible()||window.allLayersTurnedOn[eaId], //layerInfo.visible
+        'class': "visible-checkbox-" + layerInfo.id
+      });		
+      /*ckSelect = new CheckBox({
         checked: layerInfo.isVisible(), //layerInfo.visible
         'class': "visible-checkbox-" + layerInfo.id
-      });
+      });*/
 
       domConstruct.place(ckSelect.domNode, ckSelectDiv);
       html.setAttr(ckSelect.domNode, 'tabindex', layerIndex);
@@ -228,7 +246,7 @@ define([
         'alt': 'l'
       }, imageNoLegendDiv);
 
-      if (layerInfo.isTiled || layerInfo.isTable) {
+      if (layerInfo.isTiled || layerInfo.isTable || layerInfo.isBasemap()) {
         domStyle.set(imageShowLegendDiv, 'display', 'none');
         domStyle.set(ckSelectDiv, 'display', 'none');
         domStyle.set(imageNoLegendDiv, 'display', 'block');
@@ -244,27 +262,61 @@ define([
       // set tdNode width
       domStyle.set(layerTdNode, 'width', level * 12 + 40 + 'px');
 
-      /*
-      var groupLayerClass = layerInfo.getSubLayers().length > 0 ? "" : "disable";
-      imageGroupDiv = domConstruct.create('div', {
-        'class': 'image-group-div jimu-float-leading ' + groupLayerClass
-      }, layerTdNode);
-      */
-
-      var layerTitleTdNode = domConstruct.create('td', {
-        'class': 'col col2'
+      scaleLabel = domConstruct.create('td', {
+        'class': 'col col15'
       }, layerTrNode);
+      
+  	  bTileOnMap = false;
+      tileLayer = layerInfo.map.getLayer(window.layerIdTiledPrefix + window.hashFeaturedCollectionToEAID[layerInfo.id]);         	
+      if(tileLayer != null){
+        	bTileOnMap = true;      
+      } 
+      
+      var eaIDinFeatureCollection = window.hashFeaturedCollectionToEAID[layerInfo.id];
+      var indexID = window.featureLyrNumber.indexOf(eaIDinFeatureCollection);
+      	
+      scaleObject = '';
 
+      if ((layerInfo.layerObject.eaScale) || ((eaIDinFeatureCollection !=null) && (eaIDinFeatureCollection !=undefined))) {
+        scaleTitle = 'Community Dataset';
+        if ((layerInfo.layerObject.eaScale == 'NATIONAL') ||(window.hashScale[window.hashFeaturedCollectionToEAID[layerInfo.id]]== 'NATIONAL')){
+          scaleTitle = 'National Dataset';
+        };
+        
+        scaleForFeaturedCollection = window.hashScale[window.hashFeaturedCollectionToEAID[layerInfo.id]];
+        if (((scaleForFeaturedCollection != null) && (scaleForFeaturedCollection != undefined))) {
+        	scale = scaleForFeaturedCollection;
+        } else {
+        	scale = layerInfo.layerObject.eaScale;
+        }
+        
+        scaleImage = domConstruct.create('div', {
+          'title': scaleTitle,
+          'class': 'icon_style ' + scale
+        }, scaleLabel);
+      }
+
+      var layerTitleText = layerInfo.title
+      var layerTitleTdNode = domConstruct.create('div', {
+        'class': 'col col2', 
+      }, layerTrNode);
+     
       var grayedTitleClass = '';
       try {
-        if (!layerInfo.isInScale()) {
+      	var eaID = layerInfo.id.replace(window.layerIdPrefix, "");
+
+
+      	//use ((indexID >= 0) && (bTileOnMap == true)) to check if tileLayer corresponding to Featured Collection exist.
+        if ((!layerInfo.isInScale())&&(window.hashIDtoTileURL[eaID] == null)&&((indexID >= 0) && (bTileOnMap == true))) {
           grayedTitleClass = 'grayed-title';
         }
       } catch (err) {
         console.warn(err.message);
       }
+      
       var layerTitleDivIdClass = 'layer-title-div-' + layerInfo.id;
-      divLabel = domConstruct.create('div', {
+      divLabel = domConstruct.create('td', {
+        	'id': window.layerTitlePrefix + layerInfo.id,
         'innerHTML': jimuUtils.sanitizeHTML(layerInfo.title),
         'class':layerTitleDivIdClass + ' div-content jimu-float-leading ' + grayedTitleClass
       }, layerTitleTdNode);
@@ -278,12 +330,7 @@ define([
       var popupMenuDisplayStyle = this.hasContentMenu() ? "display: block" : "display: none";
       // add popupMenu
       popupMenuNode = domConstruct.create('div', {
-        'class': 'layers-list-popupMenu-div ',
-        'tabindex': layerIndex,
-        'role': 'button',
-        'aria-haspopup': 'true',
-        'aria-expanded': 'false',
-        'aria-label': this.nls.tipLayerOperation,
+        'class': 'layers-list-popupMenu-div',
         'style': popupMenuDisplayStyle
       }, layerTdNode);
 
@@ -445,8 +492,8 @@ define([
       }
       return hasContentMenu;
     },
-
-    addLegendNode: function(layerInfo, level, toTableNode) {
+        
+     addLegendNode: function(layerInfo, level, toTableNode) {
       //var legendsDiv;
       var legendTrNode = domConstruct.create('tr', {
           'class': 'legend-node-tr',
@@ -537,7 +584,6 @@ define([
               return true;
             }
           }, this);
-
           if(!findElem) {
             //release layer node.
             array.forEach(this._layerDomNodeStorage[elem].layerNodeEventHandles, function(handle) {
@@ -634,7 +680,15 @@ define([
       }
       return state;
     },
-
+    redrawLegends: function(layerInfo) {
+      var legendsNode = query("div[legendsDivId='" + layerInfo.id + "']", this.layerListTable)[0];
+      if(legendsNode) {
+        if(legendsNode._legendDijit && legendsNode._legendDijit.destroy) {
+          legendsNode._legendDijit.destroy();
+        }
+        layerInfo.drawLegends(legendsNode, this.layerListWidget.appConfig.portalUrl);
+      }
+    },
     _foldOrUnfoldLayers: function(layerInfos, isFold) {
       array.forEach(layerInfos, function(layerInfo) {
         this._foldOrUnfoldLayer(layerInfo, isFold);
@@ -650,6 +704,44 @@ define([
         }
       } else {
         this.layerListWidget._denyLayerInfosIsVisibleChangedResponseOneTime = true;
+        //set visibility for corresponding tiled layers
+	    eaId = "";
+	    layerId = layerInfo.id;
+	    if (layerId.indexOf(window.layerIdPrefix) >= 0) {
+	        eaId = layerId.replace(window.layerIdPrefix, "");                     	
+	    } 
+	    else {
+	    	eaIDFromFeaturedCollection = window.hashFeaturedCollectionToEAID[layerId];
+	    	if (((eaIDFromFeaturedCollection != null) && (eaIDFromFeaturedCollection != undefined))) {
+	    		eaId = eaIDFromFeaturedCollection;
+				var bNationalFeaturedCollection = false;
+			    var eaIDinFeatureCollection = window.hashFeaturedCollectionToEAID[layerId];
+			    if (((eaIDinFeatureCollection !=null) && (eaIDinFeatureCollection !=undefined))) {
+			          if ((window.hashScale[eaIDinFeatureCollection]== 'NATIONAL')){
+			          		bNationalFeaturedCollection = true;
+			          };
+			    }	    		
+	    	}
+	    }
+	    
+		lyrTiled = layerInfo.map.getLayer(window.layerIdTiledPrefix + eaId);   
+		if (ckSelect.checked) {
+	        if(lyrTiled){
+	        	if (window.hashRenderer[eaId] == null) {
+		       	  	lyrTiled.setVisibility(true);//set tile visible only when user not set the dynamic symbology
+		       	}
+	      	}	
+	    } else {
+	        if(lyrTiled){
+	       	  lyrTiled.setVisibility(false);
+	      	}         
+	    }     
+	    //end of set visibility for corresponding tiled layers
+	    
+		if (window.nationalLayerNumber.includes(eaId) || (bNationalFeaturedCollection == true)){//check if it is national layer. If yes, then set warning sign by triggering extent-change event
+			jimuUtils.adjustMapExtent(layerInfo.map);   			                            	
+        } 
+        
         layerInfo.setTopLayerVisible(ckSelect.checked);
       }
       evt.stopPropagation();
@@ -823,7 +915,7 @@ define([
       }
       return steps;
     },
-
+ 
     moveUpLayer: function(layerInfo) {
       // summary:
       //    move up layer in layer list.
@@ -883,8 +975,7 @@ define([
       }
       return isHidden;
     },
-
-    isFirstDisplayedLayerInfo: function(layerInfo) {
+        isFirstDisplayedLayerInfo: function(layerInfo) {
       var isFirst;
       var steps;
       var layerInfoIndex;
@@ -925,7 +1016,7 @@ define([
       }
       return isLast;
     },
-
+    
     /***************************************************
      * methods for control operation.
      ***************************************************/
@@ -945,6 +1036,9 @@ define([
         }, {
           key: "collapseAlllayers",
           label: this.nls.collapseAlllayers
+        }, {
+          key: "removeAllLayers",
+          label: this.nls.removeAllLayers
         }],
         box: this.layerListWidget.domNode.parentNode
       }).placeAt(this.layerListOperations);
@@ -967,10 +1061,10 @@ define([
         'onMenuClick',
         lang.hitch(this, this._onOperationsMenuItemClick)));
 
+
       this.operationsDropMenuLoading = new LoadingShelter({
         hidden: true
       }).placeAt(this.operationsDropMenu.domNode);
-
       this.own(on(this.layerListOperations,
         'keydown',
         lang.hitch(this, this._onLayerListOperationsKey)));
@@ -998,18 +1092,45 @@ define([
         case 'collapseAlllayers':
           this.foldOrUnfoldAllLayers(true);
           return;
+      case 'removeAllLayers':
+        document.getElementById("butRemoveAllLayers").click();        
+        return;
         default:
           return;
       }
     },
 
+
+
+    
     turnAllRootLayers: function(isOnOrOff) {
       var layerInfoArray = this.operLayerInfos.getLayerInfoArray();
       array.forEach(layerInfoArray, function(layerInfo) {
         if (!this.isLayerHiddenInWidget(layerInfo)) {
-          layerInfo.setTopLayerVisible(isOnOrOff);
+            layerInfo.setTopLayerVisible(isOnOrOff);
+			eaId = "";
+			layerId = layerInfo.id;
+			if (layerId.indexOf(window.layerIdPrefix) >= 0) {
+			    eaId = layerId.replace(window.layerIdPrefix, "");                     	
+			} 
+			
+			window.allLayersTurnedOn[eaId] = isOnOrOff;
+			lyrTiled = layerInfo.map.getLayer(window.layerIdTiledPrefix + eaId);   
+			if (isOnOrOff) {
+
+			    if(lyrTiled){
+			    	if (window.hashRenderer[eaId] == null) {
+			       	  	lyrTiled.setVisibility(true);//set tile visible only when user not set the dynamic symbology
+			       	}
+			  	}	
+			} else {
+			    if(lyrTiled){
+			   	  lyrTiled.setVisibility(false);
+			  	}         
+			}           
         }
       }, this);
+      jimuUtils.adjustMapExtent(this.operLayerInfos.map);
     },
 
     turnAllSameLevelLayers: function(layerInfo, isOnOrOff) {
@@ -1104,310 +1225,5 @@ define([
       }
     },
 
-
-    _onSearchButtonKey: function(e) {
-      if(e.keyCode === keys.TAB && e.shiftKey) {
-        e.stopPropagation();
-        e.preventDefault();
-        //focusUtil.focus(this._lastLayerNode);
-        this._backToLastNodeFlag = true;
-      }
-    },
-
-    _getLastExpandedLayerNode: function() {
-      var lastExpandedLayerNode = this._lastLayerNode;
-      //var layerTrNode = this._lastLayerNode;
-      var parentLayerTrNode = null;
-      var layerInfo = this._lastLayerInfo;
-      while(layerInfo) {
-        var parentLayerInfo = layerInfo.parentLayerInfo;
-        if(!parentLayerInfo) {
-          lastExpandedLayerNode = this._layerDomNodeStorage[layerInfo.getObjectId()].layerTrNode;
-          break;
-        } else {
-          parentLayerTrNode = this._layerDomNodeStorage[parentLayerInfo.getObjectId()].layerTrNode;
-          if(parentLayerTrNode && parentLayerTrNode._expanded) {
-            lastExpandedLayerNode = this._layerDomNodeStorage[layerInfo.getObjectId()].layerTrNode;
-            break;
-          }
-        }
-        layerInfo = parentLayerInfo;
-      }
-      return lastExpandedLayerNode;
-    },
-
-    _onLastNodeFocus: function() {
-      //e.stopPropagation();
-      //e.preventDefault();
-      if(this._backToLastNodeFlag) {
-        var lastExpandedLayerNode = this._getLastExpandedLayerNode();
-        if(lastExpandedLayerNode) {
-          focusUtil.focus(lastExpandedLayerNode);
-        }
-        this._backToLastNodeFlag = false;
-      } else {
-        focusUtil.focus(this.layerListWidget.layerFilter.searchButton);
-      }
-    },
-
-    _onLastLayerNodeKey: function(e) {
-      if(e.keyCode === keys.TAB && !e.shiftKey) {
-        e.stopPropagation();
-        e.preventDefault();
-        focusUtil.focus(this.layerListWidget.layerFilter.searchButton);
-      }
-    },
-
-    _onLayerNodeKey: function(imageShowLegendDiv, popupMenuNode, e) {
-      if(e.keyCode === keys.ENTER) {
-        e.stopPropagation();
-        e.preventDefault();
-        if(html.getStyle(imageShowLegendDiv, 'display') === 'none') {
-          focusUtil.focus(popupMenuNode);
-        } else {
-          focusUtil.focus(imageShowLegendDiv);
-        }
-      }
-    },
-
-    _onImageShowLegendKey: function(layerInfo, imageShowLegendDiv, layerTrNode, subNode, popupMenuNode, e) {
-      // avoid be impacted if the current layer is lastFocueNode.
-      if(e.keyCode === keys.TAB) {
-        e.stopPropagation();
-      }
-      if(e.keyCode === keys.TAB && e.shiftKey) {
-        e.stopPropagation();
-        e.preventDefault();
-        focusUtil.focus(popupMenuNode);
-      } else if(e.keyCode === keys.ESCAPE) {
-        e.stopPropagation();
-        e.preventDefault();
-        focusUtil.focus(layerTrNode);
-      } else if(e.keyCode === keys.ENTER) {
-        e.stopPropagation();
-        e.preventDefault();
-        this._onRowTrClick(layerInfo, imageShowLegendDiv, layerTrNode, subNode, e);
-      }
-    },
-
-    _onCkSelectDivKey: function(layerInfo, ckSelect, layerTrNode, e) {
-      // avoid be impacted if the current layer is lastFocueNode.
-      if(e.keyCode === keys.TAB) {
-        e.stopPropagation();
-      }
-      if(e.keyCode === keys.ESCAPE) {
-        e.stopPropagation();
-        e.preventDefault();
-        focusUtil.focus(layerTrNode);
-      } else if(e.keyCode === keys.SPACE || e.keyCode === keys.ENTER) {
-        e.stopPropagation();
-        e.preventDefault();
-        if(ckSelect.checked) {
-          ckSelect.uncheck(true);
-        } else {
-          ckSelect.check(true);
-        }
-        this._onCkSelectNodeClick(layerInfo, ckSelect, e);
-      }
-    },
-
-    _onPopupMenuNodeKey: function(layerInfo, popupMenuNode, layerTrNode, imageShowLegendDiv, e) {
-      // avoid be impacted if the current layer is lastFocueNode.
-      if(e.keyCode === keys.TAB) {
-        e.stopPropagation();
-      }
-      if(e.keyCode === keys.TAB && !e.shiftKey) {
-        e.stopPropagation();
-        e.preventDefault();
-        focusUtil.focus(imageShowLegendDiv);
-      } else if(e.keyCode === keys.ESCAPE) {
-        e.stopPropagation();
-        e.preventDefault();
-        focusUtil.focus(layerTrNode);
-      } else if(e.keyCode === keys.ENTER || e.keyCode === keys.DOWN_ARROW || e.keyCode === keys.UP_ARROW) {
-        e.stopPropagation();
-        e.preventDefault();
-        this._onPopupMenuClick(layerInfo, popupMenuNode, layerTrNode, e);
-      }
-    },
-
-    _onPopupMenuOpen: function(layerInfo, popupMenuNode, rootLayerInfo) {
-      //jshint unused:false
-      var menuItems = query('.menu-item', popupMenuNode.popupMenu.dropMenuNode);
-      menuItems = menuItems.filter(function(menuItem) {
-        if(html.hasClass(menuItem, 'menu-item-hidden')) {
-          return false;
-        } else {
-          return true;
-        }
-      });
-      var firstItem = menuItems[0], lastItem = menuItems[menuItems.length - 1];
-      menuItems.forEach(function(menuItem, index) {
-        var isFirstItem = false, isLastItem = false;
-        var previousItem = menuItems[index - 1], nextItem = menuItems[index + 1];
-        if(index === 0) {
-          focusUtil.focus(menuItem);
-          isFirstItem = true;
-        } else if(index === menuItems.length - 1) {
-          isLastItem = true;
-        }
-
-        if(!menuItem.hasBeenOpened) {
-          var handle = this.own(on(menuItem, 'keydown', lang.hitch(this, this._onPopupMenuItemKey,
-            popupMenuNode, previousItem, nextItem, firstItem, lastItem, isFirstItem, isLastItem)));
-          this._storeLayerNodeEventHandle(rootLayerInfo, handle[0]);
-          menuItem.hasBeenOpened = true;
-        }
-      }, this);
-    },
-
-    _onPopupMenuItemKey: function(popupMenuNode,
-      previousItem, nextItem, firstItem, lastItem, isFirstItem, isLastItem, e) {
-      //jshint unused:false
-      /*if(e.keyCode === keys.TAB && !e.shiftKey) {
-        e.stopPropagation();
-        if(isLastItem) {
-          e.preventDefault();
-        }
-        this._enableNavMode(e);
-      } else if(e.keyCode === keys.TAB && e.shiftKey) {
-        e.stopPropagation();
-        if(isFirstItem) {
-          e.preventDefault();
-        }
-        this._enableNavMode(e);
-      } else */
-      if(e.keyCode === keys.DOWN_ARROW) {
-        e.stopPropagation();
-        e.preventDefault();
-        if(nextItem) {
-          focusUtil.focus(nextItem);
-        }
-      } else if(e.keyCode === keys.UP_ARROW) {
-        e.stopPropagation();
-        e.preventDefault();
-        if(previousItem) {
-          focusUtil.focus(previousItem);
-        }
-      } else if(e.keyCode === keys.HOME) {
-        e.stopPropagation();
-        e.preventDefault();
-        if(firstItem) {
-          focusUtil.focus(firstItem);
-        }
-      } else if(e.keyCode === keys.END) {
-        e.stopPropagation();
-        e.preventDefault();
-        if(lastItem) {
-          focusUtil.focus(lastItem);
-        }
-      } else if(e.keyCode === keys.ESCAPE || e.keyCode === keys.TAB) {
-        e.stopPropagation();
-        e.preventDefault();
-        focusUtil.focus(popupMenuNode);
-        popupMenuNode.popupMenu.closeDropMenu();
-      }
-    },
-
-    _enableNavMode:function(evt) {
-      if(evt.keyCode === keys.TAB && !jimuUtils.isInNavMode()){
-        html.addClass(document.body, 'jimu-nav-mode');
-      }
-    },
-
-    _onLayerListOperationsKey: function(e) {
-      if(e.keyCode === keys.ENTER) {
-        /*
-        if(this.operationsDropMenu.state === "opened") {
-          html.setAttr(this.layerListOperations, 'aria-expanded', 'true');
-        } else {
-          html.setAttr(this.layerListOperations, 'aria-expanded', 'false');
-        }
-        */
-        this.operationsDropMenu._onBtnClick(e);
-      }
-    },
-
-    _onOperationsDropMenuOpen: function() {
-      var menuItems = query('.menu-item', this.operationsDropMenu.domNode);
-      menuItems = menuItems.filter(function(menuItem) {
-        if(html.hasClass(menuItem, 'menu-item-hidden')) {
-          return false;
-        } else {
-          return true;
-        }
-      });
-      var firstItem = menuItems[0], lastItem = menuItems[menuItems.length - 1];
-      menuItems.forEach(function(menuItem, index) {
-        var isFirstItem = false, isLastItem = false;
-        var previousItem = menuItems[index - 1], nextItem = menuItems[index + 1];
-        if(index === 0) {
-          focusUtil.focus(menuItem);
-          isFirstItem = true;
-        } else if(index === menuItems.length - 1) {
-          isLastItem = true;
-        }
-
-        if(!menuItem.hasBeenOpened) {
-          this.own(on(menuItem, 'keydown',
-            lang.hitch(this, this._onLayerListOperationsMenuItemKey,
-              previousItem, nextItem, firstItem, lastItem, isFirstItem, isLastItem)));
-          menuItem.hasBeenOpened = true;
-        }
-      }, this);
-    },
-
-    _onLayerListOperationsMenuItemKey: function(previousItem,
-      nextItem, firstItem, lastItem, isFirstItem, isLastItem, e) {
-      //jshint unused:false
-      /*
-      if(e.keyCode === keys.TAB && !e.shiftKey) {
-        e.stopPropagation();
-        if(isLastItem) {
-          e.preventDefault();
-        }
-        this._enableNavMode(e);
-      } else if(e.keyCode === keys.TAB && e.shiftKey) {
-        e.stopPropagation();
-        if(isFirstItem) {
-          e.preventDefault();
-        }
-        this._enableNavMode(e);
-      } else */
-      if(e.keyCode === keys.DOWN_ARROW) {
-        e.stopPropagation();
-        e.preventDefault();
-        if(nextItem) {
-          focusUtil.focus(nextItem);
-        }/*else {
-          focusUtil.focus(firstItem);
-        }*/
-      } else if(e.keyCode === keys.UP_ARROW) {
-        e.stopPropagation();
-        e.preventDefault();
-        if(previousItem) {
-          focusUtil.focus(previousItem);
-        }/*else {
-          focusUtil.focus(lastItem);
-        }*/
-      } else if(e.keyCode === keys.HOME) {
-        e.stopPropagation();
-        e.preventDefault();
-        if(firstItem) {
-          focusUtil.focus(firstItem);
-        }
-      } else if(e.keyCode === keys.END) {
-        e.stopPropagation();
-        e.preventDefault();
-        if(lastItem) {
-          focusUtil.focus(lastItem);
-        }
-      } else if(e.keyCode === keys.ESCAPE || e.keyCode === keys.TAB) {
-        e.stopPropagation();
-        e.preventDefault();
-        focusUtil.focus(this.layerListOperations);
-        this.operationsDropMenu.closeDropMenu();
-      }
-    }
   });
 });
