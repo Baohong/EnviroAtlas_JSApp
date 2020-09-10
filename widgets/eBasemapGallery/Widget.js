@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// Copyright © Esri. All Rights Reserved.
+// Copyright © 2014 Esri. All Rights Reserved.
 //
 // Licensed under the Apache License Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,24 +17,31 @@
 define([
     'dojo/_base/declare',
     'dijit/_WidgetsInTemplateMixin',
-    "dojo/Deferred",
+    'dojo/Deferred',
     'jimu/BaseWidget',
     'jimu/portalUtils',
+    'jimu/dijit/Message',
     'jimu/PanelManager',
+    'jimu/SpatialReference/wkidUtils',
     'jimu/portalUrlUtils',
     'jimu/utils',
-    "esri/dijit/Basemap",
-    "esri/dijit/BasemapLayer",
+    'esri/dijit/Basemap',
+    'esri/dijit/BasemapLayer',
     'esri/dijit/BasemapGallery',
-    "./a11y/Widget",
     'dojo/_base/lang',
     'dojo/_base/array',
-    "dojo/_base/html",
-    "dojo/query",
+    'dojo/_base/html',
+    'dojo/query',
+    'esri/request',
     'dojo/on',
     'dojo/promise/all',
     './utils',
-    'jimu/dijit/LoadingIndicator'
+    'dijit/form/HorizontalSlider',
+    'dijit/form/HorizontalRuleLabels',
+    'dojo/dom-construct',
+    'dojo/dom-geometry',
+    'dojo/aspect',
+    'dojo/dom'
   ],
   function(
     declare,
@@ -42,31 +49,88 @@ define([
     Deferred,
     BaseWidget,
     portalUtils,
+    Message,
     PanelManager,
+    SRUtils,
     portalUrlUtils,
     jimuUtils,
     Basemap,
     BasemapLayer,
     BasemapGallery,
-    a11y,
     lang,
     array,
     html,
     query,
+    esriRequest,
     on,
     all,
-    utils) {
+    utils,
+    HorizontalSlider,
+    HorizontalRuleLabels,
+    domConstruct,
+    domGeom,
+    aspect,
+    dom) {
     var clazz = declare([BaseWidget, _WidgetsInTemplateMixin], {
 
-      name: 'BasemapGallery',
-      baseClass: 'jimu-widget-basemapgallery',
+      name: 'eBasemapGallery',
+      baseClass: 'jimu-widget-ebasemapgallery',
       basemapGallery: null,
       spatialRef: null,
+      hybridBasemapArray: null,
+      hyBasemap: null,
+      defaultBasemapId: null,
+      secondBasemapId: null,
+      hybridBasemapId: null,
+      selectedBMNode: null,
+      selectedBMNode2: null,
+      selectedBMNode3: null,
+      hybridChangeEvent: false,
+      hybridAdded: false,
+      imgthumbposleft: 0,
+      webmapBasemap: null,
+
+      postCreate: function() {
+        this.own(on(this.domNode, 'mousedown', lang.hitch(this, function (event) {
+          event.stopPropagation();
+          if (event.altKey) {
+            var msgStr = this.nls.widgetverstr + ': ' + this.manifest.version;
+            msgStr += '\n' + this.nls.wabversionmsg + ': ' + this.manifest.wabVersion;
+            msgStr += '\n' + this.manifest.description;
+            new Message({
+              titleLabel: this.nls.widgetversion,
+              message: msgStr
+            });
+          }
+        })));
+      },
 
       startup: function() {
         /*jshint unused: false*/
         this.inherited(arguments);
         this.initBasemaps();
+        if(this.map.getBasemap()){
+          this.defaultBasemapId = this.map.getBasemap();
+        }
+        this.own(
+          aspect.before(this, 'destroy', this.beforeDestroy)
+        );
+
+        thisWidget = this;
+        on(dom.byId("basemapHelp"), "click", function(){
+              console.log(thisWidget.id);
+              thisWidget.publishData({
+                  message: "Help"
+              }, true);
+
+              var widgets = thisWidget.appConfig.getConfigElementsByName('Demo');
+              var pm = PanelManager.getInstance();
+              if(widgets[0].visible){
+                  pm.closePanel(widgets[0].id + "_panel");
+              }
+              pm.showPanel(widgets[0]);
+          });
+
       },
 
       resize: function() {
@@ -74,21 +138,27 @@ define([
       },
 
       _responsive: function() {
-        // the width of esriBasemapGalleryNode is 100px, min-margin for left&right is 5px.
-        var minMargin = 5;
-        var nodeWidth = 100 + 2 * minMargin;
-        setTimeout(lang.hitch(this, function() {
-          var paneNode = query('#' + this.id)[0];
-          var width = html.getStyle(paneNode, 'width');
-          var column      = parseInt(width / nodeWidth, 10);
-          if (column > 0) {
-            var margin    = minMargin + parseInt(width % nodeWidth / column, 10) / 2;
-            query('.esriBasemapGalleryNode', this.id).forEach(function(node) {
-              html.setStyle(node, 'margin-left', margin + 'px');
-              html.setStyle(node, 'margin-right', margin + 'px');
-            });
-          }
-        }), 100);
+        // the default width of esriBasemapGalleryNode is 85px,
+        // margin-left is 10px, margin-right is 10px;
+        var paneNode = query('#' + this.id)[0];
+        var width = html.getStyle(paneNode, 'width');
+        var column      = parseInt(width / 105, 10);
+        if (column > 0) {
+          var margin      = width % 105;
+          var addWidth    = parseInt(margin / column, 10);
+          query('.esriBasemapGalleryNode', this.id).forEach(function(node) {
+            html.setStyle(node, 'width', 85 + addWidth + 'px');
+          });
+        }
+        var imgthumbnode = query('.esriBasemapGalleryNode > a > .esriBasemapGalleryThumbnail', this.id)[0];
+        this.imgthumbposleft = parseInt(domGeom.getMarginBox(imgthumbnode).l, 10) + 10;
+
+        query('.bm-addbtn', this.id).forEach(lang.hitch(this,function(node) {
+          html.setStyle(node, 'left', this.imgthumbposleft + 'px');
+        }));
+        var sWidth = (width - 261) / 2;
+        html.setStyle(this.spacer1, 'width', sWidth + 'px');
+        html.setStyle(this.spacer2, 'width', sWidth + 'px');
       },
 
       initBasemaps: function() {
@@ -96,10 +166,10 @@ define([
         var portalSelfDef;
         var config = lang.clone(this.config.basemapGallery);
 
-        this.loadingShelter.show();
         //load form portal or config file.
-        if (config.mode === 1) {
-          basemapsDef = utils._loadPortalBaseMaps(this.appConfig.portalUrl, this.map);
+        if (!config.basemaps || config.basemaps.length === 0) {
+          basemapsDef = utils._loadPortalBaseMaps(this.appConfig.portalUrl,
+                                                  this.map.spatialReference);
         } else {
           basemapsDef = new Deferred();
           basemapsDef.resolve(config.basemaps);
@@ -117,24 +187,31 @@ define([
           var webmapBasemap = this._getWebmapBasemap();
 
           basemaps = array.filter(basemaps, function(basemap) {
-            if(!basemap || !basemap.title) {
-              return false;
-            }
             var bingKeyResult;
+            var spatialReferenceResult;
             // first, filter bingMaps
-            if(!utils.isBingMap(basemap)) {
-              // do not have bingKey and basemap is not bingMap.
-              bingKeyResult = true;
-            } else if(result.portalSelf.bingKey) {
+            if(result.portalSelf.bingKey) {
               // has bingKey, can add any bing map or not;
+              bingKeyResult = true;
+            } else if(!utils.isBingMap(basemap)) {
+              // do not have bingKey and basemap is not bingMap.
               bingKeyResult = true;
             } else {
               // do not show basemap if do not has bingKey as well as basemap is bingMap.
               bingKeyResult = false;
             }
 
+            // second, filter spatialReference.
+            // only show basemaps who has same spatialReference with current map.
+            if (SRUtils.isSameSR(this.map.spatialReference.wkid,
+                                  basemap.spatialReference.wkid)) {
+              spatialReferenceResult = true;
+            } else {
+              spatialReferenceResult = false;
+            }
+
             // basemap does not have title means basemap load failed.
-            return basemap.title && bingKeyResult;
+            return basemap.title && bingKeyResult && spatialReferenceResult;
           }, this);
 
           // if basemap of current webmap is not include, so add it.
@@ -147,6 +224,7 @@ define([
             basemaps.push(webmapBasemap);
           }
 
+
           for (i = 0; i < basemaps.length; i++) {
             var n = basemaps[i].layers.length;
             var layersArray = [];
@@ -157,21 +235,13 @@ define([
             if (!basemaps[i].thumbnailUrl) {
               basemaps[i].thumbnailUrl = this.folderUrl + "images/default.jpg";
             } else {
-              var reg = /^(https?:)?\/\//;
-              if (reg.test(basemaps[i].thumbnailUrl) && basemaps[i].thumbnailUrl.indexOf('token=') < 0) {
+              if (basemaps[i].thumbnailUrl.indexOf('//') === 0) {
                 basemaps[i].thumbnailUrl = basemaps[i].thumbnailUrl +
                                            utils.getToken(this.appConfig.portalUrl);
               } else {
                 basemaps[i].thumbnailUrl =
                   jimuUtils.processUrlInWidgetConfig(basemaps[i].thumbnailUrl, this.folderUrl);
               }
-              // else if(basemaps[i].thumbnailUrl.startWith('/') ||
-              //   basemaps[i].thumbnailUrl.startWith('data')){
-              //   basemaps[i].thumbnailUrl = basemaps[i].thumbnailUrl;
-              // }else{
-              //   //if path is relative, relative to widget's folder
-              //   basemaps[i].thumbnailUrl = this.appUrl + basemaps[i].thumbnailUrl;
-              // }
             }
             basemapObjs.push(new Basemap(basemaps[i]));
           }
@@ -185,16 +255,220 @@ define([
           config.bingMapsKey = result.portalSelf.bingKey;
           this.basemapGallery = new BasemapGallery(config, this.basemapGalleryDiv);
           this.basemapGallery.startup();
-          this.a11y_initGalleryNodesAttrs();
-          this.own(on(this.basemapGallery,
-                      "selection-change",
-                      lang.hitch(this, this.selectionChange)));
+          this.own(on(this.basemapGallery, "selection-change", lang.hitch(this, this.selectionChange)));
+          this.own(on(this.basemapGallery, "add, remove", lang.hitch(this, this._onAddorRemoveBasemap)));
           this._responsive();
-
-          this.loadingShelter.hide();
-        })).otherwise(lang.hitch(this, function() {
-          this.loadingShelter.hide();
+          this._selectWebBasemap();
         }));
+      },
+
+      _onAddorRemoveBasemap: function() {
+        this._responsive();
+
+        query('.esriBasemapGalleryNode', this.id).forEach(lang.hitch(this,function(node) {
+          this.addNode = domConstruct.create('div', {
+            'class': 'bm-addbtn',
+            'id': node.id +'_addBtn',
+            'title': this.nls.add,
+            'style': 'left:' + this.imgthumbposleft + 'px'
+          }, node);
+
+          this.own(
+            on(node, 'mouseover', lang.hitch(this, this._showAddBtn))
+          );
+
+          this.own(
+            on(node, 'mouseout', lang.hitch(this, this._hideAddBtn))
+          );
+
+          this.own(
+            on(this.addNode, 'click', lang.hitch(this, this._addBtnClick))
+          );
+        }));
+      },
+
+      _selectWebBasemap: function(){
+        this.webmapBasemap = this._getWebmapBasemap();
+        var sNode = query(".esriBasemapGalleryLabelContainer span", this.selectedBasemapGalleryNode)[0];
+        var sNode2 = query(".esriBasemapGalleryThumbnail", this.selectedBasemapGalleryNode)[0];
+        array.some(this.basemapGallery.basemaps, lang.hitch(this,function(lyr){
+          if(this.webmapBasemap.title === lyr.title){
+            var tNode = query('.esriBasemapGalleryNode > .esriBasemapGalleryLabelContainer span[ title = "' + lyr.title + '" ]', this.id).parent().parent()[0];
+            this.selectedBMNode = tNode;
+            html.setStyle(tNode,'display','none');
+            var tNode2 = query('.esriBasemapGalleryThumbnail', tNode)[0];
+            html.addClass(tNode,'.esriBasemapGallerySelectedNode');
+            this.defaultBasemapId = lyr.id;
+            sNode.innerHTML = sNode.title = sNode.alt = lyr.title;
+            sNode2.title = sNode2.alt = tNode2.alt;
+            sNode2.src = tNode2.src;
+          }
+        }));
+
+        query('.esriBasemapGalleryNode', this.id).forEach(lang.hitch(this,function(node) {
+          this.addNode = domConstruct.create('div', {
+            'class': 'bm-addbtn',
+            'id': node.id +'_addBtn',
+            'title': this.nls.add,
+            'style': 'left:' + this.imgthumbposleft +'px'
+          }, node);
+
+          this.own(
+            on(node, 'mouseover', lang.hitch(this, this._showAddBtn))
+          );
+
+          this.own(
+            on(node, 'mouseout', lang.hitch(this, this._hideAddBtn))
+          );
+
+          this.own(
+            on(this.addNode, 'click', lang.hitch(this, this._addBtnClick))
+          );
+        }));
+      },
+
+      _removeBtnClick: function(evt) {
+        html.setStyle(this.selectedBasemapGalleryNode, 'visibility', 'visible');
+        html.setStyle(this.selectedBasemap1, 'visibility', 'hidden');
+        html.setStyle(this.selectedBasemap2, 'visibility', 'hidden');
+        html.setStyle(this.faderDiv,'display','none');
+        this._resetBasemaps1and2();
+        this._removeHybridBasemap((evt.target.id === "removeBM1") ? "second" : "primary");
+        this.hybridBasemapArray=[];
+      },
+
+      _resetBasemaps1and2: function(){
+        var sNode = query(".esriBasemapGalleryLabelContainer span", this.selectedBasemap1)[0];
+        var sNode2 = query(".esriBasemapGalleryThumbnail", this.selectedBasemap1)[0];
+
+        var sNode3 = query(".esriBasemapGalleryLabelContainer span", this.selectedBasemap2)[0];
+        var sNode4 = query(".esriBasemapGalleryThumbnail", this.selectedBasemap2)[0];
+
+        sNode3.innerHTML = sNode3.title = sNode3.alt = sNode.innerHTML = sNode.title = sNode.alt = "";
+        sNode4.title = sNode4.alt = sNode2.title = sNode2.alt = "";
+        sNode4.src = sNode2.src = this.folderUrl + "/images/default.jpg";
+      },
+
+      _addBtnClick: function(evt) {
+        //begin by removing the hybrid basemap if one exists
+        if(this.hybridBasemapId){
+          array.map(this.hyBasemap.getLayers(), lang.hitch(this,function(lyr){
+            lyr.opacity = 1;
+          }));
+          this.basemapGallery.remove(this.hybridBasemapId);
+          this.hybridAdded = false;
+          this.hybridBasemapId = null;
+        }
+        var gItem = this.defaultBasemapId.split("_")[1];
+        this.hybridBasemapArray=[];
+        this.hybridBasemapArray.push(gItem);
+        evt.stopImmediatePropagation();
+        evt.preventDefault();
+
+        if(this.selectedBMNode2){
+          html.setStyle(this.selectedBMNode2, 'display', 'block');
+        }
+        html.setStyle(this.selectedBasemapGalleryNode, 'visibility', 'hidden');
+        var sNode = query(".esriBasemapGalleryLabelContainer span", this.selectedBasemap1)[0];
+        var sNode2 = query(".esriBasemapGalleryThumbnail", this.selectedBasemap1)[0];
+        var sNode3 = query(".esriBasemapGalleryLabelContainer span", this.selectedBasemapGalleryNode)[0];
+        var sNode4 = query(".esriBasemapGalleryLabelContainer span", this.selectedBasemap2)[0];
+        var sNode5 = query(".esriBasemapGalleryThumbnail", this.selectedBasemap2)[0];
+
+        var bm2Node = html.byId(evt.target.id.replace("_addBtn", ""));
+        this.selectedBMNode2 = bm2Node;
+        this.secondBasemapId = bm2Node.id.replace("galleryNode_", "");
+
+        gItem = bm2Node.id.split("_")[2];
+        this.hybridBasemapArray.push(gItem);
+
+        html.setStyle(bm2Node, 'display', 'none');
+        var aNode2 = query('.esriBasemapGalleryThumbnail', bm2Node)[0];
+        sNode4.innerHTML = sNode.title = sNode.alt = aNode2.alt;
+        sNode5.title = sNode5.alt = aNode2.alt;
+        sNode5.src = aNode2.src;
+
+        array.some(this.basemapGallery.basemaps, lang.hitch(this,function(lyr){
+          if(sNode3.title === lyr.title){
+            var tNode = query('.esriBasemapGalleryNode > .esriBasemapGalleryLabelContainer span[ title = "' + lyr.title + '" ]', this.id).parent().parent()[0];
+            var tNode2 = query('.esriBasemapGalleryThumbnail', tNode)[0];
+            sNode.innerHTML = sNode.title = sNode.alt = lyr.title;
+            sNode2.title = sNode2.alt = tNode2.alt;
+            sNode2.src = tNode2.src;
+          }
+        }));
+
+        html.setStyle(this.selectedBasemap1, 'visibility', 'visible');
+        html.setStyle(this.selectedBasemap2, 'visibility', 'visible');
+        html.setStyle(this.faderDiv,'display','inline-block');
+
+        this._addHybridBasemap();
+      },
+
+      _getBasemapNodeFromTarget: function(target) {
+        var retval;
+        if(target.tagName === "A"){
+          retval = target.parentNode;
+        }else if(target.tagName === "IMG"){
+          retval = target.parentNode.parentNode;
+        }else if(target.tagName === "SPAN"){
+          retval = target.parentNode.parentNode;
+        }else if(target.tagName === "DIV"){
+          if(html.hasClass(target, 'esriBasemapGalleryNode')){
+            retval = target;
+          }else if(html.hasClass(target, 'esriBasemapGalleryLabelContainer')){
+            retval = target.parentNode;
+          }else if(html.hasClass(target, 'bm-addbtn')){
+            retval = target.parentNode;
+          }else if(html.hasClass(target, 'bm-removebtn')){
+            retval = target.parentNode;
+          }
+        }
+        return retval;
+      },
+
+      _showAddBtn: function(evt){
+        var node = this._getBasemapNodeFromTarget(evt.target);
+        if(html.hasClass(node, 'currentSelected') || html.hasClass(node, 'basemap1') || html.hasClass(node, 'basemap2')){
+          return;
+        }
+        var addBtnNode = query('.bm-addbtn', node)[0];
+        html.setStyle(addBtnNode, 'display', 'inline-block');
+      },
+
+      _hideAddBtn: function(evt){
+        var node = this._getBasemapNodeFromTarget(evt.target);
+        if(html.hasClass(node, 'currentSelected') || html.hasClass(node, 'basemap1') || html.hasClass(node, 'basemap2')){
+          return;
+        }
+        var addBtnNode = query('.bm-addbtn', node)[0];
+        html.setStyle(addBtnNode, 'display', 'none');
+      },
+
+      _showRemoveBtn: function(evt){
+        var node = this._getBasemapNodeFromTarget(evt.target);
+        var addRemoveNode = query('.bm-removebtn', node)[0];
+        html.setStyle(addRemoveNode, 'display', 'inline-block');
+      },
+
+      _hideRemoveBtn: function(evt){
+        var node = this._getBasemapNodeFromTarget(evt.target);
+        var addRemoveNode = query('.bm-removebtn', node)[0];
+        html.setStyle(addRemoveNode, 'display', 'none');
+      },
+
+      _onFaderChanged: function(evt){
+        var floorValue = Math.floor(evt);
+        //loop through the hybrid basemap layers and adjust transparency
+        array.map(this.hyBasemap.getLayers(), lang.hitch(this,function(lyr){
+          if(lyr.hybrid === 0){
+            lyr.opacity = (100 - floorValue) / 100;
+          }else if(lyr.hybrid === 1){
+            lyr.opacity = floorValue / 100;
+          }
+        }));
+        this.hybridChangeEvent = true;
+        this.basemapGallery.select(this.hybridBasemapId);
       },
 
       _getWebmapBasemap: function() {
@@ -213,45 +487,147 @@ define([
         };
       },
 
-      selectionChange: function() {
-        this.updateExtent();
+      _addHybridBasemap: function (){
+        var bmObj = {
+          id: "basemap_" + this.basemapGallery.basemaps.length.toString(),
+          title: "Hybrid Mashup",
+          thumbnailUrl: this.folderUrl + "/images/default.jpg",
+          layers: []
+        };
+        this.hybridBasemapId = bmObj.id;
+        var bmLyrOrder = 0;
+        array.map(this.hybridBasemapArray, lang.hitch(this,function(bLyrId){
+          array.map(this.basemapGallery.basemaps[bLyrId].getLayers(), lang.hitch(this,function(lyr){
+            lyr.visibility = true;
+            lyr.opacity = 0.5;
+            lyr.hybrid = bmLyrOrder;
+            bmObj.layers.push(lyr);
+          }));
+          bmLyrOrder++;
+        }));
+        this.hyBasemap = new Basemap(bmObj);
+        this.basemapGallery.add(this.hyBasemap);
+        this.hybridAdded = true;
+        this.hybridChangeEvent = true;
+        this.basemapGallery.select(this.hybridBasemapId);
+        this.fader.set('value', 50);
+        this.selectedBMNode = html.byId("galleryNode_" + this.defaultBasemapId);
+        this.selectedBMNode2 = html.byId("galleryNode_" + this.secondBasemapId);
+        this.selectedBMNode3 = html.byId("galleryNode_" + this.hybridBasemapId);
+        html.setStyle(this.selectedBMNode, 'display', 'none');
+        html.setStyle(this.selectedBMNode2, 'display', 'none');
+        html.setStyle(this.selectedBMNode3, 'display', 'none');
+      },
 
-        if (this.gid === 'widgetOnScreen') {
-          PanelManager.getInstance().closePanel(this.id + '_panel');
+      _removeHybridBasemap: function (which){
+        array.map(this.hyBasemap.getLayers(), lang.hitch(this,function(lyr){
+          lyr.opacity = 1;
+        }));
+        this.basemapGallery.remove(this.hybridBasemapId);
+        this.hybridAdded = false;
+        this.hybridBasemapId = null;
+        this.hybridChangeEvent = false;
+
+        if(which === "primary"){
+          this.basemapGallery.select(this.defaultBasemapId);
+          this.secondBasemapId = null;
+          this.hybridBasemapId = null;
+          this.selectedBMNode2 = null;
+          this.selectedBMNode3 = null;
+        }else{
+          this.basemapGallery.select(this.secondBasemapId);
+          this.secondBasemapId = null;
+          this.hybridBasemapId = null;
+          this.selectedBMNode2 = null;
+          this.selectedBMNode3 = null;
         }
       },
 
-      updateExtent: function() {
-        if (this.map.getNumLevels() > 0) {
-          // Set scale to nearest level of current basemap layer
-          var basemap = this.basemapGallery.getSelected();
-          var layers = basemap.getLayers();
-          var currentLod = this.map.__tileInfo.lods[this.map.getLevel()];
-          var layer, tileInfo;
+      beforeDestroy: function() {
+        if(this.hybridAdded){
+          array.map(this.hyBasemap.getLayers(), lang.hitch(this,function(lyr){
+            lyr.opacity = 1;
+          }));
+          this.basemapGallery.remove(this.hybridBasemapId);
+        }
+        this.hybridAdded = false;
+        this.hybridBasemapId = null;
+        this.hybridChangeEvent = false;
+        if(this.webmapBasemap){
+          this.basemapGallery.select(this.webmapBasemap);
+        }
+        this.basemapGallery.destroy();
+        this.selectedBMNode = null;
+        this.selectedBMNode2 = null;
+        this.selectedBMNode3 = null;
+        this.webmapBasemap = null;
+      },
 
-          if (layers.length > 0) {
-            layer = layers[0];
-            tileInfo = layer.tileInfo ||
-              (layer.serviceInfoResponse && layer.serviceInfoResponse.tileInfo);
-            if (tileInfo && currentLod) {
-              // normalize scale
-              var mapScale = currentLod.scale / this.map.__tileInfo.dpi;
-              var bestScale;
-              array.forEach(tileInfo.lods, function(lod) {
-                var scale = lod.scale / tileInfo.dpi;
-                if (!bestScale || Math.abs(scale - mapScale) < Math.abs(bestScale - mapScale)){
-                  bestScale = scale;
-                }
-              });
-              if (Math.abs(bestScale - mapScale) / mapScale > (1 / this.map.width)) {
-                this.map.setScale(bestScale * tileInfo.dpi);
-              }
+      selectionChange: function() {
+        if(this.hybridChangeEvent){
+          this.hybridChangeEvent = false;
+          return;
+        }
+        if(this.selectedBMNode){
+          html.setStyle(this.selectedBMNode, 'display', 'inline-block');
+        }
+        if(this.selectedBMNode2){
+          html.setStyle(this.selectedBMNode2, 'display', 'inline-block');
+        }
+        var basemap = this.basemapGallery.getSelected();
+        if(basemap.title === "Hybrid Mashup"){
+          basemap = query(".esriBasemapGalleryLabelContainer span", this.selectedBMNode)[0];
+        }
+
+        var sNode = query(".esriBasemapGalleryLabelContainer span", this.selectedBasemapGalleryNode)[0];
+        var sNode2 = query(".esriBasemapGalleryThumbnail", this.selectedBasemapGalleryNode)[0];
+
+        var sNode3 = query(".esriBasemapGalleryLabelContainer span", this.selectedBasemap1)[0];
+        var sNode4 = query(".esriBasemapGalleryThumbnail", this.selectedBasemap1)[0];
+
+        array.some(this.basemapGallery.basemaps, lang.hitch(this,function(lyr){
+          if(basemap.title === lyr.title){
+            var tNode = query('.esriBasemapGalleryNode > .esriBasemapGalleryLabelContainer span[ title = "' +
+                              lyr.title + '" ]', this.id).parent().parent()[0];
+            html.setStyle(tNode, 'display', 'none');
+            this.selectedBMNode = tNode;
+            var tNode2 = query('.esriBasemapGalleryThumbnail', tNode)[0];
+            html.addClass(tNode,'.esriBasemapGallerySelectedNode');
+            this.defaultBasemapId = lyr.id;
+            if(this.hybridAdded){
+              sNode3.innerHTML = sNode3.title = sNode3.alt = lyr.title;
+              sNode4.title = sNode4.alt = tNode2.alt;
+              sNode4.src = tNode2.src;
             }
+
+            sNode.innerHTML = sNode.title = sNode.alt = lyr.title;
+            sNode2.title = sNode2.alt = tNode2.alt;
+            sNode2.src = tNode2.src;
           }
+        }));
+        if (this.isPreload) {
+          PanelManager.getInstance().closePanel(this.id + '_panel');
+        }
+
+        if(this.hybridAdded){
+          //begin by removing the hybrid basemap if one exists
+          if(this.hybridBasemapId){
+            array.map(this.hyBasemap.getLayers(), lang.hitch(this,function(lyr){
+              lyr.opacity = 1;
+            }));
+            this.basemapGallery.remove(this.hybridBasemapId);
+            this.hybridAdded = false;
+            this.hybridBasemapId = null;
+          }
+          var gItem = this.defaultBasemapId.split("_")[1];
+          this.hybridBasemapArray=[];
+          this.hybridBasemapArray.push(gItem);
+          gItem = this.selectedBMNode2.id.split("_")[2];
+          this.hybridBasemapArray.push(gItem);
+          this._addHybridBasemap();
         }
       }
     });
 
-    clazz.extend(a11y);//for a11y
     return clazz;
   });

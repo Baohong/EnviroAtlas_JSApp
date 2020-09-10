@@ -1,5 +1,5 @@
-define({
-  "_widgetLabel": "แกลเลอรี่แผนที่ฐาน",
-  "chooseWebScene": "เลือกเวบซีน",
-  "chooseWebMap": "เลือกเว็บแผนที่"
+﻿define({
+
+    _widgetLabel: "แกลเลอรี่แผนที่ฐาน"
+
 });

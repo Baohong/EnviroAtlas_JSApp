@@ -1,16 +1,23 @@
 {
-  "name": "Bookmark",
-  "2D": true,
-  "3D": false,
+  "name": "eBookmark",
   "platform": "HTML",
-  "version": "2.17",
-  "wabVersion": "2.17",
-  "author": "Esri R&D Center Beijing",
-  "description": "the bookmark widget which support 2D and 3D map",
-  "copyright": "",
+  "label": "Enhanced Bookmark",
+  "version": "2.3",
+  "wabVersion": "2.3",
+  "author": "Robert J. Scheitlin",
+  "description": "This is an enhanced version of the standard bookmark widget, that allows organizing bookmarks in a tree",
+  "copyright": "2017",
   "license": "http://www.apache.org/licenses/LICENSE-2.0",
   "properties": {
+    "inPanel": true,
+    "hasLocale": true,
+    "hasStyle": true,
     "hasConfig": true,
-    "hasVersionManager": true
+    "hasUIFile": true,
+    "hasSettingPage": true,
+    "hasSettingUIFile": true,
+    "hasSettingLocale": true,
+    "hasSettingStyle": true,
+    "IsController": false
   }
 }
