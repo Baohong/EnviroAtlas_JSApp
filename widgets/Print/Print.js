@@ -235,6 +235,11 @@ define([
         aspect.after(
           this.printTask,
           '_createOperationalLayers',
+          lang.hitch(this, '_fixLayerTitle')
+        );       
+        aspect.after(
+          this.printTask,
+          '_createOperationalLayers',
           lang.hitch(this, '_excludeInvalidLegend')
         );
       }
@@ -346,7 +351,44 @@ define([
       }, this);
       return opLayers;
     },
+    _fixLayerTitle: function(opLayers) {
+      array.forEach(opLayers, function(ol) {
+        if ((ol.id.indexOf(window.layerIdPrefix) >= 0) || (ol.id.indexOf(window.idCommuBoundaryPoint) >= 0)) {
+        	EAID = ol.id.replace(window.layerIdPrefix, "");
+        	var maxLength = 18;//18 is works for leb; 15 works for map22
+        	arrLayerTitle = window.hashEAIDToTitle[EAID].split(" ");
+        	var newLayerTitle = "";
+        	var currentIndex = 0;
+        	var currentLine = "";
+        	while (currentIndex <= arrLayerTitle.length - 1) {
+	        	for (var i = currentIndex; i < arrLayerTitle.length; i++) {
+	        		testCurrentLine = currentLine;
+	        		currentLine = currentLine + arrLayerTitle[i] + " ";
+	        		
+	        		if ((currentLine.length > maxLength)|| (i == (arrLayerTitle.length - 1))) {
+	        			if (((i == currentIndex) && (currentLine.length > maxLength)) || ((i == (arrLayerTitle.length - 1))&& (currentLine.length <= maxLength))){
+		        			currentIndex = i+1 ;
+		        			newLayerTitle = newLayerTitle + currentLine + "\n";
+		        			currentLine =  "";	        				
+	        			} else {
+		        			currentIndex = i ;
+		        			newLayerTitle = newLayerTitle + testCurrentLine + "\n";
+		        			currentLine =  "";		        				
+	        			}
+	        			break;
+	        		}
+	        	}
+	        }
+	        if (newLayerTitle.substring(newLayerTitle.length-2, newLayerTitle.length) == " \n") {
+	        	newLayerTitle = newLayerTitle.substring(0, newLayerTitle.length-2);
+	        }
 
+        	//console.log("title layer: " + window.hashEAIDToTitle[EAID]);
+        	ol.title = newLayerTitle;
+        }
+      }, this);
+      return opLayers;
+    },
     _excludeInvalidLegend: function(opLayers) {
       function getSubLayerIds(legendLayer) {
         return array.filter(legendLayer.subLayerIds, lang.hitch(this, function(subLayerId) {
