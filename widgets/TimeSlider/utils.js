@@ -190,6 +190,7 @@ define(['dojo/_base/html', 'dojo/dom-geometry', 'dojo/_base/array',
       position.left = left;
       html.setStyle(domNode, 'top', position.top + 'px');
       html.setStyle(domNode, 'left', position.left + 'px');
+      position.hasMoved = true;
     };
     mo.getInitTop = function (map,/*domNode,*/theme) {
       var top = 0;
