@@ -37,12 +37,13 @@ define(['dojo/_base/declare',
   './layerUtil',
   './SelectableLayerItem',
   './FeatureItem',
-  'jimu/dijit/LoadingShelter'
+  'dojo/_base/connect',
+  'jimu/dijit/LoadingShelter'  
 ],
 function(declare, lang, html, array, on, all, _WidgetsInTemplateMixin, SimpleMarkerSymbol,
 SimpleLineSymbol, SimpleFillSymbol, SymbolJsonUtils, Color, BaseWidget, WidgetManager, ViewStack,
 FeatureSetChooserForMultipleLayers, LayerInfos, SelectionManager, PopupMenu, jimuUtils, layerUtil,
-SelectableLayerItem, FeatureItem) {
+SelectableLayerItem, FeatureItem, connect) {
   return declare([BaseWidget, _WidgetsInTemplateMixin], {
     baseClass: 'jimu-widget-select',
 
@@ -169,8 +170,26 @@ SelectableLayerItem, FeatureItem) {
 
     onOpen: function() {
       WidgetManager.getInstance().activateWidget(this);
+      connect.disconnect(window.mapClickListenerForPopup);
     },
 
+      if (this.selectDijit.isActive()) {
+        this.selectDijit.deactivate();
+      }
+
+      document.getElementById("butInitClickEventForPopup").click();
+
+    },
+    onClose: function() {
+      
+
+      if (this.selectDijit.isActive()) {
+        this.selectDijit.deactivate();
+      }
+
+      document.getElementById("butInitClickEventForPopup").click();
+
+    },
     onDestroy: function() {
       if (this.selectDijit.isActive()) {
         this.selectDijit.deactivate();
