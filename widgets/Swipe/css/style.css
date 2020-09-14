@@ -3,6 +3,7 @@
 .jimu-widget-swipe {
   border-radius: 5px;
   transition: all 0.6s;
+  max-width: 350px;
 }
 .jimu-widget-swipe.hide,
 .jimu-widget-swipe .hide{
@@ -38,8 +39,9 @@
   font-size: 14px;
   padding: 14px;
   z-index: 50;
-  color: #fff;
-  background: #474747;
+  color: #686868;
+  background: #fff;
+  min-width: 320px;
 }
 .jimu-rtl .jimu-widget-swipe .swipe-layer-menu{
   right: 32px;
@@ -48,6 +50,7 @@
 .jimu-widget-swipe .swipe-layer-menu .hint{
   display: inline-block;
   font-weight: bold;
+  padding-bottom: 10px;
   width: 100%;
 }
 .jimu-widget-swipe .swipe-layer-menu .show-detail-icon{
@@ -68,9 +71,10 @@
 }
 
 .claro .jimu-widget-swipe .swipe-layer-menu .dijitSelect {
-  color: #FFF;
+  color: #7989a0;
   background-color:transparent !important;
   table-layout: fixed;
+  border-color: #d2dade;
 }
 
 .claro .jimu-widget-swipe .swipe-layer-menu .dijitSelect .dijitInputField {
@@ -88,22 +92,20 @@
 
 .claro .jimu-widget-swipe .swipe-layer-menu .dijitSelectHover,
 .claro .jimu-widget-swipe .swipe-layer-menu .dijitSelectFocused {
-  border-color:#b5bcc7;
+  border-color: #759dc0;
 }
 .claro .jimu-widget-swipe .swipe-layer-menu .dijitArrowButton{
-  padding: 0;
-  border: none;
-  background-image: none;
+  padding: 1px;
 }
 .claro .jimu-widget-swipe .swipe-layer-menu .dijitSelect .dijitButtonContents {
   border-style: none;
   border-width: 0;
-  background: transparent !important;
+  background: #fafafc !important;
 }
 .claro .jimu-widget-swipe .swipe-layer-menu .dijitSelect .dijitArrowButton {
   border-style: none;
   border-width: 0;
-  background: transparent;
+  background: #fafafc !important;
   width: 16px !important;
 }
 
