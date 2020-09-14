@@ -75,6 +75,7 @@ define([
             }
           });
         } else {
+          if (topLayerInfo.id!=window.timeSeriesLayerId) {
           var layerInfoParam = {
             hideLayers: hideLayers,
             layer: topLayerInfo.layerObject,
@@ -83,10 +84,21 @@ define([
           layerInfosParam.push(layerInfoParam);
         }
       }
+      }
     });
     return layerInfosParam.reverse();
   };
 
+  var getLayerInfoConfigById = function(legendConfig, id) {
+    var layerInfoConfig = array.filter(legendConfig.layerInfos, function(layerInfoConfig) {
+      var result = false;
+      if(layerInfoConfig.id === id) {
+        result = true;
+      }
+      return result;
+    });
+    return layerInfoConfig[0];
+  };
   mo.isSupportedLayerType = function(layer) {
     if (layer &&
         (layer.declaredClass === "esri.layers.ArcGISDynamicMapServiceLayer" ||
