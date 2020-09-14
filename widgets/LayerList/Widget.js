@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// Copyright © Esri. All Rights Reserved.
+// Copyright © 2014 - 2018 Esri. All Rights Reserved.
 //
 // Licensed under the Apache License Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 define([
     'jimu/BaseWidget',
+    'jimu/PanelManager',
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/array',
@@ -23,15 +24,15 @@ define([
     'dojo/dom',
     'dojo/on',
     'dojo/query',
-    'dijit/registry',
+    'jimu/utils',
+    'dijit/registry',    
     './LayerListView',
     './LayerFilter',
     './NlsStrings',
     'jimu/LayerInfos/LayerInfos'
   ],
-  function(BaseWidget, declare, lang, array, html, dom, on,
-  query, registry, LayerListView, LayerFilter, NlsStrings, LayerInfos) {
-
+  function(BaseWidget, PanelManager, declare, lang, array, html, dom, on,
+  query, jimuUtils, registry, LayerListView, LayerFilter, NlsStrings, LayerInfos) {
     var clazz = declare([BaseWidget], {
       //these two properties is defined in the BaseWiget
       baseClass: 'jimu-widget-layerList',
@@ -57,8 +58,10 @@ define([
 
       startup: function() {
         this.inherited(arguments);
+        var thisLayerList = this;
 
         this._createLayerFilter();
+        var openLegendDiv = document.getElementById("openLegendDiv");
 
         NlsStrings.value = this.nls;
         this._denyLayerInfosOpacityResponseOneTime = false;
@@ -100,6 +103,12 @@ define([
         html.addClass(this.layerFilter.searchButton, 'firstFocusNode');
       },
 
+	  _onOpenLegendBtnClick: function() {
+        var widgetName = 'Legend';
+        var widgets = this.appConfig.getConfigElementsByName(widgetName);
+        var pm = PanelManager.getInstance();
+        pm.showPanel(widgets[0]);     
+      },
       destroy: function() {
         this._clearLayers();
         this.inherited(arguments);
@@ -203,6 +212,10 @@ define([
           lang.hitch(this, this._onLayerInfosIsVisibleChanged)));
 
         this.own(on(this.operLayerInfos,
+          'updated',
+          lang.hitch(this, this._onLayerInfosObjUpdated)));
+
+        this.own(on(this.operLayerInfos,
           'layerInfosReorder',
           lang.hitch(this, this._onLayerInfosReorder)));
 
@@ -223,16 +236,56 @@ define([
           lang.hitch(this, this._onLayerInfosScaleRangeChanged)));
       },
 
-      _onLayerInfosChanged: function(/*layerInfo, changedType*/) {
-        //udpates layerFilter.isValid to false first
-        this.layerFilter.cancelFilter();
-        this.layerListView.refresh();
+      _onLayerInfosChanged: function(layerInfo, changedType) {
+        //this._refresh();//Comment out this line, otherwise there will some duplicate layer names in LayerList widget
+        /*if (layerInfo){
+            if(changedType === "added") {
+              var allLayers = this.map.layerIds.concat(this.map.graphicsLayerIds);
+
+              var layerIndex = array.indexOf(allLayers, layerInfo.id);
+              var refLayerId = null;
+              var refLayerNode = null;
+              var refHrNodeNonGraphic = null;
+              for(var i = layerIndex - 1; i >= 0; i--) {
+                refLayerId = allLayers[i];
+                var layerId = parseInt(refLayerId.replace(window.layerIdPrefix, "").replace(window.layerIdTiledPrefix, "").replace(window.addedLayerIdPrefix, ""));
+                if (window.featureLyrNumber.indexOf(layerId) >= 0){
+                    refLayerNode = query("[class~='layer-tr-node-" + refLayerId + "']", this.domNode)[0];	            
+                    if(refLayerNode) {
+                      break;
+                    }
+                }
+              }
+              refHrNode = query("[class~='hrClass']", this.domNode)[0];
+              refHrNodeNonGraphic = query("[class~='hrClassNonGraphic']", this.domNode)[0];
+              var layerId = parseInt(layerInfo.id.replace(window.layerIdPrefix, "").replace(window.layerIdTiledPrefix, "").replace(window.addedLayerIdPrefix, ""));
+              if (((layerInfo.layerObject.type) && (layerInfo.layerObject.type.toUpperCase() == "FEATURE LAYER")) ||((layerInfo.layerObject.url.toUpperCase().indexOf("FEATURESERVER")&&(layerInfo.layerObject.url.toUpperCase().indexOf("ARCGIS.COM"))) )) {
+                  if(refLayerNode) {	          	
+                    this.layerListView.drawListNode(layerInfo, 0, refLayerNode, 'before');
+                  } else {
+                    this.layerListView.drawListNode(layerInfo, 0, refHrNode, 'before');
+                  }
+               } else {
+                  this.layerListView.drawListNode(layerInfo, 0, refHrNodeNonGraphic, 'before');
+               }
+
+            } else {
+              this.layerListView.destroyLayerTrNode(layerInfo);
+            }
+        }*/
+       this.layerListView.refresh();
       },
 
-      _onTableInfosChanged: function(/*tableInfoArray, changedType*/) {
-        //udpates layerFilter.isValid to false first
-        this.layerFilter.cancelFilter();
-        this.layerListView.refresh();
+      _onTableInfosChanged: function(tableInfoArray, changedType) {
+        if(changedType === "added") {
+          array.forEach(tableInfoArray, function(tableInfo) {
+            this.layerListView.drawListNode(tableInfo, 0, this.layerListView.tableListTable);
+          }, this);
+        } else {
+          array.forEach(tableInfoArray, function(tableInfo) {
+            this.layerListView.destroyLayerTrNode(tableInfo);
+          }, this);
+        }
       },
 
       _onLayerInfosIsVisibleChanged: function(changedLayerInfos) {
@@ -254,6 +307,10 @@ define([
         }
       },
 
+      _onLayerInfosObjUpdated: function() {
+        this._refresh();
+      },
+
       _onZoomEnd: function() {
         var layerInfoArray = [];
         this.operLayerInfos.traversal(lang.hitch(this, function(layerInfo) {
@@ -266,7 +323,16 @@ define([
           query("[class~='layer-title-div-" + layerInfo.id + "']", this.domNode)
           .forEach(function(layerTitleDivIdDomNode) {
             try {
-              if (layerInfo.isInScale()) {
+              var eaID = layerInfo.id.replace(window.layerIdPrefix, "");
+
+              bTileOnMap = false;
+        	  tileLayer = this.map.getLayer(window.layerIdTiledPrefix + window.hashFeaturedCollectionToEAID[layerInfo.id]);         	
+        	  if(tileLayer != null){
+            	bTileOnMap = true;      
+              }                        
+              var indexID = window.featureLyrNumber.indexOf(window.hashFeaturedCollectionToEAID[layerInfo.id]);
+              //use ((indexID >= 0) && (bTileOnMap == true)) to check if tileLayer corresponding to Featured Collection exist.
+              if ((layerInfo.isInScale()) || (window.hashIDtoTileURL[eaID] != null)||((indexID >= 0) && (bTileOnMap == true))) {
                 html.removeClass(layerTitleDivIdDomNode, 'grayed-title');
               } else {
                 html.addClass(layerTitleDivIdDomNode, 'grayed-title');
@@ -358,8 +424,139 @@ define([
       onAppConfigChanged: function(appConfig, reason, changedData){
         /*jshint unused: false*/
         this.appConfig = appConfig;
-      }
+      },
+  	  uncheckRelatedCheckbox: function (chkboxLayerId){
+    	var chkSimpleSearch = document.getElementById(window.chkSelectableLayer + chkboxLayerId);
+    	if((chkSimpleSearch != null) && (chkSimpleSearch.checked == true)){	
+    		//chkSimpleSearch.checked = false;    		
+    		chkSimpleSearch.click();
+    	}
+      },   
+      _onRemoveLayersClick: function() {
+      	var that = this;
+      	
+      	var currentLayer = null;
+      	var graphicsLayerIDs = [];
+      	//remove HucLayer Result
+      	for (var j=0, jl=this.map.graphicsLayerIds.length; j<jl; j++) {
+      		var layerId = this.map.graphicsLayerIds[j];
+        	if (layerId.indexOf("graphicsLayer") > -1  ) {
+	        	graphicsLayerIDs.push(layerId);
+	        }
+        }
+        for (var j=0, jl=graphicsLayerIDs.length; j<jl; j++) {
+        	currentLayer = this.map.getLayer(graphicsLayerIDs[j]);       	
+        	
+        	if(currentLayer != null){
 
+            	this.map.removeLayer(currentLayer);      
+            }
+        }
+        //remove labels of the graphics such as HUC infor
+        while (this.map.graphics.graphics.length>=1) {
+	        this.map.graphics.graphics.forEach(function(g){    
+    			that.map.graphics.remove(g); 
+	        });  
+        }
+        
+        //remove added layer, tile layer, Time series layer, demographic layer
+      	var AlladdedLayerIDs = [];
+        
+		for (var j=0, jl=this.map.layerIds.length; j<jl; j++) {               
+			currentLayer = this.map.getLayer(this.map.layerIds[j]);
+			if(currentLayer != null){				
+				if ((currentLayer.id).indexOf(window.addedLayerIdPrefix) > -1) {
+					AlladdedLayerIDs.push(this.map.layerIds[j]);
+				}    
+				if ((currentLayer.id).indexOf(window.uploadedFeatLayerIdPrefix) > -1) {
+					AlladdedLayerIDs.push(this.map.layerIds[j]);
+				} 
+				if ((currentLayer.id).indexOf(window.layerIdTiledPrefix) > -1) {
+					var EAID = currentLayer.id.replace(window.layerIdTiledPrefix, "" );
+					var indexID = window.featureLyrNumber.indexOf(EAID);
+					if (indexID > -1) {
+					  window.featureLyrNumber.splice(indexID, 1);
+					}
+					AlladdedLayerIDs.push(this.map.layerIds[j]);
+				}  
+				if ((currentLayer.id).indexOf(window.layerIdPrefix) > -1) {
+					AlladdedLayerIDs.push(this.map.layerIds[j]);
+				}  				
+                if ((currentLayer.id).indexOf(window.layerIdDemographPrefix) > -1) {
+                    AlladdedLayerIDs.push(this.map.layerIds[j]);
+                }
+                if ((currentLayer.id).indexOf(window.timeSeriesLayerId) > -1) {
+                    AlladdedLayerIDs.push(this.map.layerIds[j]);
+                }                
+			} 
+		}
+
+        for (var j=0, jl=AlladdedLayerIDs.length; j<jl; j++) {
+        	currentLayer = this.map.getLayer(AlladdedLayerIDs[j]);  
+        	this.map.removeLayer(currentLayer);                  
+        }
+
+		//remove all layers searchable from widget SimpleSearchFilter
+    	for (i in window.allLayerNumber) {    		
+            simpleSearchFilterId = 'widgets_SimpleSearchFilter_Widget_37';
+    		lyr = this.map.getLayer(window.layerIdPrefix + window.allLayerNumber[i]);
+			if(lyr != null){
+				this.openWidgetById(simpleSearchFilterId);
+            	this.map.removeLayer(lyr);
+            	this.uncheckRelatedCheckbox(window.allLayerNumber[i]);
+          	}
+    		lyr = this.map.getLayer(window.layerIdTiledPrefix + window.allLayerNumber[i]);
+			if(lyr != null){
+            	this.map.removeLayer(lyr);
+          	}          	
+       	
+        } 
+       
+        //remove all layers added from portal, webmapdata and upload data
+    	for (i in window.layerID_Portal_WebMap) {	        
+    		lyr = this.map.getLayer(window.layerID_Portal_WebMap[i]);
+			if(lyr != null){
+	    		this.map.removeLayer(lyr);    
+	    		var eaID = window.hashFeaturedCollectionToEAID[window.layerID_Portal_WebMap[i]];
+	    		if (((eaID != null) && (eaID != undefined))) {
+	    			
+	    			var indexID = window.featureLyrNumber.indexOf(eaID);
+					if (indexID > -1) {
+					  window.featureLyrNumber.splice(indexID, 1);
+					}
+
+					lyrTiled = this.map.getLayer( window.layerIdTiledPrefix + eaID);
+					if(lyrTiled){
+			       		this.map.removeLayer(lyrTiled);
+			      	} 	    			
+	    		}
+ 	  
+          	}          	
+        }  
+        //remove all layers added from Demographics widget.    
+    	for (var key1 in window.demographicLayerSetting) {
+    		if (window.demographicLayerSetting[key1] != null) {		  	
+			  	lyr = this.map.getLayer(key1);
+	            if(lyr != null){
+	                this.map.removeLayer(lyr);
+	            }   
+				window.demographicLayerSetting[key1] = null;
+		    }
+		}
+				   
+    	for (i in window.uploadedFileColl) {	        
+    		lyr = this.map.getLayer(window.uploadedFileColl[i]);
+			if(lyr != null){
+	    		this.map.removeLayer(lyr);        	
+          	}          	
+        }                
+        //remove community boundary layer   
+        lyrCommunityBoundary = this.map.getLayer(window.idCommuBoundaryPoint);  
+		if(lyrCommunityBoundary != null){
+    		this.map.removeLayer(lyrCommunityBoundary);        	
+      	} 
+      	jimuUtils.adjustMapExtent(this.map);   
+      }
     });
 
     return clazz;

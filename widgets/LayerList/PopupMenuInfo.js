@@ -20,12 +20,214 @@ define([
   'dojo/_base/lang',
   'dojo/Deferred',
   'dojo/promise/all',
-  'jimu/WidgetManager',
   'jimu/portalUrlUtils',
+  'jimu/WidgetManager',
   'esri/lang',
-  './NlsStrings'
-], function(declare, array, lang, Deferred, all, WidgetManager, portalUrlUtils, esriLang,
-  NlsStrings) {
+  './NlsStrings',
+   'jimu/utils',
+   'jimu/PanelManager',
+   'esri/graphicsUtils',
+   'dijit/Dialog'
+   
+], function(declare, array, lang, Deferred, all,  portalUrlUtils, WidgetManager, esriLang, NlsStrings, jimuUtils, PanelManager, 
+  graphicsUtils, Dialog) }
+  var mapDescriptionStr = "";
+  var topLayerIndex = 300;
+  var layerInfoFromJson = {};
+  var _layerType = null;
+  var uncheckRelatedCheckbox = function (chkboxLayerId){
+    	var chkSimpleSearch = document.getElementById(window.chkSelectableLayer + chkboxLayerId);
+    	if((chkSimpleSearch != null) && (chkSimpleSearch.checked == true)){	
+    		chkSimpleSearch.checked = false;    		
+    	}
+   };
+
+   var getInfoFromJsonWithEaID = function(callback, arrXmlPath, EaID, actionType){  
+        
+		if (arrXmlPath.length > 0){
+	        var xobj = new XMLHttpRequest();
+	        xobj.overrideMimeType("application/json");   	
+	        //xobj.open('GET', 'widgets/LocalLayer/config.json', true); 
+	        xobj.open('GET', arrXmlPath.pop(), true); 
+	
+	        xobj.onreadystatechange = function () {
+	              if (xobj.readyState == 4 && xobj.status == "200") {
+	                // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
+	                if (callback(xobj.responseText, EaID)){
+	                	switch(actionType) {
+	                		case "eaDescription":
+		                		if ('eaDescription' in layerInfoFromJson) {
+							    	var mapDescription = new Dialog({
+								        title: layer.name,
+								        style: "width: 300px",    
+							    	});
+							        mapDescription.show();
+							        mapDescription.set("content", layerInfoFromJson['eaDescription']); 			
+		                		}
+		                		else {
+		                			alert("Map description is not available for this layer");	
+		                		}
+		                        break;      
+		                    case 'eaMetadata':
+			                    if ('eaMetadata' in layerInfoFromJson) {
+			                    	if (('eaScale' in layerInfoFromJson) &&  (layerInfoFromJson['eaScale'] == "NATIONAL")) {
+			                        	metaDataID = window.nationalMetadataDic[layerInfoFromJson['eaMetadata']];
+			                            window.open(window.matadata + "?uuid=%7B" + metaDataID + "%7D");                  		
+			                    	} else {
+			                    		if (window.communitySelected == window.strAllCommunity){
+				                            window.open(window.communityMetadataDic[layerInfoFromJson['eaMetadata']][window.communitySelected]);                    			
+			                    		} else {
+				                        	metaDataID = window.communityMetadataDic[layerInfoFromJson['eaMetadata']][window.communitySelected];
+				                            window.open(window.matadata + "?uuid=%7B" + metaDataID + "%7D");                 		
+			                    		}
+			                    	}  		     
+		                    	} 
+		                		else {
+		                			alert("Metadata is not available for this layer");	
+		                		}		
+		                		break;
+		                	case 'eaDfsLink':
+		                		if ('eaDfsLink' in layerInfoFromJson) {
+		                            window.open(window.dataFactSheet + layerInfoFromJson['eaDfsLink']);
+		                		}
+		                		else {
+		                			alert("Data fact sheet is not available for this layer");	
+		                		}		                		
+		                		break;		                	                    	                        		
+	                	}
+	                	
+	                }
+	                else {
+	                	switch(actionType) {
+	                		case "eaDescription":
+			                	if ((arrXmlPath.length == 0)&&(!('eaDescription' in layerInfoFromJson))){
+					              	alert("Map description is not available for this layer");			                	
+					            }	                		
+	                			break;
+	                		case 'eaMetadata':
+			                	if ((arrXmlPath.length == 0)&&(!('eaMetadata' in layerInfoFromJson))){
+					              	alert("Metadata is not available for this layer");			                	
+					            }		                		
+		                		break;
+		                	case 'eaDfsLink':	                		
+			                	if ((arrXmlPath.length == 0)&&(!('eaDescription' in layerInfoFromJson))){
+					              	alert("Data fact sheet is not available for this layer");			                	
+					            }			                	
+		                		break;
+		                }          			                		
+	                	getInfoFromJsonWithEaID(getInfoWithEaID, arrXmlPath, EaID, actionType);
+	                }
+	              }              
+	        }
+	        xobj.send(null); 
+		}
+        
+    };    
+    var getInfoWithEaID = function(response, layerId_url) {
+			var resultLayerInfoFromJson = {};
+	        var localLayerConfig = JSON.parse(response);
+	        var urlInConfig = "";
+	        var resultFound = false;
+	        
+	        var arrLayers = localLayerConfig.layers.layer;
+
+	        for (index = 0, len = arrLayers.length; index < len; ++index) {
+	            layer = arrLayers[index];
+	            if(layer.hasOwnProperty('eaID')){
+	            	if (layerId_url.indexOf("http")>=0){
+		            	if (_layerType != "ArcGISDynamicMapServiceLayer"){
+					        if(layer.hasOwnProperty('eaLyrNum')){
+					            urlInConfig = layer.url + "/" + layer.eaLyrNum.toString();
+					        }            
+				        } else {
+				        	urlInConfig = layer.url;
+				        }	      
+	            	}
+
+					if ((urlInConfig!=null) &&(urlInConfig!="")){
+		            	if (urlInConfig.substr(urlInConfig.length - 1) == "/") {
+		            		urlInConfig = urlInConfig.substr(0, urlInConfig.length - 2);
+		            	}					
+					}
+
+	                if ((layerId_url === layer.eaID.toString()) ||(layerId_url == urlInConfig)) {
+	                	resultFound = true;
+	                    if(layer.hasOwnProperty('eaDescription')){
+	                    	layerInfoFromJson['eaDescription'] = layer.eaDescription;
+	                    }
+	                    if(layer.hasOwnProperty('eaMetadata')){
+	                    	layerInfoFromJson['eaMetadata'] = layer.eaMetadata;
+	                    }
+	                    if(layer.hasOwnProperty('eaDfsLink')){
+	                    	layerInfoFromJson['eaDfsLink'] = layer.eaDfsLink;
+	                    }
+	                    if (layer.hasOwnProperty('eaScale')) {
+	                    	layerInfoFromJson['eaScale'] = layer.eaScale;
+	                    }
+	                    break;                    	                    
+	                }					                	                
+	            }
+	        }
+	        return 	resultFound;
+
+    };
+    var displayInfoOnClickAction = function(layerId, clickedURL, actionType) {
+    	if (actionType == "eaDescription") {
+    		if (layerId=="added_ClimateChange"){
+				var mapDescription = new Dialog({
+			        title: "Change analysis layer",
+			        style: "width: 300px",    
+		    	});
+		        mapDescription.show();
+		        mapDescription.set("content", "This map depicts the change in the selected climate variable (max temp, min temp, precipitation, potential evapotranspiration) between two time periods based on the selected RCP scenario (2.6, 4.0, 6.5 8.5) and the selected season."); 		
+    			return;
+    		} else if (layerId==window.timeSeriesLayerId) {
+				var mapDescription = new Dialog({
+			        title: "Time series data",
+			        style: "width: 300px",    
+		    	});
+		        mapDescription.show();
+		        mapDescription.set("content", "This map depicts historical or forecasted time series data for the selected climate variable (max temp, min temp, precipitation, potential evapotranspiration) based on the selected RCP scenario (2.6, 4.0, 6.5 8.5) and the selected season."); 		
+    			return;    			    			
+    		}
+    	}
+    	else if (actionType == "eaDfsLink") {
+    		if (layerId==window.timeSeriesLayerId) {
+	    		var climateVar = document.getElementById("climateSelection").value;
+	    		var climateVar2 = climateVar.replace("Max", "").replace("Min", "");
+    			window.open(window.dataFactSheet + "Supplemental/Climate_" + climateVar2 + ".pdf");
+    			return; 
+    		}
+    	}
+    	layerInfoFromJson = {};
+    	
+        var eaID = layerId.replace(window.layerIdPrefix, "");
+        
+		//check if layer is from Featured Collection   	
+		bFeaturedCollection = false;
+		var eaIDFromFeaturedCollection = window.hashFeaturedCollectionToEAID[layerId]; 
+		if (((eaIDFromFeaturedCollection != null) && (eaIDFromFeaturedCollection != undefined))) {
+    			eaID = eaIDFromFeaturedCollection;
+    			bFeaturedCollection = true;
+		}
+        
+        var arrXmlPath = [];
+        if (((layerId.indexOf(window.layerIdPrefix)) >= 0)||(bFeaturedCollection == true)) {
+			arrXmlPath.push("widgets/SimpleSearchFilter/config_layer.json");
+			getInfoFromJsonWithEaID(getInfoWithEaID, arrXmlPath, eaID, actionType);
+        }     
+        else if (eaID==window.timeSeriesLayerId) {
+    		var climateVar = document.getElementById("climateSelection").value;
+        	metaDataIDFromVariable = window.timeSeriesMetadata[climateVar];
+        	metaDataID = window.nationalMetadataDic[metaDataIDFromVariable];
+            window.open(window.matadata + "?uuid=%7B" + metaDataID + "%7D");	       	
+        }   
+        else {
+        	arrXmlPath.push("widgets/SimpleSearchFilter/config_layer.json");  	
+        	getInfoFromJsonWithEaID(getInfoWithEaID, arrXmlPath, clickedURL, actionType);
+        }    	
+    };
+
   var clazz = declare([], {
 
     _candidateMenuItems: null,
@@ -39,6 +241,7 @@ define([
       this.nls = NlsStrings.value;
       this._layerInfo = layerInfo;
       this._layerType = layerType;
+      layerInfoFromJson = {};
       this.layerListWidget = layerListWidget;
       this._initCandidateMenuItems();
       this._initDisplayItems(displayItemInfos);
@@ -47,6 +250,7 @@ define([
     _getATagLabel: function() {
       var url;
       var label;
+      var itemLayerId = this._layerInfo.isItemLayer && this._layerInfo.isItemLayer();
       var layerUrl = this._layerInfo.getUrl();
       var basicItemInfo = this._layerInfo.isItemLayer();
       if (basicItemInfo) {
@@ -92,20 +296,26 @@ define([
         key: 'empty',
         label: this.nls.empty
       }, {
-        key: 'zoomto',
-        label: this.nls.itemZoomTo
+        key: 'mapDescription',
+        label: this.nls.itemMapDescription
+      }, {
+        key: 'dataFactSheet',
+        label: this.nls.itemDataFactSheet
+      }, {
+        key: 'metadataDownload',
+        label: this.nls.itemMetadataDownload
+      }, {
+        key: 'changeSymbology',
+        label: this.nls.itemChangeSymbology
+      },{
+        key: 'remove',
+        label: this.nls.itemRemove
+      }, {
+        key: 'movetotop',
+        label: this.nls.itemMovetoTop
       }, {
         key: 'transparency',
         label: this.nls.itemTransparency
-      },  {
-        key: 'setVisibilityRange',
-        label: this.nls.itemSetVisibilityRange
-      }, {
-        key: 'moveup',
-        label: this.nls.itemMoveUp
-      }, {
-        key: 'movedown',
-        label: this.nls.itemMoveDown
       }, {
         key: 'table',
         label: this.nls.itemToAttributeTable
@@ -244,7 +454,13 @@ define([
           'key': 'setVisibilityRange',
           'denyType': 'disable'
         });
-      }
+      } else if (this._layerInfo.isRootLayer() && (this._layerInfo.getRootLayerInfo().layerObject.declaredClass === "esri.layers.ArcGISImageServiceLayer")){
+         dynamicDeniedItems.push({
+          'key': 'changeSymbology',
+          'denyType': 'hidden'
+        });         
+      }  //deny changeSymbology for ImageService
+      
 
       //var loadInfoTemplateDef = this._layerInfo.loadInfoTemplate();
       var isPopupSupportedDef = this._layerInfo.isSupportPopupNested();
@@ -315,6 +531,23 @@ define([
       switch (evt.itemKey) {
         case 'zoomto' /*this.nls.itemZoomTo'Zoom to'*/ :
           this._onItemZoomToClick(evt);
+        case 'mapDescription':
+          this._onItemMapDescriptionClick(evt);
+          break;
+        case 'dataFactSheet':
+          this._onItemDataFactSheetClick(evt);
+          break;
+        case 'metadataDownload':
+          this._onItemMetadataDownloadClick(evt);
+          break;    
+        case 'changeSymbology':
+          this._onItemChangeSymbologyClick(evt);
+          break;                             
+        case 'remove':
+          this._onItemRemoveClick(evt);
+          break;                            
+        case 'movetotop':
+          this._onMoveToTopClick(evt);
           break;
         case 'moveup' /*this.nls.itemMoveUp'Move up'*/ :
           this._onMoveUpItemClick(evt);
@@ -354,6 +587,86 @@ define([
     _onItemZoomToClick: function(evt) {
       /*jshint unused: false*/
       this._layerInfo.zoomTo();
+    },
+    _onMoveToTopClick: function(evt) {
+      /*jshint unused: false*/
+
+        lyr = this._layerInfo.map.getLayer(this._layerInfo.id);
+        if (window.topLayerID != "") {
+        	var topLayerChkbox = document.getElementById(window.layerTitlePrefix + window.topLayerID);
+        	if (topLayerChkbox != null) {
+        		topLayerChkbox.style['font-weight'] = '400';
+        	}     
+        	if (window.topLayerID.indexOf("eaLyrDEMNum_") >= 0) {
+                dynamicLayerElem = document.getElementById("map_" + window.topLayerID);
+                if (dynamicLayerElem != null){
+                    dynamicLayerElem.style.zIndex = "0";//with 0 z-index, the layer will be drawing at bottom
+                }
+            }   	
+        }
+        window.topLayerID = this._layerInfo.id;
+        document.getElementById(window.layerTitlePrefix + this._layerInfo.id).style['font-weight'] = 'bold';
+        isDynamicLayer = false;
+        isTiledLayer = false;
+        isImageLayer = false;
+        isDemographicLayer = false;
+		if(lyr){
+			for (ii in window.dynamicLayerNumber) {
+				eachDynamicLyrId = window.layerIdPrefix + window.dynamicLayerNumber[ii];
+				if (eachDynamicLyrId == this._layerInfo.id) {
+					isDynamicLayer = true;
+				}
+				eachDynamicLyr = this._layerInfo.map.getLayer(eachDynamicLyrId);
+				if (eachDynamicLyr ){
+					dynamicLayerElem = document.getElementById("map_" + eachDynamicLyrId);
+					if (dynamicLayerElem != null){
+						dynamicLayerElem.style.zIndex = "0";//with 0 z-index, the layer will be drawing at bottom
+					}
+				}
+		  	}
+			for (ii in window.tiledLayerNumber) {
+				eachTiledLyrId = window.layerIdPrefix + window.tiledLayerNumber[ii];
+				if (eachTiledLyrId == this._layerInfo.id) {
+					isTiledLayer = true;
+				}
+				eachTiledLyr = this._layerInfo.map.getLayer(eachTiledLyrId);
+				if (eachTiledLyr ){
+					tiledLayerElem = document.getElementById("map_" + eachTiledLyrId);
+					if (tiledLayerElem != null){
+						tiledLayerElem.style.zIndex = "0";
+					}
+				}
+		  	}
+			for (ii in window.imageLayerNumber) {
+				eachImageLyrId = window.layerIdPrefix + window.imageLayerNumber[ii];
+				if (eachImageLyrId == this._layerInfo.id) {
+					isImageLayer = true;
+				}
+				eachImageLyr = this._layerInfo.map.getLayer(eachImageLyrId);
+				if (eachImageLyr ){
+					imageLayerElem = document.getElementById("map_" + eachImageLyrId);
+					if (imageLayerElem != null){
+						imageLayerElem.style.zIndex = "0";
+					}
+				}
+		  	}		  	
+            if (this._layerInfo.id.indexOf("eaLyrDEMNum_") >= 0) {
+                isDemographicLayer = true;
+            }
+			if ((isDynamicLayer == true)||(isTiledLayer == true)||(isImageLayer == true)||(isDemographicLayer == true)) {
+     			document.getElementById("map_" + this._layerInfo.id).style.zIndex = "1";
+	     	} 	
+	     	else {
+        		//this._layerInfo.map.reorderLayer(lyr,this._layerInfo.map.layerIds.length);
+        		this._layerInfo.map.reorderLayer(lyr, topLayerIndex);
+      	}   
+      	
+      	}   
+        lyrTiled = this._layerInfo.map.getLayer(window.layerIdTiledPrefix + this._layerInfo.id.replace(window.layerIdPrefix, "")); //bji need to be modified to accomodate tile.
+	    if(lyrTiled){
+       	     //this._layerInfo.map.reorderLayer(lyrTiled,this._layerInfo.map.layerIds.length);
+       	     this._layerInfo.map.reorderLayer(lyrTiled, topLayerIndex);
+        } 
     },
 
     _isValidExtent: function(extent){
@@ -408,9 +721,140 @@ define([
       }));
     },
 
+    _onItemMapDescriptionClick: function(evt) {
+        layerId = this._layerInfo.id;        
+        var clickedURL = this._layerInfo.layerObject.url;        
+        displayInfoOnClickAction(layerId, clickedURL, 'eaDescription');       
+
+    },
+    _onItemDataFactSheetClick: function(evt) {
+        layerId = this._layerInfo.id;        
+		if (layerId==window.addedLayerIdPrefix + "ClimateChange") {
+			var layerTitle  = this._layerInfo.title;
+			
+			if (layerTitle.indexOf("Temp") >=0) {
+				window.open(window.dataFactSheet + "Supplemental/Climate_" + "Temp" + ".pdf");
+				return; 
+			} else if (layerTitle.indexOf("PET") >=0) {
+				window.open(window.dataFactSheet + "Supplemental/Climate_" + "PET" + ".pdf");
+				return; 
+			} if (layerTitle.indexOf("Precip") >=0) {
+				window.open(window.dataFactSheet + "Supplemental/Climate_" + "Precip" + ".pdf");
+				return; 
+			} 
+		}
+        var clickedURL = this._layerInfo.layerObject.url;        
+        displayInfoOnClickAction(layerId, clickedURL, 'eaDfsLink');
+    },
+    _onItemChangeSymbologyClick: function(evt) {
+      layerId = this._layerInfo.id;
+	  if (layerId.indexOf(window.layerIdPrefix) > -1) {			
+	      lyrTiled = this._layerInfo.map.getLayer(layerId.replace(window.layerIdPrefix, window.layerIdTiledPrefix));
+		  if(lyrTiled){
+       		lyrTiled.setVisibility(false);
+		  }	
+	  }
+
+      this.layerListWidget.publishData({
+        message: layerId
+      }, true);
+
+      var widgets = this.layerListWidget.appConfig.getConfigElementsByName('DynamicSymbology');
+      var pm = PanelManager.getInstance();
+      if(widgets[0].visible){
+        pm.closePanel(widgets[0].id + "_panel");
+      }
+      pm.showPanel(widgets[0]);
+      //var widgetId = widgets[0].id;
+      //this.layerListWidget.openWidgetById(widgetId);
+      //console.log(widgets);
+      console.log('Open Dynamic Symbology');
+    },    
+    _onItemMetadataDownloadClick: function(evt) {
+        layerId = this._layerInfo.id;        
+        if (layerId==window.addedLayerIdPrefix + "ClimateChange") {
+			var layerTitle  = this._layerInfo.title;
+			var climateVariable = "";
+			
+			if (layerTitle.indexOf("TempMax") >=0) {
+				climateVariable = "TempMax";				 
+			} else if (layerTitle.indexOf("TempMin") >=0) {
+				climateVariable = "TempMin";
+			} else if (layerTitle.indexOf("PET") >=0) {
+				climateVariable = "PET";
+			} else if (layerTitle.indexOf("Precip") >=0) {
+				climateVariable = "Precip";
+			}
+			metaDataIDFromVariable = window.timeSeriesMetadata[climateVariable];
+        	metaDataID = window.nationalMetadataDic[metaDataIDFromVariable];
+            window.open(window.matadata + "?uuid=%7B" + metaDataID + "%7D"); 
+            return; 
+		}
+        var clickedURL = this._layerInfo.layerObject.url;        
+        displayInfoOnClickAction(layerId, clickedURL, 'eaMetadata');
+        
+
+    },    
+    _onItemRemoveClick: function(evt) {
+        layerId = this._layerInfo.id;
+        
+        
+		lyr = this._layerInfo.map.getLayer(layerId);
+		if(lyr){  		
+        	this._layerInfo.map.removeLayer(lyr);
+        	uncheckRelatedCheckbox(layerId.replace(window.layerIdPrefix, ""));
+        	if (window.demographicLayerSetting[layerId] != undefined) {
+        		window.demographicLayerSetting[layerId] = null;
+        	}
+        	
+			var bNationalFeaturedCollection = false;
+		    var eaIDinFeatureCollection = window.hashFeaturedCollectionToEAID[layerId];
+		    if (((eaIDinFeatureCollection !=null) && (eaIDinFeatureCollection !=undefined))) {
+		          if ((window.hashScale[eaIDinFeatureCollection]== 'NATIONAL')){
+		          		bNationalFeaturedCollection = true;
+		          };
+		    }	  
+			            	
+        	currentEAID = layerId.replace(window.layerIdPrefix, "");
+        	if (window.nationalLayerNumber.includes(currentEAID) || (bNationalFeaturedCollection == true)){
+				jimuUtils.adjustMapExtent(this._layerInfo.map);   			                            	
+            }        	
+        	
+			var eaID = window.hashFeaturedCollectionToEAID[layerId]; //check if this layer is Featured Collection layer
+    		if (((eaID != null) && (eaID != undefined))) {
+    			var indexID = window.featureLyrNumber.indexOf(eaID);
+				if (indexID > -1) {
+				  window.featureLyrNumber.splice(indexID, 1);
+				}
+    			
+    			
+				lyrTiled = this._layerInfo.map.getLayer( window.layerIdTiledPrefix + eaID);
+				if(lyrTiled){
+		       		this._layerInfo.map.removeLayer(lyrTiled);
+		      	} 	    			
+    		}
+    		        	
+      	}    
+      	
+		lyrTiled = this._layerInfo.map.getLayer(layerId.replace(window.layerIdPrefix, window.layerIdTiledPrefix));
+		if(lyrTiled){
+		    var indexID = window.featureLyrNumber.indexOf(layerId.replace(window.layerIdPrefix, "" ));
+			if (indexID > -1) {
+			  window.featureLyrNumber.splice(indexID, 1);
+			}
+       		this._layerInfo.map.removeLayer(lyrTiled);
+      	} 
+      	
+	
+    },    
     _onTransparencyChanged: function(evt) {
       this.layerListWidget._denyLayerInfosOpacityResponseOneTime = true;
       this._layerInfo.setOpacity(1 - evt.extraData.newTransValue);
+      layerId = this._layerInfo.id;
+	  lyrTiled = this._layerInfo.map.getLayer(layerId.replace(window.layerIdPrefix, window.layerIdTiledPrefix));
+	  if(lyrTiled){
+       	  lyrTiled.setOpacity(1 - evt.extraData.newTransValue);
+      }        
     },
 
     _onControlPopup: function(evt) {
@@ -456,23 +900,41 @@ define([
       }, {
         key: 'setVisibilityRange'
       }, {
+        key: 'movetotop'
+      }, {
+        key: 'remove'
+      },{
         key: 'separator'
+      },{
+        key: 'mapDescription'
+      },{
+        key: 'dataFactSheet'
+      },{
+        key: 'url'
       }, {
-        key: 'controlPopup'
+        key: 'metadataDownload'
+      } ],
+      'RootLayerAndNonFeatureLayer': [
+      {
+        key: 'transparency'
+      }, {
+        key: 'movetotop'
+      }, {
+        key: 'remove'
       }, {
         key: 'separator'
+      },  {
+        key: 'mapDescription'
       }, {
-        key: 'moveup'
+        key: 'dataFactSheet'
       }, {
-        key: 'movedown'
+        key: 'url'
+      }, {
+        key: 'metadataDownload'
       }, {
         key: 'separator'
       }, {
         key: 'table'
-      }, {
-        key: 'separator'
-      }, {
-        key: 'url'
       }],
       'RootLayerAndFeatureLayer': [{
         key: 'zoomto'
@@ -480,10 +942,24 @@ define([
         key: 'transparency'
       }, {
         key: 'setVisibilityRange'
+      },  {
+        key: 'movetotop'
+      }, {
+        key: 'changeSymbology'
+      }, /*{
+        key: 'controlPopup'
+      },*/ {
+        key: 'remove'
       }, {
         key: 'separator'
+      },  {
+        key: 'mapDescription'
       }, {
-        key: 'controlPopup'
+        key: 'dataFactSheet'
+      }, {
+        key: 'url'
+      }, {
+        key: 'metadataDownload'
       }, {
         key: 'separator'
       }, {
@@ -491,17 +967,7 @@ define([
       }, {
         key: 'separator'
       }, {
-        key: 'moveup'
-      }, {
-        key: 'movedown'
-      }, {
-        key: 'separator'
-      }, {
         key: 'table'
-      }, {
-        key: 'separator'
-      }, {
-        key: 'url'
       }],
       'FeatureLayer': [{
         key: 'setVisibilityRange'
@@ -527,14 +993,6 @@ define([
       }],
       'GroupLayer': [{
         key: 'setVisibilityRange'
-      }, {
-        key: 'separator'
-      }, {
-        key: 'controlPopup'
-      }, {
-        key: 'separator'
-      }, {
-        key: 'table'
       }, {
         key: 'separator'
       }, {
