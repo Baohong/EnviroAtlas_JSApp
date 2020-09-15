@@ -1,8 +1,8 @@
 define({
   root: ({
-    _widgetLabel: "Sidebar Controller",
-    more: "more",
-    otherPanels: "Other panels"
+    _themeLabel: "Tab Theme",
+    _layout_default: "Default layout",
+    _layout_layout1: "Layout 1"
   }),
   "ar": 1,
   "bs": 1,
