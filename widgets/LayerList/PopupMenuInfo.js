@@ -30,7 +30,7 @@ define([
    'dijit/Dialog'
    
 ], function(declare, array, lang, Deferred, all,  portalUrlUtils, WidgetManager, esriLang, NlsStrings, jimuUtils, PanelManager, 
-  graphicsUtils, Dialog) }
+  graphicsUtils, Dialog) {
   var mapDescriptionStr = "";
   var topLayerIndex = 300;
   var layerInfoFromJson = {};
