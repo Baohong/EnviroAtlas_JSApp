@@ -246,7 +246,7 @@ define([
         'alt': 'l'
       }, imageNoLegendDiv);
 
-      if (layerInfo.isTiled || layerInfo.isTable || layerInfo.isBasemap()) {
+      if (layerInfo.isTiled || layerInfo.isTable) {
         domStyle.set(imageShowLegendDiv, 'display', 'none');
         domStyle.set(ckSelectDiv, 'display', 'none');
         domStyle.set(imageNoLegendDiv, 'display', 'block');
@@ -1225,5 +1225,310 @@ define([
       }
     },
 
+
+    _onSearchButtonKey: function(e) {
+      if(e.keyCode === keys.TAB && e.shiftKey) {
+        e.stopPropagation();
+        e.preventDefault();
+        //focusUtil.focus(this._lastLayerNode);
+        this._backToLastNodeFlag = true;
+      }
+    },
+
+    _getLastExpandedLayerNode: function() {
+      var lastExpandedLayerNode = this._lastLayerNode;
+      //var layerTrNode = this._lastLayerNode;
+      var parentLayerTrNode = null;
+      var layerInfo = this._lastLayerInfo;
+      while(layerInfo) {
+        var parentLayerInfo = layerInfo.parentLayerInfo;
+        if(!parentLayerInfo) {
+          lastExpandedLayerNode = this._layerDomNodeStorage[layerInfo.getObjectId()].layerTrNode;
+          break;
+        } else {
+          parentLayerTrNode = this._layerDomNodeStorage[parentLayerInfo.getObjectId()].layerTrNode;
+          if(parentLayerTrNode && parentLayerTrNode._expanded) {
+            lastExpandedLayerNode = this._layerDomNodeStorage[layerInfo.getObjectId()].layerTrNode;
+            break;
+          }
+        }
+        layerInfo = parentLayerInfo;
+      }
+      return lastExpandedLayerNode;
+    },
+
+    _onLastNodeFocus: function() {
+      //e.stopPropagation();
+      //e.preventDefault();
+      if(this._backToLastNodeFlag) {
+        var lastExpandedLayerNode = this._getLastExpandedLayerNode();
+        if(lastExpandedLayerNode) {
+          focusUtil.focus(lastExpandedLayerNode);
+        }
+        this._backToLastNodeFlag = false;
+      } else {
+        focusUtil.focus(this.layerListWidget.layerFilter.searchButton);
+      }
+    },
+
+    _onLastLayerNodeKey: function(e) {
+      if(e.keyCode === keys.TAB && !e.shiftKey) {
+        e.stopPropagation();
+        e.preventDefault();
+        focusUtil.focus(this.layerListWidget.layerFilter.searchButton);
+      }
+    },
+
+    _onLayerNodeKey: function(imageShowLegendDiv, popupMenuNode, e) {
+      if(e.keyCode === keys.ENTER) {
+        e.stopPropagation();
+        e.preventDefault();
+        if(html.getStyle(imageShowLegendDiv, 'display') === 'none') {
+          focusUtil.focus(popupMenuNode);
+        } else {
+          focusUtil.focus(imageShowLegendDiv);
+        }
+      }
+    },
+
+    _onImageShowLegendKey: function(layerInfo, imageShowLegendDiv, layerTrNode, subNode, popupMenuNode, e) {
+      // avoid be impacted if the current layer is lastFocueNode.
+      if(e.keyCode === keys.TAB) {
+        e.stopPropagation();
+      }
+      if(e.keyCode === keys.TAB && e.shiftKey) {
+        e.stopPropagation();
+        e.preventDefault();
+        focusUtil.focus(popupMenuNode);
+      } else if(e.keyCode === keys.ESCAPE) {
+        e.stopPropagation();
+        e.preventDefault();
+        focusUtil.focus(layerTrNode);
+      } else if(e.keyCode === keys.ENTER) {
+        e.stopPropagation();
+        e.preventDefault();
+        this._onRowTrClick(layerInfo, imageShowLegendDiv, layerTrNode, subNode, e);
+      }
+    },
+
+    _onCkSelectDivKey: function(layerInfo, ckSelect, layerTrNode, e) {
+      // avoid be impacted if the current layer is lastFocueNode.
+      if(e.keyCode === keys.TAB) {
+        e.stopPropagation();
+      }
+      if(e.keyCode === keys.ESCAPE) {
+        e.stopPropagation();
+        e.preventDefault();
+        focusUtil.focus(layerTrNode);
+      } else if(e.keyCode === keys.SPACE || e.keyCode === keys.ENTER) {
+        e.stopPropagation();
+        e.preventDefault();
+        if(ckSelect.checked) {
+          ckSelect.uncheck(true);
+        } else {
+          ckSelect.check(true);
+        }
+        this._onCkSelectNodeClick(layerInfo, ckSelect, e);
+      }
+    },
+
+    _onPopupMenuNodeKey: function(layerInfo, popupMenuNode, layerTrNode, imageShowLegendDiv, e) {
+      // avoid be impacted if the current layer is lastFocueNode.
+      if(e.keyCode === keys.TAB) {
+        e.stopPropagation();
+      }
+      if(e.keyCode === keys.TAB && !e.shiftKey) {
+        e.stopPropagation();
+        e.preventDefault();
+        focusUtil.focus(imageShowLegendDiv);
+      } else if(e.keyCode === keys.ESCAPE) {
+        e.stopPropagation();
+        e.preventDefault();
+        focusUtil.focus(layerTrNode);
+      } else if(e.keyCode === keys.ENTER || e.keyCode === keys.DOWN_ARROW || e.keyCode === keys.UP_ARROW) {
+        e.stopPropagation();
+        e.preventDefault();
+        this._onPopupMenuClick(layerInfo, popupMenuNode, layerTrNode, e);
+      }
+    },
+
+    _onPopupMenuOpen: function(layerInfo, popupMenuNode, rootLayerInfo) {
+      //jshint unused:false
+      var menuItems = query('.menu-item', popupMenuNode.popupMenu.dropMenuNode);
+      menuItems = menuItems.filter(function(menuItem) {
+        if(html.hasClass(menuItem, 'menu-item-hidden')) {
+          return false;
+        } else {
+          return true;
+        }
+      });
+      var firstItem = menuItems[0], lastItem = menuItems[menuItems.length - 1];
+      menuItems.forEach(function(menuItem, index) {
+        var isFirstItem = false, isLastItem = false;
+        var previousItem = menuItems[index - 1], nextItem = menuItems[index + 1];
+        if(index === 0) {
+          focusUtil.focus(menuItem);
+          isFirstItem = true;
+        } else if(index === menuItems.length - 1) {
+          isLastItem = true;
+        }
+
+        if(!menuItem.hasBeenOpened) {
+          var handle = this.own(on(menuItem, 'keydown', lang.hitch(this, this._onPopupMenuItemKey,
+            popupMenuNode, previousItem, nextItem, firstItem, lastItem, isFirstItem, isLastItem)));
+          this._storeLayerNodeEventHandle(rootLayerInfo, handle[0]);
+          menuItem.hasBeenOpened = true;
+        }
+      }, this);
+    },
+
+    _onPopupMenuItemKey: function(popupMenuNode,
+      previousItem, nextItem, firstItem, lastItem, isFirstItem, isLastItem, e) {
+      //jshint unused:false
+      /*if(e.keyCode === keys.TAB && !e.shiftKey) {
+        e.stopPropagation();
+        if(isLastItem) {
+          e.preventDefault();
+        }
+        this._enableNavMode(e);
+      } else if(e.keyCode === keys.TAB && e.shiftKey) {
+        e.stopPropagation();
+        if(isFirstItem) {
+          e.preventDefault();
+        }
+        this._enableNavMode(e);
+      } else */
+      if(e.keyCode === keys.DOWN_ARROW) {
+        e.stopPropagation();
+        e.preventDefault();
+        if(nextItem) {
+          focusUtil.focus(nextItem);
+        }
+      } else if(e.keyCode === keys.UP_ARROW) {
+        e.stopPropagation();
+        e.preventDefault();
+        if(previousItem) {
+          focusUtil.focus(previousItem);
+        }
+      } else if(e.keyCode === keys.HOME) {
+        e.stopPropagation();
+        e.preventDefault();
+        if(firstItem) {
+          focusUtil.focus(firstItem);
+        }
+      } else if(e.keyCode === keys.END) {
+        e.stopPropagation();
+        e.preventDefault();
+        if(lastItem) {
+          focusUtil.focus(lastItem);
+        }
+      } else if(e.keyCode === keys.ESCAPE || e.keyCode === keys.TAB) {
+        e.stopPropagation();
+        e.preventDefault();
+        focusUtil.focus(popupMenuNode);
+        popupMenuNode.popupMenu.closeDropMenu();
+      }
+    },
+
+    _enableNavMode:function(evt) {
+      if(evt.keyCode === keys.TAB && !jimuUtils.isInNavMode()){
+        html.addClass(document.body, 'jimu-nav-mode');
+      }
+    },
+
+    _onLayerListOperationsKey: function(e) {
+      if(e.keyCode === keys.ENTER) {
+        /*
+        if(this.operationsDropMenu.state === "opened") {
+          html.setAttr(this.layerListOperations, 'aria-expanded', 'true');
+        } else {
+          html.setAttr(this.layerListOperations, 'aria-expanded', 'false');
+        }
+        */
+        this.operationsDropMenu._onBtnClick(e);
+      }
+    },
+
+    _onOperationsDropMenuOpen: function() {
+      var menuItems = query('.menu-item', this.operationsDropMenu.domNode);
+      menuItems = menuItems.filter(function(menuItem) {
+        if(html.hasClass(menuItem, 'menu-item-hidden')) {
+          return false;
+        } else {
+          return true;
+        }
+      });
+      var firstItem = menuItems[0], lastItem = menuItems[menuItems.length - 1];
+      menuItems.forEach(function(menuItem, index) {
+        var isFirstItem = false, isLastItem = false;
+        var previousItem = menuItems[index - 1], nextItem = menuItems[index + 1];
+        if(index === 0) {
+          focusUtil.focus(menuItem);
+          isFirstItem = true;
+        } else if(index === menuItems.length - 1) {
+          isLastItem = true;
+        }
+
+        if(!menuItem.hasBeenOpened) {
+          this.own(on(menuItem, 'keydown',
+            lang.hitch(this, this._onLayerListOperationsMenuItemKey,
+              previousItem, nextItem, firstItem, lastItem, isFirstItem, isLastItem)));
+          menuItem.hasBeenOpened = true;
+        }
+      }, this);
+    },
+
+    _onLayerListOperationsMenuItemKey: function(previousItem,
+      nextItem, firstItem, lastItem, isFirstItem, isLastItem, e) {
+      //jshint unused:false
+      /*
+      if(e.keyCode === keys.TAB && !e.shiftKey) {
+        e.stopPropagation();
+        if(isLastItem) {
+          e.preventDefault();
+        }
+        this._enableNavMode(e);
+      } else if(e.keyCode === keys.TAB && e.shiftKey) {
+        e.stopPropagation();
+        if(isFirstItem) {
+          e.preventDefault();
+        }
+        this._enableNavMode(e);
+      } else */
+      if(e.keyCode === keys.DOWN_ARROW) {
+        e.stopPropagation();
+        e.preventDefault();
+        if(nextItem) {
+          focusUtil.focus(nextItem);
+        }/*else {
+          focusUtil.focus(firstItem);
+        }*/
+      } else if(e.keyCode === keys.UP_ARROW) {
+        e.stopPropagation();
+        e.preventDefault();
+        if(previousItem) {
+          focusUtil.focus(previousItem);
+        }/*else {
+          focusUtil.focus(lastItem);
+        }*/
+      } else if(e.keyCode === keys.HOME) {
+        e.stopPropagation();
+        e.preventDefault();
+        if(firstItem) {
+          focusUtil.focus(firstItem);
+        }
+      } else if(e.keyCode === keys.END) {
+        e.stopPropagation();
+        e.preventDefault();
+        if(lastItem) {
+          focusUtil.focus(lastItem);
+        }
+      } else if(e.keyCode === keys.ESCAPE || e.keyCode === keys.TAB) {
+        e.stopPropagation();
+        e.preventDefault();
+        focusUtil.focus(this.layerListOperations);
+        this.operationsDropMenu.closeDropMenu();
+      }
+    }
   });
 });
