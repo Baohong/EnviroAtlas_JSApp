@@ -173,13 +173,6 @@ SelectableLayerItem, FeatureItem, connect) {
       connect.disconnect(window.mapClickListenerForPopup);
     },
 
-      if (this.selectDijit.isActive()) {
-        this.selectDijit.deactivate();
-      }
-
-      document.getElementById("butInitClickEventForPopup").click();
-
-    },
     onClose: function() {
       
 
