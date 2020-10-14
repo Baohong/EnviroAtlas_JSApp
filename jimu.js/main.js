@@ -108,6 +108,7 @@ define([
     window.addedLayerIndex = 0;
     window.uploadedFeatLayerIdPrefix = "uploaded_";
     window.timeSeriesLayerId = "ScenarioDataLayer";//This is for Time Series Layer from sidebar controller
+    window.communityLayerTitle = "EnviroAtlas Community Boundaries";
     window.timeSeriesMetadata = {};
     window.timeSeriesMetadata['PET'] =  "T001";
     window.timeSeriesMetadata['TempMin'] =  "T002";
