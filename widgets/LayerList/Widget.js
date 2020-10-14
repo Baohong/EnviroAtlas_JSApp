@@ -378,12 +378,12 @@ define([
           query(".legends-div.jimu-legends-div-flag img", contentDomNode).style("opacity", opacity);
         }, this);
 
-        if(this._denyLayerInfosOpacityResponseOneTime) {
+        /*if(this._denyLayerInfosOpacityResponseOneTime) {
           // denies one time
           this._denyLayerInfosOpacityResponseOneTime = false;
         } else {
           this.layerListView._hideCurrentPopupMenu();
-        }
+        }*/
       },
 
       _onLayerInfosScaleRangeChanged: function(changedLayerInfos) {

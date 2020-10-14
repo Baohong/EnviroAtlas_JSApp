@@ -96,6 +96,10 @@ define([
 
         	this.drawListNode(layerInfo, 0, refHrNodeNonGraphic,'before');
         }
+        
+        if (layerInfo.title == window.communityLayerTitle) {
+        	layerInfo.enablePopupNested();
+        }
       }, this);
 
       if(this.config.showBasemap) {
