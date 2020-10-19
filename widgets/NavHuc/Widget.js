@@ -5741,62 +5741,25 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
      */
         updateIndicator(category_name)
         {
-            var that = this;
-            if (category_name !== null)
-            {
-                var request = esriRequest({
-                  url: this.navigator_url + '/api/wbdattributes/',
-                  content: {
-                    'category_name': category_name
-                  },
-                  handleAs: "json"
-                });
-                //NProgress.start();
-                request.then(
-                        function(data)   { that.categorySucceeded(data) },
-                        function(reason) { that.categoryFailed }
-                );
-
-            }
-        },
-        categorySucceeded(data)
-        {
-            var that = this;
-
-            var attribute_select = that.divAttributeSelect;
-
+            var attribute_select = this.divAttributeSelect;
             //TODO: do this in a dojo/dijit way, instead of straight javascript
             attribute_select.options.length = 0;
             var o = document.createElement("option");
             o.value = 'NONE';
             o.text = '--- Select ----';
             attribute_select.appendChild(o);
+            for (var eaID in window.hashTopic) {
+            	if ((window.hashTopic[eaID] == category_name) && (window.hashScale[eaID] == 'NATIONAL')){
+            		if (window.hashEAIDToTitle[eaID]!= undefined) {
+            			var o = document.createElement("option");
+		                o.value = window.hashEAIDToTitle[eaID];
+		                o.text = window.hashEAIDToTitle[eaID];		
+		                attribute_select.appendChild(o);
+            		 
+            		}
 
-            for (var i = 0; i < data.data.length; i++) {
-                var o = document.createElement("option");
-
-                o.value = data.data[i].field_nm;
-
-                o.text = data.data[i].label_tx + " [" + data.data[i].statistic_cd + "]";
-
-                attribute_select.appendChild(o);
+            	}
             }
-            // enable Recompute Aggregate
-            var recompute_button = this.divRecomputeAggregate;
-            recompute_button.disabled = true;
-            //NProgress.done();
-        },
-        categoryFailed(data)
-        {
-            var attribute_select = this.divAttributeSelect;
-
-            alert('Error:' + data);
-            //NProgress.done();
-            attribute_select.options.length = 0;
-            var o = document.createElement("option");
-            o.value = 'NONE';
-            o.text = '--- Select ----';
-            attribute_select.appendChild(o);
 
             // enable Recompute Aggregate
             var recompute_button = this.divRecomputeAggregate;
