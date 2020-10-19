@@ -626,7 +626,7 @@ define([
 		}
    };
 		var chkIdDictionary = {};
-		var nationalTopicList = [];
+		//var nationalTopicList = [];
 		var communityTopicList = [];
 		var loadJSON = function(callback){   
 	
@@ -1463,7 +1463,7 @@ define([
 	    	var bCurrentTopicDisabled = true;
 	    	
 	    	
-			if((chkNationalScale.checked) && (nationalTopicList.indexOf(key) >= 0)) {
+			if((chkNationalScale.checked) && (window.nationalTopicList.indexOf(key) >= 0)) {
 				bCurrentTopicDisabled = false;
 			}
 			if((chkCommunityScale.checked) && (communityTopicList.indexOf(key) >= 0)) {
@@ -2696,8 +2696,8 @@ define([
 	                    if(layer.hasOwnProperty('eaScale')){
 	                    	eaScale = layer.eaScale.toString();
 	                    	if (eaScale == "NATIONAL") {
-	                    		if (nationalTopicList.indexOf(eaTopic) < 0) {
-	                    			nationalTopicList.push(eaTopic);
+	                    		if (window.nationalTopicList.indexOf(eaTopic) < 0) {
+	                    			window.nationalTopicList.push(eaTopic);
 	                    		}	                    		
 	                    	}
 	                    	if (eaScale == "COMMUNITY") {
