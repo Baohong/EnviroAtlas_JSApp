@@ -271,6 +271,7 @@ define([
     window.topicDicBNF["Hydrologic Features"] = "HF";
     window.topicDicBNF["Political Boundaries"] = "PB";
 
+	window.nationalTopicList = [];
     
     window.strAllCommunity = "AllCommunity";	
     window.communityDic = {};

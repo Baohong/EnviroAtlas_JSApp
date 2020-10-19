@@ -969,7 +969,6 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
         if (this.tempResultLayer) {
           this.tempResultLayer.show();
         }
-
       },
 
       _resetDrawBox: function () {
@@ -1369,6 +1368,30 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
         this.tabContainer.startup();
 
         this.own(on(this.tabContainer, "tabChanged", lang.hitch(this, function (title) {
+        	
+        //populate the category dropdown list
+            var that = this;
+
+            var attribute_select = that.divCategorySelect;
+
+            //TODO: do this in a dojo/dijit way, instead of straight javascript
+            attribute_select.options.length = 0;
+            var o = document.createElement("option");
+            o.value = 'NONE';
+            o.text = '--- Select ----';
+            attribute_select.appendChild(o);
+
+            for (var i = 0; i < window.nationalTopicList.length; i++) {
+                var o = document.createElement("option");
+
+                o.value = window.nationalTopicList[i];
+
+                o.text = window.nationalTopicList[i];
+
+                attribute_select.appendChild(o);
+            }
+		  //end of populating the category dropdown list     
+		     	
           if (title !== this.nls.results) {
             this.selTab = title;
           }
