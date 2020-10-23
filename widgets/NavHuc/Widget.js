@@ -5794,7 +5794,7 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
 				    queryParams.outFields = window.hashAttribute[eaID];
 				    queryParams.outStatistics = [avgStatDef];
 				    
-				    statisticLyr.queryFeatures(queryParams, getStats, errback);
+				    statisticLyr.queryFeatures(queryParams, this.getStats, errback);
 
 
             	}
