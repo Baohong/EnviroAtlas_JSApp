@@ -5791,7 +5791,7 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
 
 				    var queryParams = new Query();
 				    queryParams.where = "HUC_12 in ('031800020404', '031800020401')";  // Return all block groups within one mile of the point
-				    queryParams.outFields = window.hashAttribute[eaID];
+				    queryParams.outFields = [window.hashAttribute[eaID]];
 				    queryParams.outStatistics = [avgStatDef];
 				    
 				    statisticLyr.queryFeatures(queryParams, this.getStats, this.errback);
