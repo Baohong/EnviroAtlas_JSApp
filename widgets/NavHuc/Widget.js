@@ -5794,7 +5794,7 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
 				    queryParams.outFields = window.hashAttribute[eaID];
 				    queryParams.outStatistics = [avgStatDef];
 				    
-				    statisticLyr.queryFeatures(queryParams, this.getStats, errback);
+				    statisticLyr.queryFeatures(queryParams, this.getStats, this.errback);
 
 
             	}
@@ -5877,6 +5877,10 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
             dijit.byId('gridAttributeResults').resize();
 
         },
+        errback(err){
+	      console.log("Couldn't retrieve statistics. ", err);
+	    },
+
         recomputeSucceeded(data)
         {
             var t1 = performance.now();
