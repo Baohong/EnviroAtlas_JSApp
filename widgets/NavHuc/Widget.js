@@ -5875,9 +5875,9 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
                 data: results_data2
             });
             results2Store2 = new dojo.data.ObjectStore({objectStore: objectStore2});
-            this.gridAttributeResults.store = results2Store2;
+            selfHucNav.gridAttributeResults.store = results2Store2;
 
-            this.gridAttributeResults.render();
+            selfHucNav.gridAttributeResults.render();
             dojo.style(dom.byId("gridAttributeResults"), 'display', '');
             dijit.byId('gridAttributeResults').resize();
             // show grid
