@@ -5771,6 +5771,7 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
         },
         recomputeAggregate() {
             var that = this;
+            selfHucNav = this;
             // /wbd/huc/170401040901/upstream/?format=json&attribute_only&navigation_direction=Upstream&attribute_field_nm=FRUITYIELD
             var huc_code_input = this.divNavigationHUCode;
 
@@ -5930,10 +5931,10 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
                 data: results_data2
             });
             results2Store2 = new dojo.data.ObjectStore({objectStore: objectStore2});
-            this.gridAttributeResults.store = results2Store2;
+            selfHucNav.gridAttributeResults.store = results2Store2;
 
             // show grid
-            this.gridAttributeResults.render();
+            selfHucNav.gridAttributeResults.render();
             dojo.style(dom.byId("gridAttributeResults"), 'display', '');
             dijit.byId('gridAttributeResults').resize();
             //NProgress.done();
