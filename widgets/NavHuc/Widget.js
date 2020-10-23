@@ -5773,7 +5773,7 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
             // /wbd/huc/170401040901/upstream/?format=json&attribute_only&navigation_direction=Upstream&attribute_field_nm=FRUITYIELD
             var huc_code_input = this.divNavigationHUCode;
 
-			title = this.divAttributeSelect;
+			title = this.divAttributeSelect.value;
             for (var eaID in window.hashEAIDToTitle) {
             	
             	if ((window.hashEAIDToTitle[eaID] == title) && (window.hashScale[eaID] == 'NATIONAL')){
