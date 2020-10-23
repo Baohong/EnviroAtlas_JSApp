@@ -5866,7 +5866,7 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
             results_data2.push({'key': 'Indicator Name', 'value': ""});
             results_data2.push({'key': 'Units', 'value': ""});
             results_data2.push({'key': 'Statistic', 'value': ""});
-            results_data2.push({'key': 'Aggregated Value', 'value': str(stats.avgValue)});
+            results_data2.push({'key': 'Aggregated Value', 'value': stats.avgValue.toString()});
             
 
                 // create an object store
