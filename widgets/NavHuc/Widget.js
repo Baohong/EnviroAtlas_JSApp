@@ -5795,6 +5795,11 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
 				    queryParams.outStatistics = [avgStatDef];
 				    
 				    statisticLyr.queryFeatures(queryParams, this.getStats, this.errback);
+				    
+				    // show grid
+		            this.gridAttributeResults.render();
+		            dojo.style(dom.byId("gridAttributeResults"), 'display', '');
+		            dijit.byId('gridAttributeResults').resize();
 
 
             	}
@@ -5872,9 +5877,9 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
             this.gridAttributeResults.store = results2Store2;
 
             // show grid
-            this.gridAttributeResults.render();
-            dojo.style(dom.byId("gridAttributeResults"), 'display', '');
-            dijit.byId('gridAttributeResults').resize();
+            //this.gridAttributeResults.render();
+            //dojo.style(dom.byId("gridAttributeResults"), 'display', '');
+            //dijit.byId('gridAttributeResults').resize();
 
         },
         errback(err){
