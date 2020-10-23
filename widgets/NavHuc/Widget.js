@@ -5796,10 +5796,10 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
 				    
 				    statisticLyr.queryFeatures(queryParams, this.getStats, this.errback);
 				    
-				    // show grid
-		            this.gridAttributeResults.render();
-		            dojo.style(dom.byId("gridAttributeResults"), 'display', '');
-		            dijit.byId('gridAttributeResults').resize();
+				    //// show grid
+		            //this.gridAttributeResults.render();
+		            //dojo.style(dom.byId("gridAttributeResults"), 'display', '');
+		            //dijit.byId('gridAttributeResults').resize();
 
 
             	}
@@ -5876,6 +5876,9 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
             results2Store2 = new dojo.data.ObjectStore({objectStore: objectStore2});
             this.gridAttributeResults.store = results2Store2;
 
+            this.gridAttributeResults.render();
+            dojo.style(dom.byId("gridAttributeResults"), 'display', '');
+            dijit.byId('gridAttributeResults').resize();
             // show grid
             //this.gridAttributeResults.render();
             //dojo.style(dom.byId("gridAttributeResults"), 'display', '');
