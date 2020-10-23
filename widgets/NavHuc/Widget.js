@@ -226,6 +226,7 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
 	featHUC8: null,
 
     hu12_headwater_list: [],
+    hu12_for_recompute:[],	
 
 
     //END new
@@ -3515,6 +3516,7 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
             return;
         }
         var hu12_list = data.navigation_data.results.hu12_data.hu12_list;
+        this.hu12_for_recompute = [];
         huc12_ids_len = hu12_list.length;
 
         if (huc12_ids_len > 0)
@@ -3539,6 +3541,7 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
             array.forEach(hu12_list, function(hu12_tuple)
             {
                 huc12_id = hu12_tuple[huc_code_index_nu];
+                that.hu12_for_recompute.push(huc12_id);
 
                 if (headwater_index_nu > -1
                     && hu12_tuple[headwater_index_nu] == true
@@ -5770,10 +5773,33 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
             // /wbd/huc/170401040901/upstream/?format=json&attribute_only&navigation_direction=Upstream&attribute_field_nm=FRUITYIELD
             var huc_code_input = this.divNavigationHUCode;
 
-            var category = this.divCategorySelect;
-            var category_name = category.options[category.selectedIndex].value;
+			title = this.divAttributeSelect;
+            for (var eaID in window.hashEAIDToTitle) {
+            	
+            	if ((window.hashEAIDToTitle[eaID] == title) && (window.hashScale[eaID] == 'NATIONAL')){
+					
+            		url = window.hashURL[eaID];
+        		    var statisticLyr = new FeatureLayer(url, {
+				      outFields: window.hashAttribute[eaID]
+				    });
+				    var sqlExpression = window.hashAttribute[eaID];
+				    var avgStatDef = new StatisticDefinition();
+				    avgStatDef.statisticType = "avg";
+				    avgStatDef.onStatisticField = sqlExpression;
+				    avgStatDef.outStatisticFieldName = "avgValue";
 
-            var attribute = this.divAttributeSelect;
+				    var queryParams = new Query();
+				    queryParams.where = "HUC_12 in ('031800020404', '031800020401')";  // Return all block groups within one mile of the point
+				    queryParams.outFields = window.hashAttribute[eaID];
+				    queryParams.outStatistics = [avgStatDef];
+				    
+				    statisticLyr.queryFeatures(queryParams, getStats, errback);
+
+
+            	}
+            }
+
+            /*var attribute = this.divAttributeSelect;
             var attribute_name = attribute.options[attribute.selectedIndex].value;
             var attribute_text = attribute.options[attribute.selectedIndex].text;
 
@@ -5823,7 +5849,32 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
             request.then(
                     function(data)   { that.recomputeSucceeded(data) },
                     function(reason) { that.recomputeFailed }
-            );
+            );*/
+        },
+        getStats(results){
+        	
+        	var stats = results.features[0].attributes;
+        	
+        	results_data2 = [];
+        	results_data2.push({'key': 'Indicator Category', 'value': ""});
+            results_data2.push({'key': 'Indicator Name', 'value': ""});
+            results_data2.push({'key': 'Units', 'value': ""});
+            results_data2.push({'key': 'Statistic', 'value': ""});
+            results_data2.push({'key': 'Aggregated Value', 'value': "avgValue"});
+            
+
+                // create an object store
+            var objectStore2 = new Memory({
+                data: results_data2
+            });
+            results2Store2 = new dojo.data.ObjectStore({objectStore: objectStore2});
+            this.gridAttributeResults.store = results2Store2;
+
+            // show grid
+            this.gridAttributeResults.render();
+            dojo.style(dom.byId("gridAttributeResults"), 'display', '');
+            dijit.byId('gridAttributeResults').resize();
+
         },
         recomputeSucceeded(data)
         {
