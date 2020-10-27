@@ -3757,7 +3757,7 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
 			        "classMaxValue": 2
 			      },
 			            {
-			        "symbol": huc12_headwater_symbol(),
+			        "symbol": this.huc12_headwater_symbol(),
 			        "label": "HUC12 HEADWATER",
 			        "classMaxValue": 3
 			      }
