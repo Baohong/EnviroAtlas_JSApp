@@ -3742,7 +3742,7 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
 			"type" : "Feature Layer",
 			"description" : "",
 			"definitionExpression" : "",
-			"name": "Navigated HUC12 Subwatershed",
+			"name": window.NavHuc12LayerTitle,
 			"geometryType": "esriGeometryPolygon",
 			"objectIdField": "ObjectID",
 			"drawingInfo": {
@@ -3794,7 +3794,7 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
 			"type" : "Feature Layer",
 			"description" : "",
 			"definitionExpression" : "",
-			"name": "Navigated HUC8 Subbasin",
+			"name": window.NavHuc8LayerTitle,
 			"geometryType": "esriGeometryPolygon",
 			"objectIdField": "ObjectID",
 			"drawingInfo": {
