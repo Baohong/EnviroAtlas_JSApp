@@ -3747,11 +3747,22 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
 			"objectIdField": "ObjectID",
 			"drawingInfo": {
 				"renderer": {
-					"type": "simple",
-					"label": "HUC12",
-					"description" : "Subwatershed",
-					"symbol": this.huc12_symbol()
-				}
+			    "type": "classBreaks",
+			    "field": "ObjectID",
+			    "minValue": 1,
+			    "classBreakInfos": [
+			      {
+			        "symbol": this.huc12_symbol(),
+			        "label": "HUC12",
+			        "classMaxValue": 2
+			      },
+			            {
+			        "symbol": huc12_headwater_symbol(),
+			        "label": "HUC12 HEADWATER",
+			        "classMaxValue": 3
+			      }
+			    ]
+			  }
 			},
 			"fields": [
 				{
