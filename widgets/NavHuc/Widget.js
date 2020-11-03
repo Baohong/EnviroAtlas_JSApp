@@ -3522,6 +3522,10 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
 
         if (huc12_ids_len > 0)
         {
+	        if (huc12_ids_len > 1)
+	        {
+	        	this.divNavigationMessages.innerHTML = 'Click on only one of the highlighted HUC-12 subwatersheds to navigate.'
+	        }
             html.setStyle(this.progressBar.domNode, 'display', '');
             this.progressBar.domNode.innerText = "done " + this.navigator_url + " search. Found " + huc12_ids_len.toString() + " h12s. Starting ArcGIS Query";
 
