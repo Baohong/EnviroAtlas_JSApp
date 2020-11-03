@@ -3522,10 +3522,7 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
 
         if (huc12_ids_len > 0)
         {
-	        if (huc12_ids_len > 1)
-	        {
-	        	this.divNavigationMessages.innerHTML = 'Click on only one of the highlighted HUC-12 subwatersheds to navigate.'
-	        }
+
             html.setStyle(this.progressBar.domNode, 'display', '');
             this.progressBar.domNode.innerText = "done " + this.navigator_url + " search. Found " + huc12_ids_len.toString() + " h12s. Starting ArcGIS Query";
 
@@ -4757,11 +4754,13 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
 		//jab
 		else if (this.currentFeatures.length > 1)
 		{
-			html.empty(this.divResultMessage);
+			/*html.empty(this.divResultMessage);
 			html.empty(this.clickAgainMessage);
 			var msg_text = "<label style=\"font-size: 18px;\">" + "Click on only one of the " + this.currentFeatures.length + " highlighted Subwatersheds to navigate." + "</label>";
 			html.place(html.toDom(msg_text), this.clickAgainMessage);
-			html.setStyle(this.clickAgainMessage, 'display', '');
+			html.setStyle(this.clickAgainMessage, 'display', '');*/
+			
+			this.divNavigationMessages.innerHTML = "Click on only one of the " + this.currentFeatures.length + " highlighted Subwatersheds to navigate.";
 		}
 		else 
 		{
