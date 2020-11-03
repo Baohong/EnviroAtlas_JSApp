@@ -3472,6 +3472,7 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
 	//
 	upstreamNavigationSucceeded: function(data) 
 	{
+		this.divNavigationMessages.innerHTML = '';
 		this.hu12_headwater_list = [];
 
 		var that = this;
