@@ -5518,6 +5518,8 @@
 				"autorefresh": 0,
 				"opacity": 0.6,
 				"eaTopic": "Carbon Storage",
+                "hucNavStats": ["sum"],
+                "hucNavStatsUnits": "number per year",					
 				"eaBCSDD": [
 					"Climate Stabilization - x"
 				],
@@ -5591,6 +5593,8 @@
 				"autorefresh": 0,
 				"opacity": 0.6,
 				"eaTopic": "Carbon Storage",
+                "hucNavStats": [],
+                "hucNavStatsUnits": "number per year",					
 				"eaBCSDD": [
 					"Climate Stabilization - x"
 				],
@@ -6069,6 +6073,8 @@
 				"autorefresh": 0,
 				"opacity": 0.6,
 				"eaTopic": "Carbon Storage",
+                "hucNavStats": ["average","sum"],
+                "hucNavStatsUnits": "number per year",					
 				"eaBCSDD": [
 					"Climate Stabilization - x"
 				],
@@ -6148,6 +6154,8 @@
 				"autorefresh": 0,
 				"opacity": 0.6,
 				"eaTopic": "Carbon Storage",
+                "hucNavStats": ["average","sum"],
+                "hucNavStatsUnits": "number per year",					
 				"eaBCSDD": [
 					"Climate Stabilization - x"
 				],
@@ -48502,6 +48510,8 @@
 				"eaScale": "COMMUNITY",
 				"opacity": 0.6,
 				"eaTopic": "Carbon Storage",
+				"hucNavStats": ["average","sum"],
+                "hucNavStatsUnits": "number per year",	
 				"eaBCSDD": [
 					"Climate Stabilization - x"
 				],
@@ -48536,6 +48546,8 @@
 				"eaScale": "COMMUNITY",
 				"opacity": 0.6,
 				"eaTopic": "Carbon Storage",
+                "hucNavStats": ["average"],
+                "hucNavStatsUnits": "number per year",					
 				"eaBCSDD": [
 					"Climate Stabilization - x"
 				],
