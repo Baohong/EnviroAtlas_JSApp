@@ -5917,7 +5917,7 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
         },
         getStats(results){
 
-			var titleWhole = this.divAttributeSelect.value;
+			var titleWhole = that.divAttributeSelect.value;
 			
 			var bAverageForStatistic;
 			var titleLayer;
