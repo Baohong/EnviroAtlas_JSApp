@@ -5775,7 +5775,7 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
             		if (window.hashEAIDToNavHucStats[eaID]!= undefined) {
             			//layerStatistic = window.hashEAIDToNavHucStats[eaID].split(",");
             			layerStatistic = window.hashEAIDToNavHucStats[eaID];
-            			numStatistic = layerStatistic.length();
+            			numStatistic = layerStatistic.length;
             			if (window.hashEAIDToNavHucStats[eaID].indexOf(window.NavHucTermForAverage) != -1) {
         					bAverageStatic = true;
             			}
