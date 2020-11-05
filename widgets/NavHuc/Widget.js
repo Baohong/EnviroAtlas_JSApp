@@ -5773,7 +5773,8 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
             		var numStatistic = 0;
             		var bAverageStatic = false;
             		if (window.hashEAIDToNavHucStats[eaID]!= undefined) {
-            			layerStatistic = window.hashEAIDToNavHucStats[eaID].split(",");
+            			//layerStatistic = window.hashEAIDToNavHucStats[eaID].split(",");
+            			layerStatistic = window.hashEAIDToNavHucStats[eaID];
             			numStatistic = layerStatistic.length();
             			if (window.hashEAIDToNavHucStats[eaID].indexOf(window.NavHucTermForAverage) != -1) {
         					bAverageStatic = true;
