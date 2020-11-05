@@ -5917,7 +5917,7 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
         },
         getStats(results){
 
-			var titleWhole = that.divAttributeSelect.value;
+			var titleWhole = selfHucNav.divAttributeSelect.value;
 			
 			var bAverageForStatistic;
 			var titleLayer;
@@ -5943,7 +5943,7 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
         	var stats = results.features[0].attributes;
         	
         	results_data2 = [];
-        	results_data2.push({'key': 'Indicator Category', 'value': that.divCategorySelect.value});
+        	results_data2.push({'key': 'Indicator Category', 'value': selfHucNav.divCategorySelect.value});
             results_data2.push({'key': 'Indicator Name', 'value': titleLayer});
             results_data2.push({'key': 'Units', 'value': navHucStatsUnit});
             results_data2.push({'key': 'Statistic', 'value': navHucStatsMethod});
