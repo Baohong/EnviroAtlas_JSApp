@@ -5835,7 +5835,7 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
 				    if (bAverageForStatistic == true) {
 				    	avgStatDef.statisticType = "avg";
 				    } else {
-				    	avgStatDef.statisticType = "sum";"
+				    	avgStatDef.statisticType = "sum";
 				    }
 				    
 				    avgStatDef.onStatisticField = sqlExpression;
