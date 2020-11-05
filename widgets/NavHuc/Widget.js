@@ -5816,12 +5816,12 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
 			var titleLayer;
 
 			termAverageInTopic = " [" + window.NavHucTermForAverage + "]";
-			if (titleWhole.slice((-1)*termAverageInTopic.length()) == termAverageInTopic) {
+			if (titleWhole.slice((-1)*termAverageInTopic.length) == termAverageInTopic) {
 				bAverageForStatistic = true;
-				titleLayer = titleWhole.substring(0, titleWhole.length()-termAverageInTopic.length())
+				titleLayer = titleWhole.substring(0, titleWhole.length-termAverageInTopic.length)
 			} else {
 				bAverageForStatistic = false;
-				titleLayer = titleWhole.substring(0, titleWhole.length()-" [sum]".length())
+				titleLayer = titleWhole.substring(0, titleWhole.length-" [sum]".length)
 			}
             for (var eaID in window.hashEAIDToTitle) {
             	
@@ -5925,13 +5925,13 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
 			var navHucStatsMethod;
 
 			termAverageInTopic = " [" + window.NavHucTermForAverage + "]";
-			if (titleWhole.slice((-1)*termAverageInTopic.length()) == termAverageInTopic) {
+			if (titleWhole.slice((-1)*termAverageInTopic.length) == termAverageInTopic) {
 				navHucStatsMethod = "average";
-				titleLayer = titleWhole.substring(0, titleWhole.length()-termAverageInTopic.length())
+				titleLayer = titleWhole.substring(0, titleWhole.length-termAverageInTopic.length)
 
 			} else {
 				navHucStatsMethod = "sum";
-				titleLayer = titleWhole.substring(0, titleWhole.length() - " [sum]".length())
+				titleLayer = titleWhole.substring(0, titleWhole.length - " [sum]".length)
 			}
 			
 			for (var eaID in window.hashEAIDToTitle) {			
