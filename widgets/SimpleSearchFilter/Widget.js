@@ -2655,6 +2655,13 @@ define([
 	                    else {
 	                    	eaMetadata = "";
 	                    }
+	                    if(layer.hasOwnProperty(window.NavHucStats)){
+	                    	window.hashEAIDToNavHucStats[layer.eaID] = layer[window.NavHucStats];
+	                    }
+	                    if(layer.hasOwnProperty(window.NavHucStatsUnit)){
+	                    	window.hashEAIDToNavHucStatsUnit[layer.eaID] = layer[window.NavHucStatsUnit];
+	                    }
+	                    	                    
 	                    if(layer.hasOwnProperty('url')&&(layer.url!=null)){
 	                    	eaURL1 = layer.url.toString();
 	                    	

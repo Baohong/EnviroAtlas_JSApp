@@ -22000,6 +22000,8 @@
                 "eaBC": true,
                 "tileLink": "no",
                 "eaTopic": "Ecosystem Markets",
+                "hucNavStats": ["average","sum"],
+                "hucNavStatsUnits": "number per year",
                 "layers": [
                     {
                         "popup": {
@@ -23495,6 +23497,8 @@
                 "eaBC": true,
                 "tileLink": "no",
                 "eaTopic": "Ecosystem Markets",
+                "hucNavStats": ["average"],
+                "hucNavStatsUnits": "number per year",                
                 "layers": [
                     {
                         "popup": {
@@ -25005,6 +25009,8 @@
                 "eaBC": true,
                 "tileLink": "no",
                 "eaTopic": "Ecosystem Markets",
+                "hucNavStats": ["sum"],
+                "hucNavStatsUnits": "number per year",                
                 "layers": [
                     {
                         "popup": {
@@ -27455,7 +27461,9 @@
                 "eaID": 276,
                 "tileLink": "no",
                 "opacity": 0.6,
-                "eaTopic": "Ecosystem Markets"
+                "eaTopic": "Ecosystem Markets",
+                "hucNavStats": [],
+                "hucNavStatsUnits": "number per year"
             },
             {
                 "eaMetric": "Additional_landcover",
@@ -27520,6 +27528,8 @@
                 "eaBC": true,
                 "tileLink": "no",
                 "eaTopic": "Ecosystem Markets",
+                "hucNavStats": ["average","sum"],
+                "hucNavStatsUnits": "number per year",                
                 "layers": [
                     {
                         "popup": {

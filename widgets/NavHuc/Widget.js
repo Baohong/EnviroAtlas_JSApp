@@ -228,6 +228,7 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
 
     hu12_headwater_list: [],
     hu12_for_recompute:[],	
+    
 
 
     //END new
@@ -5769,11 +5770,29 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
             attribute_select.appendChild(o);
             for (var eaID in window.hashTopic) {
             	if ((window.hashTopic[eaID] == category_name) && (window.hashScale[eaID] == 'NATIONAL')){
+            		var numStatistic = 0;
+            		var bAverageStatic = false;
+            		if (window.hashEAIDToNavHucStats[eaID]!= undefined) {
+            			layerStatistic = window.hashEAIDToNavHucStats[eaID].split(",");
+            			numStatistic = layerStatistic.length();
+            			if (window.hashEAIDToNavHucStats[eaID].indexOf(window.NavHucTermForAverage) != -1) {
+        					bAverageStatic = true;
+            			}
+            		}
+            		
             		if (window.hashEAIDToTitle[eaID]!= undefined) {
-            			var o = document.createElement("option");
-		                o.value = window.hashEAIDToTitle[eaID];
-		                o.text = window.hashEAIDToTitle[eaID];		
-		                attribute_select.appendChild(o);
+            			if ((numStatistic == 0) || (window.hashEAIDToNavHucStats[eaID].indexOf('sum') != -1)){//if no statistic info is defined, we will choose sum as default
+	            			var o = document.createElement("option");
+			                o.value = window.hashEAIDToTitle[eaID] + " [sum]";
+			                o.text = window.hashEAIDToTitle[eaID] + " [sum]";		
+			                attribute_select.appendChild(o);            				
+            			}
+            			if (bAverageStatic == true) {
+	            			var o = document.createElement("option");
+			                o.value = window.hashEAIDToTitle[eaID] + " [average]";
+			                o.text = window.hashEAIDToTitle[eaID] + " [average]";		
+			                attribute_select.appendChild(o);   
+            			}
             		 
             		}
 
@@ -5790,10 +5809,22 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
             // /wbd/huc/170401040901/upstream/?format=json&attribute_only&navigation_direction=Upstream&attribute_field_nm=FRUITYIELD
             var huc_code_input = this.divNavigationHUCode;
 
-			title = this.divAttributeSelect.value;
+			var titleWhole = this.divAttributeSelect.value;
+			
+			var bAverageForStatistic;
+			var titleLayer;
+
+			termAverageInTopic = " [" + window.NavHucTermForAverage + "]";
+			if (titleWhole.slice((-1)*termAverageInTopic.length()) == termAverageInTopic) {
+				bAverageForStatistic = true;
+				titleLayer = titleWhole.substring(0, titleWhole.length()-termAverageInTopic.length())
+			} else {
+				bAverageForStatistic = false;
+				titleLayer = titleWhole.substring(0, titleWhole.length()-" [sum]".length())
+			}
             for (var eaID in window.hashEAIDToTitle) {
             	
-            	if ((window.hashEAIDToTitle[eaID] == title) && (window.hashScale[eaID] == 'NATIONAL')){
+            	if ((window.hashEAIDToTitle[eaID] == titleLayer) && (window.hashScale[eaID] == 'NATIONAL')){
 					
             		url = window.hashURL[eaID];
         		    var statisticLyr = new FeatureLayer(url, {
@@ -5801,12 +5832,22 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
 				    });
 				    var sqlExpression = window.hashAttribute[eaID];
 				    var avgStatDef = new StatisticDefinition();
-				    avgStatDef.statisticType = "avg";
+				    if (bAverageForStatistic == true) {
+				    	avgStatDef.statisticType = "avg";
+				    } else {
+				    	avgStatDef.statisticType = "sum";"
+				    }
+				    
 				    avgStatDef.onStatisticField = sqlExpression;
-				    avgStatDef.outStatisticFieldName = "avgValue";
+				    avgStatDef.outStatisticFieldName = "hucNavValue";
 
 				    var queryParams = new Query();
-				    queryParams.where = "HUC_12 in ('031800020404', '031800020401')";  // Return all block groups within one mile of the point
+				    queryParams.where = "HUC_12 in (";
+				    for (i=0; i < that.hu12_for_recompute.length - 1; i++) {
+				    	queryParams.where = queryParams.where + "'" + that.hu12_for_recompute[i] + "',"; 
+				    }
+				    queryParams.where = queryParams.where + "'" + that.hu12_for_recompute[that.hu12_for_recompute.length - 1] + "')";
+				    //queryParams.where = "HUC_12 in ('031800020404', '031800020401')";  // Return all block groups within one mile of the point
 				    queryParams.outFields = [window.hashAttribute[eaID]];
 				    queryParams.outStatistics = [avgStatDef];
 				    
@@ -5874,15 +5915,38 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
             );*/
         },
         getStats(results){
-        	
+
+			var titleWhole = this.divAttributeSelect.value;
+			
+			var bAverageForStatistic;
+			var titleLayer;
+			var navHucStatsUnit;
+			var navHucStatsMethod;
+
+			termAverageInTopic = " [" + window.NavHucTermForAverage + "]";
+			if (titleWhole.slice((-1)*termAverageInTopic.length()) == termAverageInTopic) {
+				navHucStatsMethod = "average";
+				titleLayer = titleWhole.substring(0, titleWhole.length()-termAverageInTopic.length())
+
+			} else {
+				navHucStatsMethod = "sum";
+				titleLayer = titleWhole.substring(0, titleWhole.length() - " [sum]".length())
+			}
+			
+			for (var eaID in window.hashEAIDToTitle) {			
+				if ((window.hashEAIDToTitle[eaID] == titleLayer) && (window.hashScale[eaID] == 'NATIONAL')) {			
+					navHucStatsUnit = window.hashEAIDToNavHucStatsUnit[eaID];
+				}
+			}
+			        	
         	var stats = results.features[0].attributes;
         	
         	results_data2 = [];
-        	results_data2.push({'key': 'Indicator Category', 'value': ""});
-            results_data2.push({'key': 'Indicator Name', 'value': ""});
-            results_data2.push({'key': 'Units', 'value': ""});
-            results_data2.push({'key': 'Statistic', 'value': ""});
-            results_data2.push({'key': 'Aggregated Value', 'value': stats.avgValue.toString()});
+        	results_data2.push({'key': 'Indicator Category', 'value': that.divCategorySelect.value});
+            results_data2.push({'key': 'Indicator Name', 'value': titleLayer});
+            results_data2.push({'key': 'Units', 'value': navHucStatsUnit});
+            results_data2.push({'key': 'Statistic', 'value': navHucStatsMethod});
+            results_data2.push({'key': 'Aggregated Value', 'value': stats.hucNavValue.toString()});
             
 
                 // create an object store

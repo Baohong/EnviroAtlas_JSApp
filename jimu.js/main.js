@@ -132,6 +132,9 @@ define([
     window.idCommuBoundaryPoint = "Boundary_Point";
     window.NavHuc8LayerTitle = "Navigated HUC8 Subbasin";
     window.NavHuc12LayerTitle = "Navigated HUC12 Subwatershed";
+    window.NavHucStats = "hucNavStats";
+    window.NavHucStatsUnit = "hucNavStatsUnits";
+    window.NavHucTermForAverage = "average";
     
     window.PanelId = "";
     window.timeSeriesDisclaim = false;
@@ -339,6 +342,9 @@ define([
     window.hashVisibleLayersForDynamic = {};
     window.hashTitleToEAID = {};
     window.hashEAIDToTitle = {};
+    window.hashEAIDToNavHucStats = {};
+    window.hashEAIDToNavHucStatsUnit = {};
+    
     window.hashGeometryTypeAddedFeatLyr = {};
     window.hashInfoTemplate = {};
 	window.hashRenderer = {};
