@@ -8833,6 +8833,8 @@
 				"tileLink": "yes",
 				"eaLyrNum": 9,
 				"eaTopic": "Energy Potential",
+                "hucNavStats": ["average","sum"],
+                "hucNavStatsUnits": "number per year",					
 				"type": "FEATURE",
 				"name": "Area of solar energy (km2)",
 				"popup": {
@@ -8896,6 +8898,8 @@
 				"tileLink": "yes",
 				"eaLyrNum": 10,
 				"eaTopic": "Energy Potential",
+                "hucNavStats": ["average"],
+                "hucNavStatsUnits": "number per year",						
 				"type": "FEATURE",
 				"name": "Average annual daily potential solar energy (kWh/m2/day)",
 				"popup": {
@@ -8961,6 +8965,8 @@
 				"tileLink": "yes",
 				"eaLyrNum": 11,
 				"eaTopic": "Energy Potential",
+                "hucNavStats": ["sum"],
+                "hucNavStatsUnits": "number per year",						
 				"type": "FEATURE",
 				"name": "Average annual daily potential wind energy (kWh/m2/day)",
 				"popup": {
