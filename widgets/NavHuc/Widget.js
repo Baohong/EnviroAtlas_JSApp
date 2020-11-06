@@ -5947,7 +5947,8 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
             results_data2.push({'key': 'Indicator Name', 'value': titleLayer});
             results_data2.push({'key': 'Units', 'value': navHucStatsUnit});
             results_data2.push({'key': 'Statistic', 'value': navHucStatsMethod});
-            results_data2.push({'key': 'Aggregated Value', 'value': stats.hucNavValue.toString()});
+            //results_data2.push({'key': 'Aggregated Value', 'value': stats.hucNavValue.toString()});
+            results_data2.push({'key': 'Aggregated Value', 'value': stats.hucNavValue.toFixed(2)});
             
 
                 // create an object store
