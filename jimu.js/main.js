@@ -278,6 +278,7 @@ define([
     window.topicDicBNF["Political Boundaries"] = "PB";
 
 	window.nationalTopicList = [];
+	window.nationalFeatureTopicList = [];
     
     window.strAllCommunity = "AllCommunity";	
     window.communityDic = {};

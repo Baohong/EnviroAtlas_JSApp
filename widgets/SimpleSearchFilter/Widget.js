@@ -2655,8 +2655,12 @@ define([
 	                    else {
 	                    	eaMetadata = "";
 	                    }
+	                    var bNavHucStatsDefined = false;
 	                    if(layer.hasOwnProperty(window.NavHucStats)){
 	                    	window.hashEAIDToNavHucStats[layer.eaID] = layer[window.NavHucStats];
+	                    	if (layer[window.NavHucStats].length > 0) {
+	                    		bNavHucStatsDefined = true;
+	                    	}
 	                    }
 	                    if(layer.hasOwnProperty(window.NavHucStatsUnit)){
 	                    	window.hashEAIDToNavHucStatsUnit[layer.eaID] = layer[window.NavHucStatsUnit];
@@ -2705,6 +2709,10 @@ define([
 	                    	if (eaScale == "NATIONAL") {
 	                    		if (window.nationalTopicList.indexOf(eaTopic) < 0) {
 	                    			window.nationalTopicList.push(eaTopic);
+	                    			if ((bNavHucStatsDefined == true) && (window.nationalFeatureTopicList.indexOf(eaTopic)) < 0) {
+	                    				window.nationalFeatureTopicList.push(eaTopic);
+	                    			}
+	                    			
 	                    		}	                    		
 	                    	}
 	                    	if (eaScale == "COMMUNITY") {

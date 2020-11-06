@@ -1384,12 +1384,12 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
             o.text = '--- Select ----';
             attribute_select.appendChild(o);
 
-            for (var i = 0; i < window.nationalTopicList.length; i++) {
+            for (var i = 0; i < window.nationalFeatureTopicList.length; i++) {
                 var o = document.createElement("option");
 
-                o.value = window.nationalTopicList[i];
+                o.value = window.nationalFeatureTopicList[i];
 
-                o.text = window.nationalTopicList[i];
+                o.text = window.nationalFeatureTopicList[i];
 
                 attribute_select.appendChild(o);
             }

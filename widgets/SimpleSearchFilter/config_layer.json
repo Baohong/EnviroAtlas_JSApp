@@ -24052,9 +24052,7 @@
 				"visible": false,
 				"eaMetadata": "E003,E004",
 				"opacity": 0.6,
-				"eaTopic": "Ecosystem Markets",
-                "hucNavStats": ["average","sum"],
-                "hucNavStatsUnits": "number per year",				
+				"eaTopic": "Ecosystem Markets",			
 				"eaBCSDD": [
 					"Biodiversity Conservation - x",
 					"Clean and Plentiful Water - x",
@@ -25552,8 +25550,7 @@
 				"eaMetadata": "E003,E004",
 				"opacity": 0.6,
 				"eaTopic": "Ecosystem Markets",
-                "hucNavStats": ["average"],
-                "hucNavStatsUnits": "number per year",				
+		
 				"eaBCSDD": [
 					"Biodiversity Conservation - x",
 					"Recreation, Culture, and Aesthetics - x"
@@ -27065,8 +27062,7 @@
 				"eaMetadata": "E003,E004",
 				"opacity": 0.6,
 				"eaTopic": "Ecosystem Markets",
-                "hucNavStats": ["sum"],
-                "hucNavStatsUnits": "number per year",				
+	
 				"eaBCSDD": [
 					"Biodiversity Conservation - x",
 					"Clean and Plentiful Water - x",
@@ -28092,8 +28088,7 @@
 				"eaMetadata": "E003,E004",
 				"opacity": 0.6,
 				"eaTopic": "Ecosystem Markets",
-                "hucNavStats": ["average","sum"],
-                "hucNavStatsUnits": "number per year",				
+	
 				"eaBCSDD": [
 					"Climate Stabilization - x"
 				],
@@ -28897,8 +28892,7 @@
 				"eaMetadata": "E005",
 				"opacity": 0.6,
 				"eaTopic": "Ecosystem Markets",
-                "hucNavStats": [],
-                "hucNavStatsUnits": "number per year",				
+
 				"eaBCSDD": [
 					"Biodiversity Conservation - x",
 					"Clean and Plentiful Water - x",
