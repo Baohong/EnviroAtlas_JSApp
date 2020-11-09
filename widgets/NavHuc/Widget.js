@@ -1137,41 +1137,6 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
         this.paramsDijit.setFocusOnFirstParam();
       },
 
-      _initBufferUnits: function () {
-        // if(this.config.bufferDefaults.maxBufferValue){
-        //   this.txtBufferValue.constraints.max = this.config.bufferDefaults.maxBufferValue;
-        //   this.txtBufferValueSpat.constraints.max = this.config.bufferDefaults.maxBufferValue;
-        // }
-        //
-        // var options = [];
-        // var len = this.config.bufferDefaults.bufferUnits.bufferUnit.length;
-        // for (var i = 0; i < len; i++) {
-        //   var option = {
-        //     value: this.config.bufferDefaults.bufferUnits.bufferUnit[i].name,
-        //     label: this.config.bufferDefaults.bufferUnits.bufferUnit[i].label
-        //   };
-        //   options.push(option);
-        //   if (i === 0) {
-        //     options[i].selected = true;
-        //   }
-        // }
-        // this.bufferUnits.addOption(options);
-        // this.bufferUnitsSpat.addOption(options);
-      },
-
-      _initSpatialRelationships: function () {
-        // var len = this.config.spatialrelationships.spatialrelationship.length;
-        // for (var i = 0; i < len; i++) {
-        //   var iClass = this._getSpatialIconClass(this.config.spatialrelationships.spatialrelationship[i].name);
-        //   var spatButton = html.create('div', {
-        //     'class': 'spatial-item',
-        //     'data-spatialtype': this.config.spatialrelationships.spatialrelationship[i].name,
-        //     'title': this.config.spatialrelationships.spatialrelationship[i].label
-        //   }, this.spatialItems);
-        //   html.addClass(spatButton, iClass);
-        //   this.own(on(spatButton, 'click', lang.hitch(this, this._spatButtonOnClick)));
-        // }
-      },
 
       _spatButtonOnClick: function (event) {
         event.stopPropagation();
@@ -1270,75 +1235,7 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
         } else {
           this.disabledTabs = [];
         }
-        // this.limitMapExtentCbx.setValue(this.config.limitsearch2mapextentchecked || false);
-        // this.eLocateEnabled = this.config.graphicalsearchoptions.enableeLocateselect || false;
-        // this.txtBufferValue.set('value', this.config.bufferDefaults.bufferDefaultValue || 2);
-        // this.txtBufferValueSpat.set('value', this.config.bufferDefaults.bufferDefaultValue || 2);
-        // this.bufferWKID = this.config.bufferDefaults.bufferWKID;
-        // this.autozoomtoresults = this.config.autozoomtoresults || false;
-        // this.mouseovergraphics = this.config.mouseovergraphics || false;
-        // var initView = this.config.initialView || "text";
-        // this.pointSearchTolerance = this.config.graphicalsearchoptions.toleranceforpointgraphicalselection || 6;
-        // this.cbxAddTolerance.setValue(this.config.graphicalsearchoptions.addpointtolerancechecked || false);
-        // this.cbxMultiGraphic.setValue(this.config.graphicalsearchoptions.multipartgraphicsearchchecked || false);
-        // this.cbxBufferGraphic.setValue(false);
-        // if (this.config.graphicalsearchoptions.showmultigraphicsgraphicaloption) {
-        //   html.setStyle(this.multiGraDiv, 'display', '');
-        // } else {
-        //   html.setStyle(this.multiGraDiv, 'display', 'none');
-        // }
-        // if (this.config.graphicalsearchoptions.showaddtolerancegraphicaloption) {
-        //   html.setStyle(this.addToleranceDiv, 'display', '');
-        // } else {
-        //   html.setStyle(this.addToleranceDiv, 'display', 'none');
-        // }
-        // if (this.config.graphicalsearchoptions.showaddsqltextgraphicaloption) {
-        //   html.setStyle(this.addSqlTextDiv, 'display', '');
-        // } else {
-        //   html.setStyle(this.addSqlTextDiv, 'display', 'none');
-        // }
-        // if (this.config.graphicalsearchoptions.showbuffergraphicaloption) {
-        //   html.setStyle(this.bufferGraDiv, 'display', '');
-        // } else {
-        //   html.setStyle(this.bufferGraDiv, 'display', 'none');
-        // }
-        // this.cbxBufferGraphic.setValue(this.config.graphicalsearchoptions.buffercheckedbydefaultgraphicaloption);
-        //
-        // this.cbxMultiGraphic.onChange = lang.hitch(this, this._onCbxMultiGraphicClicked);
-        //
-        // array.map(this.disabledTabs, lang.hitch(this, function (dTab) {
-        //   if (dTab === 'graphic') {
-        //     this.shapeTab = false;
-        //   }
-        //   if (dTab === 'text') {
-        //     this.attribTab = false;
-        //   }
-        //   if (dTab === 'spatial') {
-        //     this.spatTab = false;
-        //   }
-        //   if (dTab === 'result') {
-        //     this.rsltsTab = false;
-        //   }
-        // }));
 
-        //determine if this layer has any expressions
-        // if(this.config.layers[0].expressions.expression.length > 0){
-        //   this.cbxAddTextQuery.setStatus(true);
-        // }else{
-        //   this.cbxAddTextQuery.setStatus(false);
-        // }
-        //
-        // if (this.cbxMultiGraphic.getValue()) {
-        //   html.setStyle(this.btnGraSearch, 'display', 'inline-block');
-        // } else {
-        //   html.setStyle(this.btnGraSearch, 'display', 'none');
-        // }
-        // var len = this.config.layers.length;
-        // if (initView === "text" && this.attribTab) {
-        //   this.selTab = this.nls.selectByAttribute;
-        // } else if (initView === "graphical" && this.shapeTab) {
-        //   this.selTab = this.nls.selectFeatures;
-        // }
         if(this.autoactivatedtool){
           this.drawBox.activate(this.autoactivatedtool.toUpperCase());
         }
@@ -2335,32 +2232,11 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
           }
         })));
         this.own(on(this.drawBox, 'DrawEnd', lang.hitch(this, function (graphic) {
-          //if (!this.cbxMultiGraphic.getValue()) {
-          //   if (graphic.geometry.type === "point" && this.cbxAddTolerance.getValue()) {
               var ext = this.pointToExtent(graphic.geometry, this.pointSearchTolerance);
               this.search(ext, this.graphicLayerIndex);
-            // } else {
-            //   if (this.cbxBufferGraphic.getValue()) {
-            //     this._bufferGeometries([graphic.geometry], new SpatialReference({
-            //       wkid: this.bufferWKID
-            //     }), [parseFloat(this.txtBufferValue.get('value'))], this.bufferUnits.get('value'), true);
-            //   } else {
-            //     this.search(graphic.geometry, this.graphicLayerIndex);
-            //   }
-            // }
-          //} else {
-          //  this.garr.push(graphic);
-          //}
+
         })));
-        // this.own(on(this.btnClear2, "click", lang.hitch(this, this.clear, true)));
-        // this.own(on(this.btnClear3, "click", lang.hitch(this, this.clear, true)));
-        // this.own(on(this.btnClear4, "click", lang.hitch(this, this.clearFields, true)));
-        // this.own(on(this.btnClearBuffer2, "click", lang.hitch(this, this.clearbuffer)));
-        // this.own(on(this.btnClearBuffer3, "click", lang.hitch(this, this.clearbuffer)));
-        // html.setStyle(this.btnClearBuffer2, 'display', 'none');
-        // html.setStyle(this.btnClearBuffer3, 'display', 'none');
-        // html.setStyle(this.btnClear2, 'display', 'none');
-        // html.setStyle(this.btnClear3, 'display', 'none');
+
       },
 
       exportURL: function () {
@@ -2611,14 +2487,10 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
       },
 
       onAddSelection: function(){
-//        html.replaceClass(this.gSelectType.iconNode, 'addSelIcon', 'newSelIcon');
-//        html.replaceClass(this.gSelectType.iconNode, 'addSelIcon', 'removeSelIcon');
         this.gSelectTypeVal = 'add';
       },
 
       onRemoveSelection: function(){
-//        html.replaceClass(this.gSelectType.iconNode, 'removeSelIcon', 'newSelIcon');
-//        html.replaceClass(this.gSelectType.iconNode, 'removeSelIcon', 'addSelIcon');
         this.gSelectTypeVal = 'rem';
       },
 
@@ -2701,24 +2573,7 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
           this.map_click_point = geometry.getExtent().getCenter();
           this.add_click_point_graphic(this.map_click_point);
           //jab-end
-          queryParams.spatialRelationship = spatialRelationship || Query.SPATIAL_REL_INTERSECTS;
-          
-          // if (this.cbxAddTextQuery.getValue()) {
-          //   var gwhere = this.buildWhereClause(layerIndex, this.expressIndex, theValue);
-          //   queryParams.where = this.lastWhere = gwhere;
-          //   if(!gwhere){
-          //     console.info('No SQL expression found');
-          //   }else{
-          //     console.info(gwhere);
-          //   }
-          // }
-          // if (layerConfig.definitionexpression) {
-          //   queryParams.where = layerConfig.definitionexpression;
-          //   if (this.lastWhere) {
-          //     queryParams.where += ' AND ' + this.lastWhere;
-          //   }
-          //   console.info('SQL Where with layers definition expression: ', queryParams.where);
-          // }
+          queryParams.spatialRelationship = spatialRelationship || Query.SPATIAL_REL_INTERSECTS;         
         } 
         else 
         {
@@ -2746,9 +2601,6 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
         }
 
 
-        // if (this.rsltsTab) {
-        //   this.tabContainer.selectTab(this.nls.results);
-        // }
         html.setStyle(this.progressBar.domNode, 'display', 'block');
         // this.progressBar.domNode.innerHTML = "Searching ...";
         html.setStyle(this.divOptions, 'display', 'none');
@@ -2899,15 +2751,8 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
         this.gSelectTypeVal = 'new';
         this.aSelectTypeVal = 'new';
         this.sumResultArr = [];
-//        html.replaceClass(this.gSelectType.iconNode, 'newSelIcon', 'removeSelIcon');
-//        html.replaceClass(this.gSelectType.iconNode, 'newSelIcon', 'addSelIcon');
-//        html.replaceClass(this.aSelectType.iconNode, 'newSelIcon', 'removeSelIcon');
-//        html.replaceClass(this.aSelectType.iconNode, 'newSelIcon', 'addSelIcon');
-        if (closeAtt) {
-          // if (this.list.items.length > 0 && this.isSelTabVisible()) {
-          //   this.tabContainer.selectTab(this.selTab);
-          // }
-        }
+
+
         this.list.clear();
         
         html.empty(this.divResultMessage);
@@ -3148,8 +2993,6 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
 
       _clearLayers: function () {
         this._removeAllResultLayers();
-        // html.setStyle(this.btnClear2, 'display', 'none');
-        // html.setStyle(this.btnClear3, 'display', 'none');
       },
 
       _clearRelateLayers: function () {
@@ -3446,11 +3289,6 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
 				{
 					console.log('matched id==' + id.slice(0, 12 - i) + ' for target_huc_id==' + target_huc_id);
 				
-//					// fix this issue here # buggy_huc12 101600102004  the bug is in the HUC coverage, not the routing tables.
-//					if (id == 101600112004)
-//					{
-//						id = 101600102004;
-//					}
 					returned_ids.push(id);
 					if (returned_ids.length == max_count_nu)
 					{
@@ -3555,11 +3393,7 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
                 }
 
                 var huc8_id = huc12_id.substring(0, 8);
-                // don't add the HUC8 that contains the user clicked HUC12
-                // if (huc8_id == data.hu_data.huc_code.substring(0, 8))
-                // {
-                // 	return;
-                // }
+
                 if (huc8_ids.indexOf(huc8_id) === -1)
                 {
                     huc8_ids.push(huc8_id)
@@ -3686,30 +3520,6 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
         this.divNavigationMessages.innerHTML = '';
         dom.byId("NavigateErrorMessage").innerHTML = '';
     },
-		//end new
-		// if (data.us_huc12_ids.value.length > 0)
-		// {
-		// 	// the rest service returns a list of the HUC12s called 'huc12_ids' (using NHD terminology)
-		// 	//var huc12_ids = data.huc12_ids;
-		//
-		// 	huc12_ids_len = data.us_huc12_ids.value.length;
-		//
-		// 	// get a list of the HUC8s for HUC12s that were found - these will be shown on the map
-		// 	var huc8_ids = [];
-		// 	array.forEach(data.us_huc12_ids.value, function(huc12_id)
-		// 	{
-		// 		var huc8_id = huc12_id.substring(0, 8);
-		// 		// don't add the HUC8 that contains the user clicked HUC12
-		// 		if (huc8_id == data.huc8.value)
-		// 		{
-		// 			return;
-		// 		}
-		// 		if (huc8_ids.indexOf(huc8_id) === -1)
-		// 		{
-		// 			huc8_ids.push(huc8_id)
-		// 		}
-		// 	});
-		// 	data['upstream_huc8_count_nu']['value'] = huc8_ids.length;
 
 
 	numberWithCommas(x) {
@@ -3943,25 +3753,10 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
 		dojo.style(dom.byId("gridAttributeResults"), 'display', 'none');
 
 		this.results_json = {};
-		//dojo.destroy("grid");
-		// create an extent from the mapPoint that was clicked
-		// this is used to return features within 2 pixel of the click point
-
-		//NProgress.start();
-
-		// map_click_point = e.mapPoint;
-		// var pxWidth = app.map.extent.getWidth() / app.map.width;
-		// var padding = 1 * pxWidth;
-		// map_click_pointGeom = new Extent({
-		// 	"xmin" : map_click_point.x - padding, "ymin" : map_click_point.y - padding,
-		// 	"xmax" : map_click_point.x + padding, "ymax" : map_click_point.y + padding,
-		// 	"spatialReference" : map_click_point.spatialReference
-		// });
-		//
+		
 		// add_click_point_graphic(map_click_point);
 		dojo.style(dom.byId("gridHUC12"), 'display', 'none');
 
-		// dom.byId("NavigationMessages").innerHTML = 'Searching HUC12s using HUC_CODE ' + huc_code;
 
 		// use the 'map_click_pointGeom' for the initial query
 		if (huc_code.length == 8)
@@ -3973,7 +3768,6 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
 		{
 			this.qHUC12.where = this.huc12_field_nm + "  LIKE '" + huc_code + "%'";
 		}
-		//this.qHUC12.where = huc12_field_nm + "  = '" + huc_code + "'";
 
 		this.qHUC8.where = this.huc8_field_nm + "  = '" + huc_code.substr(0, 8) + "'";
 
@@ -4681,9 +4475,7 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
 		} else{
 			currentLayer.setRenderer(this._setCurentLayerRenderer('config'));
 		}
-		// if (this.rsltsTab) {
-		// 	this.tabContainer.selectTab(this.nls.results);
-		// }
+
 		html.setStyle(this.progressBar.domNode, 'display', 'none');
 		html.setStyle(this.divOptions, 'display', 'block');
 		
@@ -4741,10 +4533,7 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
 			this.list.clear();
 			this.gSelectTypeVal = 'new';
 			this.aSelectTypeVal = 'new';
-//			html.replaceClass(this.gSelectType.iconNode, 'newSelIcon', 'removeSelIcon');
-//			html.replaceClass(this.gSelectType.iconNode, 'newSelIcon', 'addSelIcon');
-//			html.replaceClass(this.aSelectType.iconNode, 'newSelIcon', 'removeSelIcon');
-//			html.replaceClass(this.aSelectType.iconNode, 'newSelIcon', 'addSelIcon');
+
 			html.setStyle(this.divOptions, 'display', 'none');
 			
 			//jab
@@ -5773,7 +5562,6 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
             		var numStatistic = 0;
             		var bAverageStatic = false;
             		if (window.hashEAIDToNavHucStats[eaID]!= undefined) {
-            			//layerStatistic = window.hashEAIDToNavHucStats[eaID].split(",");
             			layerStatistic = window.hashEAIDToNavHucStats[eaID];
             			numStatistic = layerStatistic.length;
             			if (window.hashEAIDToNavHucStats[eaID].indexOf(window.NavHucTermForAverage) != -1) {
@@ -5854,66 +5642,8 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
 				    
 				    statisticLyr.queryFeatures(queryParams, this.getStats, this.errback);
 				    
-				    //// show grid
-		            //this.gridAttributeResults.render();
-		            //dojo.style(dom.byId("gridAttributeResults"), 'display', '');
-		            //dijit.byId('gridAttributeResults').resize();
-
-
             	}
             }
-
-            /*var attribute = this.divAttributeSelect;
-            var attribute_name = attribute.options[attribute.selectedIndex].value;
-            var attribute_text = attribute.options[attribute.selectedIndex].text;
-
-            if (huc_code_input.value.length == 12 && attribute_name.length > 0) {
-
-            }
-            var request = esriRequest({
-              url: this.navigator_url + '/wbd/huc/' + huc_code_input.value + '/upstream/',
-              content: {
-                'navigation_direction': 'Upstream',
-                'attribute_field_nm': attribute_name,
-                'attribute': attribute_name,
-                'attribute_only': true,
-                'format': 'json'
-
-              },
-              handleAs: "json"
-            });
-            results_data2 = [];
-            results_data2.push({'key': 'Indicator Category', 'value': category_name});
-            results_data2.push({'key': 'Indicator Name', 'value': attribute_text});
-            results_data2.push({'key': 'Units', 'value': 'Fetching ...'});
-            results_data2.push({'key': 'Statistic', 'value': 'Fetching ...'});
-            results_data2.push({'key': 'Aggregated Value', 'value': 'Fetching ...'});
-
-            // if (data.attribute_results['us_count_nu'] > 0)
-            // {
-            // 	results_data2.push({'key': 'Upstream HUC Value', 'value': data.attribute_results['us_value'] + ' ' + data.attribute_results['units']});
-            // }
-                // create an object store
-            var objectStore2 = new Memory({
-                data: results_data2
-            });
-            results2Store2 = new dojo.data.ObjectStore({objectStore: objectStore2});
-            this.gridAttributeResults.store = results2Store2;
-
-            // show grid
-            this.gridAttributeResults.render();
-            dojo.style(dom.byId("gridAttributeResults"), 'display', '');
-            dijit.byId('gridAttributeResults').resize();
-
-            //NProgress.start();
-            // showLoading();
-            //TODO progressBar
-            t0 = performance.now();
-            //request.then(this.recomputeSucceeded, this.recomputeFailed);
-            request.then(
-                    function(data)   { that.recomputeSucceeded(data) },
-                    function(reason) { that.recomputeFailed }
-            );*/
         },
         getStats(results){
 
@@ -5961,10 +5691,7 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
             selfHucNav.gridAttributeResults.render();
             dojo.style(dom.byId("gridAttributeResults"), 'display', '');
             dijit.byId('gridAttributeResults').resize();
-            // show grid
-            //this.gridAttributeResults.render();
-            //dojo.style(dom.byId("gridAttributeResults"), 'display', '');
-            //dijit.byId('gridAttributeResults').resize();
+
 
         },
         errback(err){
