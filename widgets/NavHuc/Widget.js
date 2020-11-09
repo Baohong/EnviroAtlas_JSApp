@@ -269,8 +269,6 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
 		this._initResultFormatString();
 		this._initDrawBox();
 		this._initTabContainer();
-		this._initBufferUnits();
-		this._initSpatialRelationships();
 		this._initLayerSelect();
 		this._initProgressBar();
 		this._initCheckForSupportedWidgets();
