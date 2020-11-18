@@ -228,6 +228,7 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
 
     hu12_headwater_list: [],
     hu12_for_recompute:[],	
+    huc12_feature_selected: null,
     
 
 
@@ -237,6 +238,7 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
 	
 	postCreate: function () 
 	{
+
 		this.inherited(arguments);
 		
 		this.list = new List({}, this.listDiv);
@@ -351,7 +353,12 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
 
                 var r = confirm("Do you want to navigate " + direction.toLowerCase() + " from subwatershed " + huc_code_input.value + "'?");
                 if (r == true){
-                    this.executeHUCSearch(huc_code_input.value);
+                    //this.executeHUCSearch(huc_code_input.value);
+                    if (this.huc12_feature_selected != null) {
+                    	this.navigate_upstream(this.huc12_feature_selected);
+                    }
+                    
+                    
                 }
             }
 
@@ -4842,6 +4849,7 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
                 this.divNavigationHUCode.value = atts["HUC_12"];
 
 				console.time("Navigate HUC12");
+				this.huc12_feature_selected = results;
 				this.navigate_upstream(results);
 				console.timeEnd("Navigate HUC12");
 
