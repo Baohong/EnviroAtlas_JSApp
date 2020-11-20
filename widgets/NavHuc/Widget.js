@@ -3812,7 +3812,8 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
             var hu12_index_nu = data.navigation_data.results.hu12_data.fields.huc_code;
             var hu12_list = data.navigation_data.results.hu12_data.hu12_list;
         }
-
+		
+		this.hu12_for_recompute = [];
         huc12_ids_len = hu12_list.length;
         if (huc12_ids_len > 0)
         {
@@ -3823,6 +3824,7 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
             array.forEach(hu12_list, function(hu12_tuple)
             {
                 var hu12_id = hu12_tuple[hu12_index_nu];
+                that.hu12_for_recompute.push(hu12_id);
 
                 var huc8_id = hu12_id.substring(0, 8);
                 // don't add the HUC8 that contains the user clicked HUC12
@@ -3920,7 +3922,8 @@ return declare([BaseWidget, _WidgetsInTemplateMixin], {
         //dojo.style(dom.byId("gridAttributeResults"), 'display', '');
 
         this.results_json.huc12 = huc_json;
-        if (this.featHUC12.length == 1)
+
+        if (this.featHUC12 == null || this.featHUC12.length == 1)
         {
             this.results_json.huc12.push('GETTING GIS RESULTS <img src=/wbdmap/images/hourglass.gif />');
             if (data.hu_data.terminal_bool == true){
