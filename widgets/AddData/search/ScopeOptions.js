@@ -120,13 +120,12 @@ define(["dojo/_base/declare",
                         if (i < selfAddDataScopeOptions.btnGroup.children.length) {            //  if the counter < 10, call the loop function
                             myLoop();             //  ..  again which will trigger another 
                         }  
-                        else { 
+                        /*else { 
 			   				setTimeout(function () {  	
-								//window.saveSessionLoaded = false;
 			   				 }, 200)
-                        }
+                        }*/
                                            //  ..  setTimeout()
-                   }, 500)
+                   }, 100)
                 }
                 
                 myLoop();               
