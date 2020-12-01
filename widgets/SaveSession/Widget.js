@@ -266,10 +266,16 @@ define(['dojo/_base/declare',
               	var widgets = this.appConfig.getConfigElementsByName("AddData");
 		        var pm = PanelManager.getInstance();		
 		        pm.showPanel(widgets[0]);
+		        
 		        panelID = "widgets_AddData_30_panel";
 		        pm.closePanel(panelID);//close the panel
+		        setTimeout(function () { 
 
-   				document.getElementById(simpleSearchFilterId).click();
+			        //selfAddDataScopeOptions.optionClicked();
+
+	
+	   				document.getElementById(simpleSearchFilterId).click();
+   				}, 1800)
  	
             },
             onReceiveData: function (name, widgetId, data, historyData) {
@@ -534,8 +540,24 @@ define(['dojo/_base/declare',
                 //showLayerListWidget();
                 var session = e.item;
                 sessionLoaded = session;
+                this.loadSession(session);
                 console.log('SaveSession :: onLoadSessionClicked :: session  = ', session);
+                window.saveSessionLoaded = true;
                 
+
+				for (ii = 0; ii<session.onlineDataItems.length; ii++){
+					setTimeout(function () {
+						itemCardItem = session.onlineDataItems[ii];
+						itemCardItem_split = itemCardItem.split(":::");
+			
+						selfSearchInAddData.searchTextBox.value = itemCardItem_split[1];
+						selfSearchInAddData.searchButton.click();
+	                	selfAddDataScopeOptions.optionClicked();
+                	}, 3000)
+				}
+				
+
+
                 var layerListWidget = WidgetManager.getInstance().getWidgetById("widgets_LayerList_Widget_17");
                 if (layerListWidget) {
                     layerListWidget._onRemoveLayersClick();
@@ -543,7 +565,7 @@ define(['dojo/_base/declare',
 
                     //document.getElementById("butRemoveAllLayers").click();
 
-                    this.loadSession(session);
+                    
             },
 
             /**

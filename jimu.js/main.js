@@ -124,6 +124,7 @@ define([
     window.toggleOnElevation = false;
     window.toggleOnCMA = false;
     window.mapClickListenerForPopup = null;
+    window.saveSessionLoaded = false;
     window.removeAllMessage = "removeAll";
     window.chkTopicPrefix = "ckTopic_";
     window.chkTopicPBSPrefix = "ckTopicPBS_";

@@ -34,10 +34,11 @@ define(["dojo/_base/declare",
 
       addItem: function(itemCard) {
         itemCard.placeAt(this.itemsNode);
-        var indexTobeAdded = window.onlineDataTobeAdded.indexOf(itemCard.item.id);
-        var indexAlreadyAdded = window.onlineDataAlreadyAdded.indexOf(itemCard.item.id);
+        var indexTobeAdded = window.onlineDataTobeAdded.indexOf(itemCard.item.id + ":::" + itemCard.item.title);
+        var indexAlreadyAdded = window.onlineDataAlreadyAdded.indexOf(itemCard.item.id + ":::" + itemCard.item.title);
         if ((indexTobeAdded >=0 ) && ( indexAlreadyAdded <0 )){
-        	window.onlineDataAlreadyAdded.push(itemCard.item.id);
+        	window.onlineDataAlreadyAdded.push(itemCard.item.id + ":::" + itemCard.item.title);
+        	//itemCard.item.title:: USA Current Wildfires
         	itemCard.addButton.click();
         }
       },
