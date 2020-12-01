@@ -553,7 +553,7 @@ define(['dojo/_base/declare',
 						setTimeout(function () {
 							selfSearchInAddData.searchButton.click();
 		                	selfAddDataScopeOptions.optionClicked();
-	                	}, 50)
+	                	}, 80)
                         ii++;                                            //  increment the counter
                         if (ii < session.onlineDataItems.length) {            
                             AddDataLoop();             //  ..  again which will trigger another 
