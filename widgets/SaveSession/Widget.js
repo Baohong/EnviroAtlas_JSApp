@@ -550,8 +550,10 @@ define(['dojo/_base/declare',
 						itemCardItem = session.onlineDataItems[ii];
 						itemCardItem_split = itemCardItem.split(":::");			
 						selfSearchInAddData.searchTextBox.value = itemCardItem_split[1];
-						selfSearchInAddData.searchButton.click();
-	                	selfAddDataScopeOptions.optionClicked();
+						setTimeout(function () {
+							selfSearchInAddData.searchButton.click();
+		                	selfAddDataScopeOptions.optionClicked();
+	                	}, 400)
                         ii++;                                            //  increment the counter
                         if (ii < session.onlineDataItems.length) {            
                             AddDataLoop();             //  ..  again which will trigger another 
