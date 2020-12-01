@@ -96,7 +96,10 @@ define(["dojo/_base/declare",
           }).otherwise(function(error) {
             console.warn("Add layer failed.");
             console.warn(error);
-            util.setNodeText(self.messageNode, i18n.search.item.messages.addFailed);
+            if (self.messageNode!=undefined){
+            	util.setNodeText(self.messageNode, i18n.search.item.messages.addFailed);
+            }
+            
             domClass.remove(btn, "disabled");
             if (error && typeof error.message === "string" && error.message.length > 0) {
                 // TODO show this message
