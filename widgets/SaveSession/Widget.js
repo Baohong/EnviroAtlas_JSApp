@@ -544,18 +544,28 @@ define(['dojo/_base/declare',
                 console.log('SaveSession :: onLoadSessionClicked :: session  = ', session);
                 window.saveSessionLoaded = true;
                 
-
-				for (ii = 0; ii<session.onlineDataItems.length; ii++){
-					setTimeout(function () {
+                ii = 0;
+                function AddDataLoop () {           //  create a loop function
+                   setTimeout(function () {    //  call a 3s setTimeout when the loop is called
 						itemCardItem = session.onlineDataItems[ii];
-						itemCardItem_split = itemCardItem.split(":::");
-			
+						itemCardItem_split = itemCardItem.split(":::");			
 						selfSearchInAddData.searchTextBox.value = itemCardItem_split[1];
 						selfSearchInAddData.searchButton.click();
 	                	selfAddDataScopeOptions.optionClicked();
-                	}, 3000)
-				}
-				
+                        ii++;                                            //  increment the counter
+                        if (ii < session.onlineDataItems.length) {            
+                            AddDataLoop();             //  ..  again which will trigger another 
+                        }  
+                        else { 
+			   				setTimeout(function () {  	
+								window.saveSessionLoaded = false;
+			   				 }, 500)
+                        }
+                                           //  ..  setTimeout()
+                   }, 3000)
+                }
+                
+                AddDataLoop();		
 
 
                 var layerListWidget = WidgetManager.getInstance().getWidgetById("widgets_LayerList_Widget_17");
