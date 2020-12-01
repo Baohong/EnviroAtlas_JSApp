@@ -564,7 +564,7 @@ define(['dojo/_base/declare',
 			   				 }, 150)
                         }
                                            //  ..  setTimeout()
-                   }, 500)
+                   }, 1000)
                 }
                 
                 AddDataLoop();		
