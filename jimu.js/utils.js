@@ -171,8 +171,10 @@ function(lang, array, html, has, config, ioQuery, query, nlt, Deferred, all, on,
   }
 
   function displayMoreInformation() {
-
-	elemHelpContents2 = document.getElementsByClassName("helpContent2");
+		    var url = window.location.protocol + '//' + window.location.host + window.location.pathname;
+        	//var urlObject = urlUtils.urlToObject(window.location.href);
+        	window.open(window.location.protocol + '//' + window.location.host + "/Enviroatlas_WAB/help.html"+ "#"+ window.widgetNameInDemo);
+	/*elemHelpContents2 = document.getElementsByClassName("helpContent2");
     
 	if (window.displayMoreInfor=="true"){    
 		
@@ -195,7 +197,7 @@ function(lang, array, html, has, config, ioQuery, query, nlt, Deferred, all, on,
 	            window.displayMoreInfor = "true";
 	        }             	
         }	
-	}
+	}*/
   }
   //if no beforeId, append to head tag, or insert before the id
   function loadStyleLink(id, href, beforeId) {
@@ -5264,6 +5266,7 @@ function(lang, array, html, has, config, ioQuery, query, nlt, Deferred, all, on,
                 if (widgetName!=null){
                     if (window.PanelId.toUpperCase().indexOf(widgetName.toUpperCase()) >= 0) {
                         stop = i;
+                        window.widgetNameInDemo = widgetName;
                     }               
                 }            
             }  
