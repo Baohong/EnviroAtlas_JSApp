@@ -176,7 +176,7 @@ function(lang, array, html, has, config, ioQuery, query, nlt, Deferred, all, on,
         	window.open(window.location.protocol + '//' + window.location.host + "/Enviroatlas_WAB/help.html"+ "#"+ window.widgetNameInDemo);
         	setTimeout(function() {
         		return false;
-        	}, 100);
+        	}, 10);
 	/*elemHelpContents2 = document.getElementsByClassName("helpContent2");
     
 	if (window.displayMoreInfor=="true"){    
