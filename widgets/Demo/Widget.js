@@ -112,8 +112,12 @@ define(['dojo/_base/declare', 'jimu/BaseWidget', 'jimu/PanelManager', 'dijit/Too
         },
         
         _displayMoreInformation : function() {
+        	
+	        var url = window.location.protocol + '//' + window.location.host + window.location.pathname;
+        	//var urlObject = urlUtils.urlToObject(window.location.href);
+        	window.open(url);
 
-    		elemHelpContents2 = document.getElementsByClassName("helpContent2");
+    		/*elemHelpContents2 = document.getElementsByClassName("helpContent2");
             elemHelpContent2 = elemHelpContents2.item(0);
         	if (window.displayMoreInfor=="true"){    		
                 if (elemHelpContent2 != null)
@@ -127,7 +131,7 @@ define(['dojo/_base/declare', 'jimu/BaseWidget', 'jimu/PanelManager', 'dijit/Too
                     elemHelpContent2.style.display = 'None';
                     window.displayMoreInfor = "true";
                 }             		
-        	}
+        	}*/
         },
 
         _nextStop : function(stop) {
