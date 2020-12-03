@@ -171,12 +171,11 @@ function(lang, array, html, has, config, ioQuery, query, nlt, Deferred, all, on,
   }
 
   function displayMoreInformation() {
-		    var url = window.location.protocol + '//' + window.location.host + window.location.pathname;
-        	//var urlObject = urlUtils.urlToObject(window.location.href);
-        	window.open(window.location.protocol + '//' + window.location.host + "/Enviroatlas_WAB/help.html"+ "#"+ window.widgetNameInDemo);
-        	setTimeout(function() {
-        		return false;
-        	}, 10);
+		    var parthArray = window.location.pathname.split(' ');		    
+        	window.open(window.location.protocol + '//' + window.location.host + "/" + parthArray[0] + "/help.html"+ "#"+ window.widgetNameInDemo);
+    		return false;
+
+        	//}, 10);
 	/*elemHelpContents2 = document.getElementsByClassName("helpContent2");
     
 	if (window.displayMoreInfor=="true"){    

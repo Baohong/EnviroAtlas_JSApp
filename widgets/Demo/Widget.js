@@ -115,10 +115,8 @@ define(['dojo/_base/declare', 'jimu/BaseWidget', 'jimu/PanelManager', 'dijit/Too
         	
 
         	
-		    var url = window.location.protocol + '//' + window.location.host + window.location.pathname;
-        	//var urlObject = urlUtils.urlToObject(window.location.href);
-        	window.open(window.location.protocol + '//' + window.location.host + "/Enviroatlas_WAB/help.html"+ "#"+ window.widgetNameInDemo);
-
+		    var parthArray = window.location.pathname.split(' ');		    
+        	window.open(window.location.protocol + '//' + window.location.host + "/" + parthArray[0] + "/help.html"+ "#"+ window.widgetNameInDemo);
     		return false;
 
     		/*elemHelpContents2 = document.getElementsByClassName("helpContent2");
