@@ -113,9 +113,13 @@ define(['dojo/_base/declare', 'jimu/BaseWidget', 'jimu/PanelManager', 'dijit/Too
         
         _displayMoreInformation : function() {
         	
-	        var url = window.location.protocol + '//' + window.location.host + window.location.pathname;
+
+        	
+		    var url = window.location.protocol + '//' + window.location.host + window.location.pathname;
         	//var urlObject = urlUtils.urlToObject(window.location.href);
-        	window.open(url);
+        	window.open(window.location.protocol + '//' + window.location.host + "/Enviroatlas_WAB/help.html"+ "#"+ window.widgetNameInDemo);
+
+    		return false;
 
     		/*elemHelpContents2 = document.getElementsByClassName("helpContent2");
             elemHelpContent2 = elemHelpContents2.item(0);
@@ -192,7 +196,9 @@ define(['dojo/_base/declare', 'jimu/BaseWidget', 'jimu/PanelManager', 'dijit/Too
             } else if (stop < numberStops - 1) {
                 var bSidebarWidget = false;
                 nodeToHelp = window.helpTour[stop].node;
-
+				var widgetName = window.helpTour[stop].widgetName;
+				window.widgetNameInDemo = widgetName;
+				
                 //helperClass = window.formatters[window.helpTour[stop].helpFile];
                 //helpContent = new helperClass();
                 helperClass1 = window.formatters[window.helpTour[stop].helpFile+"1"];
