@@ -268,7 +268,7 @@ define(['dojo/_base/declare', 'jimu/BaseWidget', 'jimu/PanelManager', 'dijit/Too
 
 		    	//insert More infomation button
                 newlink = document.createElement('button');
-                newlink.setAttribute('onclick', "selfDemo._displayMoreInformation(" + ")");
+                newlink.setAttribute('onclick', "selfDemo._displayMoreInformation(" + ")"+";return false");
                 newlink.innerHTML = 'More information';
                 newlink.setAttribute('title', 'More information');
                 newlink.setAttribute('class', 'topicHeader');
