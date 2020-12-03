@@ -115,7 +115,7 @@ define(['dojo/_base/declare', 'jimu/BaseWidget', 'jimu/PanelManager', 'dijit/Too
         	
 
         	
-		    var parthArray = window.location.pathname.split(' ');		    
+		    var parthArray = window.location.pathname.split("/");		    
         	window.open(window.location.protocol + '//' + window.location.host + "/" + parthArray[0] + "/help.html"+ "#"+ window.widgetNameInDemo);
     		return false;
 

@@ -171,7 +171,7 @@ function(lang, array, html, has, config, ioQuery, query, nlt, Deferred, all, on,
   }
 
   function displayMoreInformation() {
-		    var parthArray = window.location.pathname.split(' ');		    
+		    var parthArray = window.location.pathname.split("/");		    
         	window.open(window.location.protocol + '//' + window.location.host + "/" + parthArray[0] + "/help.html"+ "#"+ window.widgetNameInDemo);
     		return false;
 
