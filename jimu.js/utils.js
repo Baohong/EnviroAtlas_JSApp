@@ -170,37 +170,18 @@ function(lang, array, html, has, config, ioQuery, query, nlt, Deferred, all, on,
     }
   }
 
-  function displayMoreInformation() {
-		    var parthArray = window.location.pathname.split("/");		    
-        	window.open(window.location.protocol + '//' + window.location.host + "/" + parthArray[0] + "/help.html"+ "#"+ window.widgetNameInDemo);
+  /*function displayMoreInformation() {
+		    var parthArray = window.location.pathname.split("/");	
+		    var parth1= "";
+		    if (parthArray[0] == "") {
+		    	parth1 = parthArray[1];		    	
+		    }
+		    else {
+		    	parth1 = parthArray[0];	
+		    }
+        	window.open(window.location.protocol + '//' + window.location.host + "/" + parth1 + "/help.html"+ "#"+ window.widgetNameInDemo);
     		return false;
-
-        	//}, 10);
-	/*elemHelpContents2 = document.getElementsByClassName("helpContent2");
-    
-	if (window.displayMoreInfor=="true"){    
-		
-		for (ii = 0; ii< elemHelpContents2.length; ii++) {	
-			elemHelpContent2 = elemHelpContents2.item(ii);	
-	        if (elemHelpContent2 != null)
-	        {
-	            elemHelpContent2.style.display = '';
-	            window.displayMoreInfor = "false";
-	        }      
-        }    
-	} else {
-		
-        for (ii = 0; ii< elemHelpContents2.length; ii++) {	
-        
-        	elemHelpContent2 = elemHelpContents2.item(ii);	
-	        if (elemHelpContent2 != null)
-	        {
-	            elemHelpContent2.style.display = 'None';
-	            window.displayMoreInfor = "true";
-	        }             	
-        }	
-	}*/
-  }
+  }*/
   //if no beforeId, append to head tag, or insert before the id
   function loadStyleLink(id, href, beforeId) {
     var def = new Deferred(), styleNode, styleLinkNode;
@@ -319,7 +300,18 @@ function(lang, array, html, has, config, ioQuery, query, nlt, Deferred, all, on,
       }
     });
   });
-
+  mo.displayMoreInformation = function() {
+		    var parthArray = window.location.pathname.split("/");	
+		    var parth1= "";
+		    if (parthArray[0] == "") {
+		    	parth1 = parthArray[1];		    	
+		    }
+		    else {
+		    	parth1 = parthArray[0];	
+		    }
+        	window.open(window.location.protocol + '//' + window.location.host + "/" + parth1 + "/help.html"+ "#"+ window.widgetNameInDemo);
+    		return false;
+  };
   mo.checkError = function(resKey, def) {
     //when resKey match a error, def will be reject
     errorCheckLists.push({
