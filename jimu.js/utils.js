@@ -5320,7 +5320,7 @@ function(lang, array, html, has, config, ioQuery, query, nlt, Deferred, all, on,
 			  newlink.setAttribute('class', 'topicHeader');
 			  newlink.setAttribute('style', 'width:100%;background-color: #9aadbb; margin-top:20px');
 			  newlink.setAttribute('id', 'helpContent2TriggerButton');
-			  newlink.setAttribute('onclick', "displayMoreInformation(" + ")"+";return false");
+			  newlink.setAttribute('onclick', "mo.displayMoreInformation(" + ")"+";return false");
 			  
 			  newDiv.appendChild(newlink);
 			  helpContent.domNode.appendChild(newDiv);
