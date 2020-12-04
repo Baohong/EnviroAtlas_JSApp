@@ -5314,7 +5314,7 @@ function(lang, array, html, has, config, ioQuery, query, nlt, Deferred, all, on,
 			  newlink.setAttribute('id', 'helpContent2TriggerButton');
 			  //newlink.setAttribute('onclick', "this.displayMoreInformation(" + ")"+";return false");
 			  //newlink.setAttribute('onclick', "var parthArray = window.location.pathname.split('/'); var parth1= ''; if (parthArray[0] == '') {	parth1 = parthArray[1];} else {parth1 = parthArray[0];  }     	window.open(window.location.protocol + '//' + window.location.host + '/' + parth1 + '/help.html'+ ''#'+ window.widgetNameInDemo);return false;");
-				newlink.setAttribute('onclick', "parthArray = window.location.pathname.split('/');  parth1= parthArray[0] ;  	window.open(window.location.protocol + '//' + window.location.host + '/' + parth1 + '/help.html'+ '#'+ window.widgetNameInDemo);return false;");
+				newlink.setAttribute('onclick', "parthArray = window.location.pathname.split('/');  parth1= parthArray[1] ;  	window.open(window.location.protocol + '//' + window.location.host + '/' + parth1 + '/help.html'+ '#'+ window.widgetNameInDemo);return false;");
     		
     		
 			  
