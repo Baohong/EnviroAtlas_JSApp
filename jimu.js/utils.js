@@ -5320,6 +5320,8 @@ function(lang, array, html, has, config, ioQuery, query, nlt, Deferred, all, on,
 			  newlink.setAttribute('class', 'topicHeader');
 			  newlink.setAttribute('style', 'width:100%;background-color: #9aadbb; margin-top:20px');
 			  newlink.setAttribute('id', 'helpContent2TriggerButton');
+			  newlink.setAttribute('onclick', "displayMoreInformation(" + ")"+";return false");
+			  
 			  newDiv.appendChild(newlink);
 			  helpContent.domNode.appendChild(newDiv);
                 
@@ -5380,15 +5382,7 @@ function(lang, array, html, has, config, ioQuery, query, nlt, Deferred, all, on,
 		                window.displayMoreInfor = "true";
 		            }      
 	            }  
-	            document.getElementById("helpContent2TriggerButton").addEventListener("click", displayMoreInformation); 
-	            /*document.getElementById("helpContent2TriggerButton").addEventListener("onclick", function(){
-				    var url = window.location.protocol + '//' + window.location.host + window.location.pathname;
-		        	//var urlObject = urlUtils.urlToObject(window.location.href);
-		        	window.open(window.location.protocol + '//' + window.location.host + "/Enviroatlas_WAB/help.html"+ "#"+ window.widgetNameInDemo);
-		        	
-		        		return false;
-		        	
-	            });*/
+	            //document.getElementById("helpContent2TriggerButton").addEventListener("click", displayMoreInformation); 
                                                     
               exitButtons = document.getElementsByClassName("exit_buttonOnScreenWidget");
 
