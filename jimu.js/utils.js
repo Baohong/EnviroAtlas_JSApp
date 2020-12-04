@@ -170,18 +170,6 @@ function(lang, array, html, has, config, ioQuery, query, nlt, Deferred, all, on,
     }
   }
 
-  function displayMoreInformation() {
-		    var parthArray = window.location.pathname.split("/");	
-		    var parth1= "";
-		    if (parthArray[0] == "") {
-		    	parth1 = parthArray[1];		    	
-		    }
-		    else {
-		    	parth1 = parthArray[0];	
-		    }
-        	window.open(window.location.protocol + '//' + window.location.host + "/" + parth1 + "/help.html"+ "#"+ window.widgetNameInDemo);
-    		return false;
-  }
   //if no beforeId, append to head tag, or insert before the id
   function loadStyleLink(id, href, beforeId) {
     var def = new Deferred(), styleNode, styleLinkNode;
@@ -300,18 +288,7 @@ function(lang, array, html, has, config, ioQuery, query, nlt, Deferred, all, on,
       }
     });
   });
-  mo.displayMoreInformation = function() {
-		    var parthArray = window.location.pathname.split("/");	
-		    var parth1= "";
-		    if (parthArray[0] == "") {
-		    	parth1 = parthArray[1];		    	
-		    }
-		    else {
-		    	parth1 = parthArray[0];	
-		    }
-        	window.open(window.location.protocol + '//' + window.location.host + "/" + parth1 + "/help.html"+ "#"+ window.widgetNameInDemo);
-    		return false;
-  };
+
   mo.checkError = function(resKey, def) {
     //when resKey match a error, def will be reject
     errorCheckLists.push({
@@ -5384,7 +5361,6 @@ function(lang, array, html, has, config, ioQuery, query, nlt, Deferred, all, on,
 		                window.displayMoreInfor = "true";
 		            }      
 	            }  
-	            //document.getElementById("helpContent2TriggerButton").addEventListener("click", displayMoreInformation); 
                                                     
               exitButtons = document.getElementsByClassName("exit_buttonOnScreenWidget");
 
