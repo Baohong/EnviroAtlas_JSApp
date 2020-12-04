@@ -170,7 +170,7 @@ function(lang, array, html, has, config, ioQuery, query, nlt, Deferred, all, on,
     }
   }
 
-  /*function displayMoreInformation() {
+  function displayMoreInformation() {
 		    var parthArray = window.location.pathname.split("/");	
 		    var parth1= "";
 		    if (parthArray[0] == "") {
@@ -181,7 +181,7 @@ function(lang, array, html, has, config, ioQuery, query, nlt, Deferred, all, on,
 		    }
         	window.open(window.location.protocol + '//' + window.location.host + "/" + parth1 + "/help.html"+ "#"+ window.widgetNameInDemo);
     		return false;
-  }*/
+  }
   //if no beforeId, append to head tag, or insert before the id
   function loadStyleLink(id, href, beforeId) {
     var def = new Deferred(), styleNode, styleLinkNode;
@@ -5312,7 +5312,7 @@ function(lang, array, html, has, config, ioQuery, query, nlt, Deferred, all, on,
 			  newlink.setAttribute('class', 'topicHeader');
 			  newlink.setAttribute('style', 'width:100%;background-color: #9aadbb; margin-top:20px');
 			  newlink.setAttribute('id', 'helpContent2TriggerButton');
-			  newlink.setAttribute('onclick', "mo.displayMoreInformation(" + ")"+";return false");
+			  newlink.setAttribute('onclick', "this.displayMoreInformation(" + ")"+";return false");
 			  
 			  newDiv.appendChild(newlink);
 			  helpContent.domNode.appendChild(newDiv);
