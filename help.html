@@ -8,6 +8,14 @@
     <title>EnviroAtlas Help</title>
     <script src="//code.jquery.com/jquery-3.5.1.min.js"></script>
     <script>
+    
+		function reloadIt() {
+		    if (window.location.href.substr(-2) !== "?r") {
+			        window.location = window.location.href + "?r";
+		    }
+		}
+
+		setTimeout('reloadIt()', 1000)();
     	window.indexLoad = 0;
     	function LoadOnce()     	
 		{ 	
@@ -45,7 +53,7 @@
         
     </script>
 </head>
-<body onLoad=" LoadOnce()">
+<body >
 <div class="container">
     <div id="pageHeader">
         <h1>EnviroAtlas Help</h1>
