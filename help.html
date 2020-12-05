@@ -8,9 +8,13 @@
     <title>EnviroAtlas Help</title>
     <script src="//code.jquery.com/jquery-3.5.1.min.js"></script>
     <script>
+    	function LoadOnce() 
+		{ 
+			window.location.reload(true); 
+		} 
         $(document).ready(function(){
             const configURL = "widgets/Demo/config.json";
-            window.location.reload(true);
+            
             // Fetch the help configuration and sort
             $.getJSON( configURL, function( data ) {
                 console.log(data)
@@ -31,9 +35,10 @@
                 location.hash = window.location.hash;
             });
         });
+        
     </script>
 </head>
-<body>
+<body onLoad=" LoadOnce()">
 <div class="container">
     <div id="pageHeader">
         <h1>EnviroAtlas Help</h1>
