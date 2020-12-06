@@ -61,7 +61,7 @@ define(["dojo/_base/declare",
         domClass.add(btn, "disabled");
 
         if (this.canRemove) {
-          var index = window.onlineDataAlreadyAdded.indexOf(self.item.id + ":::" + self.item.title);
+          var index = window.onlineDataAlreadyAdded.indexOf(self.item.id + ":::" + self.item.title + ":::" + window.onlineDataScopeDic[selfAddDataScopeOptions.scopePlaceholderText.innerHTML]);
 		  window.onlineDataAlreadyAdded.splice(index, 1);
           var map = this.resultsPane.getMap();
           util.setNodeText(self.messageNode, i18n.search.item.messages.removing);
@@ -76,9 +76,9 @@ define(["dojo/_base/declare",
           domClass.remove(btn, "disabled");
 
         } else {
-          var index = window.onlineDataAlreadyAdded.indexOf(self.item.id + ":::" + self.item.title);
+          var index = window.onlineDataAlreadyAdded.indexOf(self.item.id + ":::" + self.item.title + ":::" + window.onlineDataScopeDic[selfAddDataScopeOptions.scopePlaceholderText.innerHTML]);
           if (index<0) {
-        		window.onlineDataAlreadyAdded.push(self.item.id + ":::" + self.item.title);
+        		window.onlineDataAlreadyAdded.push(self.item.id + ":::" + self.item.title + ":::" + window.onlineDataScopeDic[selfAddDataScopeOptions.scopePlaceholderText.innerHTML]);
           }
           util.setNodeText(self.messageNode, i18n.search.item.messages.adding);
           var loader = new LayerLoader();
@@ -112,7 +112,7 @@ define(["dojo/_base/declare",
                 if (!(url in window.faildedOutsideLayerDictionary)){
 			  		window.faildedOutsideLayerDictionary[url] = url;
 			    }	
-                var indexTobeRemoved = window.onlineDataAlreadyAdded.indexOf(self.item.id + ":::" + self.item.title);
+                var indexTobeRemoved = window.onlineDataAlreadyAdded.indexOf(self.item.id + ":::" + self.item.title + ":::" + window.onlineDataScopeDic[selfAddDataScopeOptions.scopePlaceholderText.innerHTML]);
 		  		window.onlineDataAlreadyAdded.splice(indexTobeRemoved, 1);
 				selfAddData.publishData({
 		        	message: "openFailedLayer"

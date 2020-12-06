@@ -136,6 +136,7 @@ define([
     window.NavHucStats = "hucNavStats";
     window.NavHucStatsUnit = "hucNavStatsUnits";
     window.NavHucTermForAverage = "average";
+    window.widgetNameInDemo = "";
     
     window.PanelId = "";
     window.timeSeriesDisclaim = false;
@@ -162,6 +163,10 @@ define([
     window.demographicLayerSetting = {};
     window.onlineDataTobeAdded = [];
     window.onlineDataAlreadyAdded = [];
+    window.onlineDataScopeDic = {};
+    window.onlineDataScopeDic["EPA GeoPlatform"] = "MyOrganization";
+    window.onlineDataScopeDic["Federal GeoPlatform"] = "Curated";
+    window.onlineDataScopeDic["ArcGIS Online"] = "ArcGISOnline";
     window.uploadedFileColl = [];
     
     window.formatters = {};
