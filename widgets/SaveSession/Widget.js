@@ -550,7 +550,14 @@ define(['dojo/_base/declare',
                 function AddDataLoop () {           //  create a loop function
                    setTimeout(function () {    //  call a 3s setTimeout when the loop is called
 						itemCardItem = session.onlineDataItems[ii];
-						itemCardItem_split = itemCardItem.split(":::");			
+						itemCardItem_split = itemCardItem.split(":::");	
+						
+						for (var key in window.onlineDataScopeDic) {
+							if (itemCardItem_split[2] == window.onlineDataScopeDic[key]) {
+								selfAddDataScopeOptions.scopePlaceholderText.innerHTML = key;
+							}
+						}
+						
 						
 						//set the active note for ScopeOptions
 				        array.forEach(selfAddDataScopeOptions.btnGroup.children, function(node) {
