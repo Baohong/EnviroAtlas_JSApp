@@ -544,11 +544,10 @@ define(['dojo/_base/declare',
                 sessionLoaded = session;
                 this.loadSession(session);
                 console.log('SaveSession :: onLoadSessionClicked :: session  = ', session);
-                //window.saveSessionLoaded = true;
                 
                 ii = 0;
                 function AddDataLoop () {           //  create a loop function
-                   setTimeout(function () {    //  call a 3s setTimeout when the loop is called
+                   setTimeout(function () {    
 						itemCardItem = session.onlineDataItems[ii];
 						itemCardItem_split = itemCardItem.split(":::");	
 						
@@ -556,44 +555,30 @@ define(['dojo/_base/declare',
 							if (itemCardItem_split[2] == window.onlineDataScopeDic[key]) {
 								selfAddDataScopeOptions.scopePlaceholderText.innerHTML = key;
 							}
-						}
-						
-						
-						//set the active note for ScopeOptions
+						}						
+						//set the active node for ScopeOptions in AddData widget
 				        array.forEach(selfAddDataScopeOptions.btnGroup.children, function(node) {
-				        	
-				        	
-		    				//node = selfAddDataScopeOptions.btnGroup.children[i];
 		    				if (node.getAttribute("data-option-name") == itemCardItem_split[2]) {
 		    					domClass.add(node, "active");
 		    				} else {
 		    					domClass.remove(node, "active");
-		    				}								        
-				           
-				           
-				        });		
-				        
-				        		
-				        selfAddDataScopeOptions.hideDropdown();		
+		    				}				           
+				        });				        		
+				        selfAddDataScopeOptions.hideDropdown();								
+						// end of setting active node for ScopeOptions
 						
-						// end of ScopeOptions
+						//input the search box in AddData widget
+						selfSearchInAddData.searchTextBox.value = itemCardItem_split[1];				
 						
-						
-						selfSearchInAddData.searchTextBox.value = itemCardItem_split[1];						
+								
 						setTimeout(function () {
 							selfSearchInAddData.searchButton.click();
-		                	//selfAddDataScopeOptions.optionClicked();
 		                	selfAddDataScopeOptions.search(); 
 	                	}, 80)
                         ii++;                                            //  increment the counter
                         if (ii < session.onlineDataItems.length) {            
                             AddDataLoop();             //  ..  again which will trigger another 
                         }  
-                        else { 
-			   				/*setTimeout(function () {  	
-								window.saveSessionLoaded = false;
-			   				 }, 150)*/
-                        }
                                            //  ..  setTimeout()
                    }, 1000)
                 }
@@ -605,9 +590,7 @@ define(['dojo/_base/declare',
                 if (layerListWidget) {
                     layerListWidget._onRemoveLayersClick();
                 }
-
                     //document.getElementById("butRemoveAllLayers").click();
-
                     
             },
 

@@ -99,47 +99,9 @@ define(["dojo/_base/declare",
       },
 
       optionClicked: function(evt) {
-      	if (window.saveSessionLoaded == true ){
-      		
-	        array.forEach(this.btnGroup.children, function(node) {
-	          domClass.remove(node, "active");
-	        });
-
-			i = 0;
-                function myLoop () {           //  create a loop function
-                   setTimeout(function () {    //  call a 3s setTimeout when the loop is called
-			   					node = selfAddDataScopeOptions.btnGroup.children[i];
-				        		domClass.add(node, "active");
-						        selfAddDataScopeOptions.hideDropdown();
-						        //selfSearchInAddData.searchTextBox.value = "USA Current Wildfires";
-						        //selfSearchInAddData.searchButton.click();
-				        		selfAddDataScopeOptions.search(); 
-				        		domClass.remove(node, "active");
-                        i++; 
-                                           //  increment the counter
-                        if (i < selfAddDataScopeOptions.btnGroup.children.length) {            //  if the counter < 10, call the loop function
-                            myLoop();             //  ..  again which will trigger another 
-                        }  
-                        /*else { 
-			   				setTimeout(function () {  	
-			   				 }, 200)
-                        }*/
-                                           //  ..  setTimeout()
-                   }, 100)
-                }
-                
-                myLoop();               
-       
-
-	        //this.scopePlaceholderText.innerHTML = evt.target.innerHTML;     	
-	        
- 	
-      	} else {
-	        this.toggleClassName(evt);
-	        this.hideDropdown();
-	        this.search();      		
-      	}
-
+        this.toggleClassName(evt);
+        this.hideDropdown();
+        this.search();
       },
 
       scopePlaceholderClicked: function(evt) {
